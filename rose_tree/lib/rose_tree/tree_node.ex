@@ -3,10 +3,10 @@ defmodule RoseTree.TreeNode do
   A Rose Tree Node
   """
 
-  defstruct ~w(data children)a
+  defstruct ~w(term children)a
 
   @type t() :: %__MODULE__{
-    data: term() | nil,
+    term: term(),
     children: [t() | nil]
   }
 
@@ -14,7 +14,7 @@ defmodule RoseTree.TreeNode do
   defguard tree_node?(value) when is_struct(value) and value.__struct__ == __MODULE__
 
   @spec empty?(t()) :: boolean()
-  defguard empty?(value) when tree_node?(value) and value.data == nil and value.children == []
+  defguard empty?(value) when tree_node?(value) and value.term == nil and value.children == []
 
   @doc """
   Initializes an empty tree.
@@ -22,55 +22,55 @@ defmodule RoseTree.TreeNode do
   ## Examples
 
       iex> RoseTree.TreeNode.empty()
-      %RoseTree.TreeNode{data: nil, children: []}
+      %RoseTree.TreeNode{term: nil, children: []}
 
   """
   @spec empty() :: t()
-  def empty(), do: %__MODULE__{data: nil, children: []}
+  def empty(), do: %__MODULE__{term: nil, children: []}
 
   @doc """
-  Initializes a new tree with the given data.
+  Initializes a new tree with the given term.
 
   ## Examples
 
-      iex> RoseTree.TreeNode.new("new data")
-      %RoseTree.TreeNode{data: "new data", children: []}
+      iex> RoseTree.TreeNode.new("new term")
+      %RoseTree.TreeNode{term: "new term", children: []}
 
       iex> RoseTree.TreeNode.new(5, [4, 3, 2, 1])
       %RoseTree.TreeNode{
-        data: 5,
+        term: 5,
         children: [
-          %RoseTree.TreeNode{data: 4, children: []},
-          %RoseTree.TreeNode{data: 3, children: []},
-          %RoseTree.TreeNode{data: 2, children: []},
-          %RoseTree.TreeNode{data: 1, children: []}
+          %RoseTree.TreeNode{term: 4, children: []},
+          %RoseTree.TreeNode{term: 3, children: []},
+          %RoseTree.TreeNode{term: 2, children: []},
+          %RoseTree.TreeNode{term: 1, children: []}
         ]
       }
 
       iex> children = [
-      ...>   %RoseTree.TreeNode{data: 4, children: []},
+      ...>   %RoseTree.TreeNode{term: 4, children: []},
       ...>   3,
-      ...>   %RoseTree.TreeNode{data: 2, children: []},
-      ...>   %RoseTree.TreeNode{data: 1, children: []}
+      ...>   %RoseTree.TreeNode{term: 2, children: []},
+      ...>   %RoseTree.TreeNode{term: 1, children: []}
       ...> ]
       ...> RoseTree.TreeNode.new(5, children)
       %RoseTree.TreeNode{
-        data: 5,
+        term: 5,
         children: [
-          %RoseTree.TreeNode{data: 4, children: []},
-          %RoseTree.TreeNode{data: 3, children: []},
-          %RoseTree.TreeNode{data: 2, children: []},
-          %RoseTree.TreeNode{data: 1, children: []}
+          %RoseTree.TreeNode{term: 4, children: []},
+          %RoseTree.TreeNode{term: 3, children: []},
+          %RoseTree.TreeNode{term: 2, children: []},
+          %RoseTree.TreeNode{term: 1, children: []}
         ]
       }
 
   """
   @spec new(term(), [t() | term()]) :: t()
-  def new(data, children \\ [])
+  def new(term, children \\ [])
 
-  def new(data, []), do: %__MODULE__{data: data, children: []}
+  def new(term, []), do: %__MODULE__{term: term, children: []}
 
-  def new(data, children) when is_list(children) do
+  def new(term, children) when is_list(children) do
     new_children =
       children
       |> Enum.map(fn
@@ -82,42 +82,42 @@ defmodule RoseTree.TreeNode do
         end)
 
     %__MODULE__{
-      data: data,
+      term: term,
       children: new_children
     }
   end
 
   @doc """
-  Sets the tree data to the given data.
+  Sets the tree term to the given term.
 
   ## Examples
 
     iex> tree = RoseTree.TreeNode.new(5)
-    ...> RoseTree.TreeNode.set_data(tree, "five")
-    %RoseTree.TreeNode{data: "five", children: []}
+    ...> RoseTree.TreeNode.set_term(tree, "five")
+    %RoseTree.TreeNode{term: "five", children: []}
 
   """
-  @spec set_data(t(), term()) :: t()
-  def set_data(%__MODULE__{} = tree, data) do
-    %{tree | data: data}
+  @spec set_term(t(), term()) :: t()
+  def set_term(%__MODULE__{} = tree, term) do
+    %{tree | term: term}
   end
 
   @doc """
-  Applies the given function to the tree data.
+  Applies the given function to the tree term.
 
   ## Examples
 
       iex> tree = RoseTree.TreeNode.new(5)
-      ...> RoseTree.TreeNode.map_data(tree, fn x -> x * 2 end)
-      %RoseTree.TreeNode{data: 10, children: []}
+      ...> RoseTree.TreeNode.map_term(tree, fn x -> x * 2 end)
+      %RoseTree.TreeNode{term: 10, children: []}
 
   """
-  @spec map_data(t(), (term() -> term())) :: t()
-  def map_data(%__MODULE__{data: data} = tree, map_fn)
+  @spec map_term(t(), (term() -> term())) :: t()
+  def map_term(%__MODULE__{term: term} = tree, map_fn)
       when is_function(map_fn) do
-    new_data = map_fn.(data)
+    new_term = map_fn.(term)
 
-    %{tree | data: new_data}
+    %{tree | term: new_term}
   end
 
   @doc """
@@ -128,12 +128,12 @@ defmodule RoseTree.TreeNode do
       iex> tree = RoseTree.TreeNode.new(5)
       ...> RoseTree.TreeNode.set_children(tree, [4, 3, 2, 1])
       %RoseTree.TreeNode{
-        data: 5,
+        term: 5,
         children: [
-          %RoseTree.TreeNode{data: 4, children: []},
-          %RoseTree.TreeNode{data: 3, children: []},
-          %RoseTree.TreeNode{data: 2, children: []},
-          %RoseTree.TreeNode{data: 1, children: []}
+          %RoseTree.TreeNode{term: 4, children: []},
+          %RoseTree.TreeNode{term: 3, children: []},
+          %RoseTree.TreeNode{term: 2, children: []},
+          %RoseTree.TreeNode{term: 1, children: []}
         ]
       }
 
@@ -153,15 +153,15 @@ defmodule RoseTree.TreeNode do
 
       iex> tree = RoseTree.TreeNode.new(5, [4, 3, 2, 1])
       ...> RoseTree.TreeNode.map_children(tree, fn child ->
-      ...>   RoseTree.TreeNode.map_data(child, fn x -> x * 2 end)
+      ...>   RoseTree.TreeNode.map_term(child, fn x -> x * 2 end)
       ...> end)
       %RoseTree.TreeNode{
-        data: 5,
+        term: 5,
         children: [
-          %RoseTree.TreeNode{data: 8, children: []},
-          %RoseTree.TreeNode{data: 6, children: []},
-          %RoseTree.TreeNode{data: 4, children: []},
-          %RoseTree.TreeNode{data: 2, children: []}
+          %RoseTree.TreeNode{term: 8, children: []},
+          %RoseTree.TreeNode{term: 6, children: []},
+          %RoseTree.TreeNode{term: 4, children: []},
+          %RoseTree.TreeNode{term: 2, children: []}
         ]
       }
 
@@ -188,13 +188,13 @@ defmodule RoseTree.TreeNode do
       iex> tree = RoseTree.TreeNode.new(5, [4, 3, 2, 1])
       ...> RoseTree.TreeNode.prepend_child(tree, 0)
       %RoseTree.TreeNode{
-        data: 5,
+        term: 5,
         children: [
-          %RoseTree.TreeNode{data: 0, children: []},
-          %RoseTree.TreeNode{data: 4, children: []},
-          %RoseTree.TreeNode{data: 3, children: []},
-          %RoseTree.TreeNode{data: 2, children: []},
-          %RoseTree.TreeNode{data: 1, children: []}
+          %RoseTree.TreeNode{term: 0, children: []},
+          %RoseTree.TreeNode{term: 4, children: []},
+          %RoseTree.TreeNode{term: 3, children: []},
+          %RoseTree.TreeNode{term: 2, children: []},
+          %RoseTree.TreeNode{term: 1, children: []}
         ]
       }
 
@@ -217,13 +217,13 @@ defmodule RoseTree.TreeNode do
       iex> tree = RoseTree.TreeNode.new(5, [4, 3, 2, 1])
       ...> RoseTree.TreeNode.append_child(tree, 0)
       %RoseTree.TreeNode{
-        data: 5,
+        term: 5,
         children: [
-          %RoseTree.TreeNode{data: 4, children: []},
-          %RoseTree.TreeNode{data: 3, children: []},
-          %RoseTree.TreeNode{data: 2, children: []},
-          %RoseTree.TreeNode{data: 1, children: []},
-          %RoseTree.TreeNode{data: 0, children: []}
+          %RoseTree.TreeNode{term: 4, children: []},
+          %RoseTree.TreeNode{term: 3, children: []},
+          %RoseTree.TreeNode{term: 2, children: []},
+          %RoseTree.TreeNode{term: 1, children: []},
+          %RoseTree.TreeNode{term: 0, children: []}
         ]
       }
   """
@@ -251,10 +251,10 @@ defmodule RoseTree.TreeNode do
   defimpl Enumerable do
     alias RoseTree.TreeNode
 
-    def count(%TreeNode{data: nil, children: []}), do: {:ok, 0}
+    def count(%TreeNode{term: nil, children: []}), do: {:ok, 0}
     def count(_tree), do: {:error, __MODULE__}
 
-    def member?(%TreeNode{data: nil, children: []}, _value), do: {:ok, false}
+    def member?(%TreeNode{term: nil, children: []}, _value), do: {:ok, false}
     def member?(_tree, _value), do: {:error, __MODULE__}
 
     def slice(%TreeNode{} = _tree), do: {:error, __MODULE__}
@@ -281,7 +281,7 @@ defmodule RoseTree.TreeNode do
            [%TreeNode{children: []} = h | t],
            remaining_tree_sets
          ),
-         do: do_reduce(fun.(h.data, acc), fun, t, remaining_tree_sets)
+         do: do_reduce(fun.(h.term, acc), fun, t, remaining_tree_sets)
 
     defp do_reduce(
            {:cont, acc},
@@ -289,6 +289,6 @@ defmodule RoseTree.TreeNode do
            [%TreeNode{children: children} = h | t],
            remaining_tree_sets
          ),
-         do: do_reduce(fun.(h.data, acc), fun, children, t ++ remaining_tree_sets)
+         do: do_reduce(fun.(h.term, acc), fun, children, t ++ remaining_tree_sets)
   end
 end
