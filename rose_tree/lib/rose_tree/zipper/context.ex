@@ -225,8 +225,25 @@ defmodule RoseTree.Zipper.Context do
       4
 
   """
-  @spec depth_of_focus(t()) :: integer()
+  @spec depth_of_focus(t()) :: non_neg_integer()
   def depth_of_focus(%__MODULE__{path: path}),
     do: Enum.count(path)
+
+  @doc """
+  Returns the index (zero-based) of the current focus with respect to
+  any potential siblings it may have.
+
+  ## Examples
+
+      iex> prev = for n <- [4,3,2,1], do: RoseTree.TreeNode.new(n)
+      ...> node = RoseTree.TreeNode.new(5, [])
+      ...> ctx = RoseTree.Zipper.Context.new(node, prev: prev)
+      ...> RoseTree.Zipper.Context.index_of_focus(ctx)
+      4
+
+  """
+  @spec index_of_focus(t()) :: non_neg_integer()
+  def index_of_focus(%__MODULE__{prev: prev}),
+    do: Enum.count(prev)
 
 end
