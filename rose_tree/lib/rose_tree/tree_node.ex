@@ -173,7 +173,7 @@ defmodule RoseTree.TreeNode do
       children
       |> Enum.map(fn child -> map_fn.(child) end)
 
-    if check_children(new_children) do
+    if all_tree_nodes?(new_children) do
       %{tree | children: new_children}
     else
       raise("`map_fn` must return a valid `RoseTree.TreeNode` struct")
@@ -226,6 +226,7 @@ defmodule RoseTree.TreeNode do
           %RoseTree.TreeNode{term: 0, children: []}
         ]
       }
+
   """
   @spec append_child(t(), t() | term()) :: t()
   def append_child(%__MODULE__{children: children} = tree, child)
@@ -237,14 +238,21 @@ defmodule RoseTree.TreeNode do
     %{tree | children: children ++ [new(child)]}
   end
 
-  @doc false
-  @spec check_children([term()]) :: boolean()
-  defp check_children(children) when is_list(children) do
-    children
-    |> Enum.all?(fn child -> tree_node?(child) end)
-  end
+  @doc """
+  Returns whether a list of values are all TreeNodes or not. Will return
+  true if passed an empty list.
 
-  defp check_children(_), do: false
+  ## Examples
+
+      iex> trees = for t <- [5,4,3,2,1], do: RoseTree.TreeNode.new(t)
+      ...> RoseTree.TreeNode.all_tree_nodes?(trees)
+      true
+
+  """
+  @spec all_tree_nodes?([term()]) :: boolean()
+  def all_tree_nodes?(values) when is_list(values) do
+    Enum.all?(values, &tree_node?(&1))
+  end
 
   ## Implement Enumerable Protocol
 
