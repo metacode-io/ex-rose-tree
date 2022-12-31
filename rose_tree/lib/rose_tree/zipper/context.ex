@@ -176,15 +176,15 @@ defmodule RoseTree.Zipper.Context do
 
   ## Examples
 
-      iex> prev = for t <- [4,3,2,1], do: RoseTree.TreeNode.new(t)
+      iex> prev = for t <- [1,2,3,4], do: RoseTree.TreeNode.new(t)
       ...> node = RoseTree.TreeNode.new(5)
       ...> ctx = RoseTree.Zipper.Context.new(node, prev: prev)
       ...> RoseTree.Zipper.Context.siblings_before_focus(ctx)
       [
-        %RoseTree.TreeNode{term: 1, children: []},
-        %RoseTree.TreeNode{term: 2, children: []},
+        %RoseTree.TreeNode{term: 4, children: []},
         %RoseTree.TreeNode{term: 3, children: []},
-        %RoseTree.TreeNode{term: 4, children: []}
+        %RoseTree.TreeNode{term: 2, children: []},
+        %RoseTree.TreeNode{term: 1, children: []}
       ]
 
   """
@@ -245,5 +245,22 @@ defmodule RoseTree.Zipper.Context do
   @spec index_of_focus(t()) :: non_neg_integer()
   def index_of_focus(%__MODULE__{prev: prev}),
     do: Enum.count(prev)
+
+  @doc """
+  Returns the term in the current context's parent location.
+
+  ## Examples
+      iex> loc_nodes = for n <- [4,3,2,1], do: RoseTree.TreeNode.new(n)
+      ...> locs = for n <- loc_nodes, do: RoseTree.Zipper.Location.new(n)
+      ...> node = RoseTree.TreeNode.new(5, [])
+      ...> ctx = RoseTree.Zipper.Context.new(node, path: locs)
+      ...> RoseTree.Zipper.Context.parent_term(ctx)
+      4
+
+  """
+  @spec parent_term(t()) :: TreeNode.t() | nil
+  def parent_term(%__MODULE__{path: []}), do: nil
+
+  def parent_term(%__MODULE__{path: [parent | _]}), do: parent.term
 
 end
