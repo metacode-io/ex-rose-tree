@@ -213,5 +213,20 @@ defmodule RoseTree.Zipper.Context do
   def siblings_after_focus(%__MODULE__{next: next}),
     do: next
 
+  @doc """
+  Returns the depth (as zero-based index) of the current focus.
+
+  ## Examples
+      iex> loc_nodes = for n <- [4,3,2,1], do: RoseTree.TreeNode.new(n)
+      ...> locs = for n <- loc_nodes, do: RoseTree.Zipper.Location.new(n)
+      ...> node = RoseTree.TreeNode.new(5, [])
+      ...> ctx = RoseTree.Zipper.Context.new(node, path: locs)
+      ...> RoseTree.Zipper.Context.depth_of_focus(ctx)
+      4
+
+  """
+  @spec depth_of_focus(t()) :: integer()
+  def depth_of_focus(%__MODULE__{path: path}),
+    do: Enum.count(path)
 
 end
