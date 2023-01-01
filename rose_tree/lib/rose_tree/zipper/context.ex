@@ -69,7 +69,7 @@ defmodule RoseTree.Zipper.Context do
       }
 
       iex> prev = for n <- [4,3,2,1], do: RoseTree.TreeNode.new(n)
-      ...> node = RoseTree.TreeNode.new(5, [])
+      ...> node = RoseTree.TreeNode.new(5)
       ...> RoseTree.Zipper.Context.new(node, prev: prev)
       %RoseTree.Zipper.Context{
         focus: %RoseTree.TreeNode{term: 5, children: []},
@@ -85,7 +85,7 @@ defmodule RoseTree.Zipper.Context do
 
       iex> loc_nodes = for n <- [4,3,2,1], do: RoseTree.TreeNode.new(n)
       ...> locs = for n <- loc_nodes, do: RoseTree.Zipper.Location.new(n)
-      ...> node = RoseTree.TreeNode.new(5, [])
+      ...> node = RoseTree.TreeNode.new(5)
       ...> RoseTree.Zipper.Context.new(node, path: locs)
       %RoseTree.Zipper.Context{
         focus: %RoseTree.TreeNode{term: 5, children: []},
@@ -179,7 +179,7 @@ defmodule RoseTree.Zipper.Context do
       iex> prev = for t <- [1,2,3,4], do: RoseTree.TreeNode.new(t)
       ...> node = RoseTree.TreeNode.new(5)
       ...> ctx = RoseTree.Zipper.Context.new(node, prev: prev)
-      ...> RoseTree.Zipper.Context.siblings_before_focus(ctx)
+      ...> RoseTree.Zipper.Context.prev_siblings(ctx)
       [
         %RoseTree.TreeNode{term: 4, children: []},
         %RoseTree.TreeNode{term: 3, children: []},
@@ -188,8 +188,8 @@ defmodule RoseTree.Zipper.Context do
       ]
 
   """
-  @spec siblings_before_focus(t()) :: [TreeNode.t()]
-  def siblings_before_focus(%__MODULE__{prev: prev}),
+  @spec prev_siblings(t()) :: [TreeNode.t()]
+  def prev_siblings(%__MODULE__{prev: prev}),
     do: Enum.reverse(prev)
 
   @doc """
@@ -200,7 +200,7 @@ defmodule RoseTree.Zipper.Context do
       iex> next = for t <- [6,7,8,9], do: RoseTree.TreeNode.new(t)
       ...> node = RoseTree.TreeNode.new(5)
       ...> ctx = RoseTree.Zipper.Context.new(node, next: next)
-      ...> RoseTree.Zipper.Context.siblings_after_focus(ctx)
+      ...> RoseTree.Zipper.Context.next_siblings(ctx)
       [
         %RoseTree.TreeNode{term: 6, children: []},
         %RoseTree.TreeNode{term: 7, children: []},
@@ -209,8 +209,8 @@ defmodule RoseTree.Zipper.Context do
       ]
 
   """
-  @spec siblings_after_focus(t()) :: [TreeNode.t()]
-  def siblings_after_focus(%__MODULE__{next: next}),
+  @spec next_siblings(t()) :: [TreeNode.t()]
+  def next_siblings(%__MODULE__{next: next}),
     do: next
 
   @doc """
@@ -219,7 +219,7 @@ defmodule RoseTree.Zipper.Context do
   ## Examples
       iex> loc_nodes = for n <- [4,3,2,1], do: RoseTree.TreeNode.new(n)
       ...> locs = for n <- loc_nodes, do: RoseTree.Zipper.Location.new(n)
-      ...> node = RoseTree.TreeNode.new(5, [])
+      ...> node = RoseTree.TreeNode.new(5)
       ...> ctx = RoseTree.Zipper.Context.new(node, path: locs)
       ...> RoseTree.Zipper.Context.depth_of_focus(ctx)
       4
@@ -236,7 +236,7 @@ defmodule RoseTree.Zipper.Context do
   ## Examples
 
       iex> prev = for n <- [4,3,2,1], do: RoseTree.TreeNode.new(n)
-      ...> node = RoseTree.TreeNode.new(5, [])
+      ...> node = RoseTree.TreeNode.new(5)
       ...> ctx = RoseTree.Zipper.Context.new(node, prev: prev)
       ...> RoseTree.Zipper.Context.index_of_focus(ctx)
       4
@@ -252,7 +252,7 @@ defmodule RoseTree.Zipper.Context do
   ## Examples
       iex> loc_nodes = for n <- [4,3,2,1], do: RoseTree.TreeNode.new(n)
       ...> locs = for n <- loc_nodes, do: RoseTree.Zipper.Location.new(n)
-      ...> node = RoseTree.TreeNode.new(5, [])
+      ...> node = RoseTree.TreeNode.new(5)
       ...> ctx = RoseTree.Zipper.Context.new(node, path: locs)
       ...> RoseTree.Zipper.Context.parent_term(ctx)
       4
@@ -262,5 +262,192 @@ defmodule RoseTree.Zipper.Context do
   def parent_term(%__MODULE__{path: []}), do: nil
 
   def parent_term(%__MODULE__{path: [parent | _]}), do: parent.term
+
+  @doc """
+  Sets the current focus of the context to the given tree node.
+
+  ## Examples
+
+      iex> node = RoseTree.TreeNode.new(5)
+      ...> ctx = RoseTree.Zipper.Context.empty()
+      ...> RoseTree.Zipper.Context.set_focus(ctx, node)
+      %RoseTree.Zipper.Context{
+        focus: %RoseTree.TreeNode{term: 5, children: []},
+        prev: [],
+        next: [],
+        path: []
+      }
+
+  """
+  @spec set_focus(t(), TreeNode.t()) :: t()
+  def set_focus(ctx, new_focus)
+
+  def set_focus(%__MODULE__{} = ctx, new_focus) when TreeNode.tree_node?(new_focus),
+    do: %{ctx | focus: new_focus}
+
+
+  @doc """
+  Applies the given function to the current focus.
+
+  ## Examples
+
+      iex> node = RoseTree.TreeNode.new(5)
+      ...> ctx = RoseTree.Zipper.Context.new(node)
+      ...> map_fn = &RoseTree.TreeNode.map_term(&1, fn term -> term * 2 end)
+      ...> RoseTree.Zipper.Context.map_focus(ctx, &map_fn.(&1))
+      %RoseTree.Zipper.Context{
+        focus: %RoseTree.TreeNode{term: 10, children: []},
+        prev: [],
+        next: [],
+        path: []
+      }
+
+  """
+  @spec map_focus(t(), (TreeNode.t() -> TreeNode.t())) :: t()
+  def map_focus(%__MODULE__{focus: focus} = ctx, map_fn) when is_function(map_fn) do
+    case map_fn.(focus) do
+      new_focus when TreeNode.tree_node?(new_focus) ->
+        set_focus(ctx, new_focus)
+
+      err ->
+        raise BadFunctionError, "map_fn must return a valid RoseTree.TreeNode struct"
+    end
+  end
+
+  @doc """
+  Applies the given function to all previous siblings of the current focus without
+  moving the context.
+
+  ## Examples
+
+      iex> prev = for n <- [4,3,2,1], do: RoseTree.TreeNode.new(n)
+      ...> node = RoseTree.TreeNode.new(5)
+      ...> ctx = RoseTree.Zipper.Context.new(node, prev: prev)
+      ...> map_fn = &RoseTree.TreeNode.map_term(&1, fn term -> term * 2 end)
+      ...> RoseTree.Zipper.Context.map_prev_siblings(ctx, &map_fn.(&1))
+      %RoseTree.Zipper.Context{
+        focus: %RoseTree.TreeNode{term: 5, children: []},
+        prev: [
+          %RoseTree.TreeNode{term: 8, children: []},
+          %RoseTree.TreeNode{term: 6, children: []},
+          %RoseTree.TreeNode{term: 4, children: []},
+          %RoseTree.TreeNode{term: 2, children: []}
+        ],
+        next: [],
+        path: []
+      }
+
+  """
+  @spec map_prev_siblings(t(), (TreeNode.t() -> TreeNode.t())) :: t()
+  def map_prev_siblings(%__MODULE__{prev: prev} = ctx, map_fn) when is_function(map_fn) do
+    new_siblings =
+      prev
+      |> Enum.map(fn sibling -> map_fn.(sibling) end)
+
+    if TreeNode.all_tree_nodes?(new_siblings) do
+      %{ctx | prev: new_siblings}
+    else
+      raise BadFunctionError, "map_fn must return a valid RoseTree.TreeNode struct"
+    end
+  end
+
+  @doc """
+  Applies the given function to all next siblings of the current focus without
+  moving the context.
+
+  ## Examples
+
+      iex> next = for n <- [6,7,8,9], do: RoseTree.TreeNode.new(n)
+      ...> node = RoseTree.TreeNode.new(5)
+      ...> ctx = RoseTree.Zipper.Context.new(node, next: next)
+      ...> map_fn = &RoseTree.TreeNode.map_term(&1, fn term -> term * 2 end)
+      ...> RoseTree.Zipper.Context.map_next_siblings(ctx, &map_fn.(&1))
+      %RoseTree.Zipper.Context{
+        focus: %RoseTree.TreeNode{term: 5, children: []},
+        prev: [],
+        next: [
+          %RoseTree.TreeNode{term: 12, children: []},
+          %RoseTree.TreeNode{term: 14, children: []},
+          %RoseTree.TreeNode{term: 16, children: []},
+          %RoseTree.TreeNode{term: 18, children: []}
+        ],
+        path: []
+      }
+
+  """
+  @spec map_next_siblings(t(), (TreeNode.t() -> TreeNode.t())) :: t()
+  def map_next_siblings(%__MODULE__{next: next} = ctx, map_fn) when is_function(map_fn) do
+    new_siblings =
+      next
+      |> Enum.map(fn sibling -> map_fn.(sibling) end)
+
+    if TreeNode.all_tree_nodes?(new_siblings) do
+      %{ctx | next: new_siblings}
+    else
+      raise BadFunctionError, "map_fn must return a valid RoseTree.TreeNode struct"
+    end
+  end
+
+  @doc """
+  Applies the given function to path of locations from the current focus back to the root
+  without moving the context.
+
+  ## Examples
+
+      iex> path = for n <- [4,3,2,1], do: RoseTree.Zipper.Location.new(n)
+      ...> node = RoseTree.TreeNode.new(5)
+      ...> ctx = RoseTree.Zipper.Context.new(node, path: path)
+      ...> map_fn = &RoseTree.Zipper.Location.map_term(&1, fn term -> term * 2 end)
+      ...> RoseTree.Zipper.Context.map_path(ctx, &map_fn.(&1))
+      %RoseTree.Zipper.Context{
+        focus: %RoseTree.TreeNode{term: 5, children: []},
+        prev: [],
+        next: [],
+        path: [
+          %RoseTree.Zipper.Location{prev: [], term: 8, next: []},
+          %RoseTree.Zipper.Location{prev: [], term: 6, next: []},
+          %RoseTree.Zipper.Location{prev: [], term: 4, next: []},
+          %RoseTree.Zipper.Location{prev: [], term: 2, next: []}]
+      }
+
+  """
+  @spec map_path(t(), (Location.t() -> Location.t())) :: t()
+  def map_path(%__MODULE__{path: path} = ctx, map_fn) when is_function(map_fn) do
+    new_locations =
+      path
+      |> Enum.map(fn location -> map_fn.(location) end)
+
+    if Location.all_locations?(new_locations) do
+      %{ctx | path: new_locations}
+    else
+      raise BadFunctionError, "map_fn must return a valid RoseTree.Zipper.Location struct"
+    end
+  end
+
+  @doc """
+  Builds a new location out of the current context.
+
+  ## Examples
+
+      iex> next = for n <- [6,7,8,9], do: RoseTree.TreeNode.new(n)
+      ...> node = RoseTree.TreeNode.new(5)
+      ...> ctx = RoseTree.Zipper.Context.new(node, next: next)
+      ...> RoseTree.Zipper.Context.new_location(ctx)
+      %RoseTree.Zipper.Location{
+        prev: [],
+        term: 5,
+        next: [
+          %RoseTree.TreeNode{term: 6, children: []},
+          %RoseTree.TreeNode{term: 7, children: []},
+          %RoseTree.TreeNode{term: 8, children: []},
+          %RoseTree.TreeNode{term: 9, children: []}
+        ]
+      }
+
+  """
+  @spec new_location(t()) :: Location.t()
+  def new_location(%__MODULE__{focus: focus, prev: prev, next: next}) do
+    Location.new(focus, prev: prev, next: next)
+  end
 
 end

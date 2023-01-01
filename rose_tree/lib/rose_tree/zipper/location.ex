@@ -46,9 +46,13 @@ defmodule RoseTree.Zipper.Location do
 
       iex> tree = RoseTree.TreeNode.new(4)
       ...> RoseTree.Zipper.Location.new(5, prev: [tree], next: [])
-      %RoseTree.Zipper.Location{prev: [
-        %RoseTree.TreeNode{term: 4, children: []}
-      ], term: 5, next: []}
+      %RoseTree.Zipper.Location{
+        prev: [
+          %RoseTree.TreeNode{term: 4, children: []}
+        ],
+        term: 5,
+        next: []
+      }
 
   """
   @spec new(TreeNode.t() | term(), keyword()) :: t() | nil
