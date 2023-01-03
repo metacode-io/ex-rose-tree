@@ -16,6 +16,9 @@ defmodule RoseTree.TreeNode do
   @spec empty?(t()) :: boolean()
   defguard empty?(value) when tree_node?(value) and value.term == nil and value.children == []
 
+  @spec leaf?(t()) :: boolean()
+  defguard leaf?(value) when tree_node?(value) and value.children == []
+
   @doc """
   Initializes an empty tree.
 
@@ -88,12 +91,26 @@ defmodule RoseTree.TreeNode do
   end
 
   @doc """
+  Returns the inner term of a tree node.
+
+  ## Examples
+
+    iex> node = RoseTree.TreeNode.new(5)
+    ...> RoseTree.TreeNode.get_term(node)
+    5
+
+  """
+
+  @spec get_term(t()) :: term()
+  def get_term(node) when tree_node?(node), do: node.term
+
+  @doc """
   Sets the tree term to the given term.
 
   ## Examples
 
-    iex> tree = RoseTree.TreeNode.new(5)
-    ...> RoseTree.TreeNode.set_term(tree, "five")
+    iex> node = RoseTree.TreeNode.new(5)
+    ...> RoseTree.TreeNode.set_term(node, "five")
     %RoseTree.TreeNode{term: "five", children: []}
 
   """
@@ -107,8 +124,8 @@ defmodule RoseTree.TreeNode do
 
   ## Examples
 
-      iex> tree = RoseTree.TreeNode.new(5)
-      ...> RoseTree.TreeNode.map_term(tree, fn x -> x * 2 end)
+      iex> node = RoseTree.TreeNode.new(5)
+      ...> RoseTree.TreeNode.map_term(node, fn x -> x * 2 end)
       %RoseTree.TreeNode{term: 10, children: []}
 
   """
@@ -121,12 +138,30 @@ defmodule RoseTree.TreeNode do
   end
 
   @doc """
+  Returns the children of a tree node.
+
+  ## Examples
+
+    iex> node = RoseTree.TreeNode.new(5, [4,3,2,1])
+    ...> RoseTree.TreeNode.get_children(node)
+    [
+      %RoseTree.TreeNode{term: 4, children: []},
+      %RoseTree.TreeNode{term: 3, children: []},
+      %RoseTree.TreeNode{term: 2, children: []},
+      %RoseTree.TreeNode{term: 1, children: []}
+    ]
+
+  """
+  @spec get_children(t()) :: [t()]
+  def get_children(node) when tree_node?(node), do: node.children
+
+  @doc """
   Sets the tree children to the given list of children.
 
   ## Examples
 
-      iex> tree = RoseTree.TreeNode.new(5)
-      ...> RoseTree.TreeNode.set_children(tree, [4, 3, 2, 1])
+      iex> node = RoseTree.TreeNode.new(5)
+      ...> RoseTree.TreeNode.set_children(node, [4, 3, 2, 1])
       %RoseTree.TreeNode{
         term: 5,
         children: [
@@ -151,8 +186,8 @@ defmodule RoseTree.TreeNode do
 
   ## Examples
 
-      iex> tree = RoseTree.TreeNode.new(5, [4, 3, 2, 1])
-      ...> RoseTree.TreeNode.map_children(tree, fn child ->
+      iex> node = RoseTree.TreeNode.new(5, [4, 3, 2, 1])
+      ...> RoseTree.TreeNode.map_children(node, fn child ->
       ...>   RoseTree.TreeNode.map_term(child, fn x -> x * 2 end)
       ...> end)
       %RoseTree.TreeNode{
@@ -185,8 +220,8 @@ defmodule RoseTree.TreeNode do
 
   ## Examples
 
-      iex> tree = RoseTree.TreeNode.new(5, [4, 3, 2, 1])
-      ...> RoseTree.TreeNode.prepend_child(tree, 0)
+      iex> node = RoseTree.TreeNode.new(5, [4, 3, 2, 1])
+      ...> RoseTree.TreeNode.prepend_child(node, 0)
       %RoseTree.TreeNode{
         term: 5,
         children: [
@@ -214,8 +249,8 @@ defmodule RoseTree.TreeNode do
 
   ## Examples
 
-      iex> tree = RoseTree.TreeNode.new(5, [4, 3, 2, 1])
-      ...> RoseTree.TreeNode.append_child(tree, 0)
+      iex> node = RoseTree.TreeNode.new(5, [4, 3, 2, 1])
+      ...> RoseTree.TreeNode.append_child(node, 0)
       %RoseTree.TreeNode{
         term: 5,
         children: [
@@ -244,8 +279,8 @@ defmodule RoseTree.TreeNode do
 
   ## Examples
 
-      iex> trees = for t <- [5,4,3,2,1], do: RoseTree.TreeNode.new(t)
-      ...> RoseTree.TreeNode.all_tree_nodes?(trees)
+      iex> nodes = for t <- [5,4,3,2,1], do: RoseTree.TreeNode.new(t)
+      ...> RoseTree.TreeNode.all_tree_nodes?(nodes)
       true
 
   """
@@ -271,16 +306,16 @@ defmodule RoseTree.TreeNode do
       do_reduce(acc, fun, [tree], [])
     end
 
-    defp do_reduce({:halt, acc}, _fun, _trees, _remaining_tree_sets),
+    defp do_reduce({:halt, acc}, _fun, _nodes, _remaining_tree_sets),
       do: {:halted, acc}
 
-    defp do_reduce({:suspend, acc}, fun, trees, remaining_tree_sets),
-      do: {:suspended, acc, &do_reduce(&1, fun, trees, remaining_tree_sets)}
+    defp do_reduce({:suspend, acc}, fun, nodes, remaining_tree_sets),
+      do: {:suspended, acc, &do_reduce(&1, fun, nodes, remaining_tree_sets)}
 
-    defp do_reduce({:cont, acc}, _fun, [] = _trees, [] = _remaining_tree_sets),
+    defp do_reduce({:cont, acc}, _fun, [] = _nodes, [] = _remaining_tree_sets),
       do: {:done, acc}
 
-    defp do_reduce({:cont, acc}, fun, [] = _trees, [h | t] = _remaining_tree_sets),
+    defp do_reduce({:cont, acc}, fun, [] = _nodes, [h | t] = _remaining_tree_sets),
       do: do_reduce({:cont, acc}, fun, [h], t)
 
     defp do_reduce(
