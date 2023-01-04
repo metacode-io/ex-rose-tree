@@ -6,9 +6,9 @@ defmodule RoseTree.TreeNode do
   defstruct ~w(term children)a
 
   @type t() :: %__MODULE__{
-    term: term(),
-    children: [t() | nil]
-  }
+          term: term(),
+          children: [t() | nil]
+        }
 
   @spec tree_node?(t()) :: boolean()
   defguard tree_node?(value) when is_struct(value) and value.__struct__ == __MODULE__
@@ -77,12 +77,12 @@ defmodule RoseTree.TreeNode do
     new_children =
       children
       |> Enum.map(fn
-          child when tree_node?(child) ->
-            child
+        child when tree_node?(child) ->
+          child
 
-          child ->
-            new(child)
-        end)
+        child ->
+          new(child)
+      end)
 
     %__MODULE__{
       term: term,

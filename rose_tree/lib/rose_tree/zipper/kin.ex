@@ -42,8 +42,7 @@ defmodule RoseTree.Zipper.Kin do
   def parent(%Context{path: []}), do: nil
 
   def parent(%Context{path: [parent | g_parents]} = ctx) do
-    consolidated_ctx =
-      Enum.reverse(ctx.prev) ++ [ctx.focus | ctx.next]
+    consolidated_ctx = Enum.reverse(ctx.prev) ++ [ctx.focus | ctx.next]
 
     focused_parent =
       parent.term
@@ -77,7 +76,7 @@ defmodule RoseTree.Zipper.Kin do
   @spec first_child(Context.t()) :: Context.t() | nil
   def first_child(%Context{focus: focus})
       when TreeNode.empty?(focus) or TreeNode.leaf?(focus),
-    do: nil
+      do: nil
 
   def first_child(%Context{} = ctx) do
     [child | children] = Context.focused_children(ctx)
@@ -115,7 +114,7 @@ defmodule RoseTree.Zipper.Kin do
   @spec last_child(Context.t()) :: Context.t() | nil
   def last_child(%Context{focus: focus})
       when TreeNode.empty?(focus) or TreeNode.leaf?(focus),
-    do: nil
+      do: nil
 
   def last_child(%Context{} = ctx) do
     [child | children] =
@@ -155,7 +154,7 @@ defmodule RoseTree.Zipper.Kin do
   @spec child_at(Context.t(), integer()) :: Context.t() | nil
   def child_at(%Context{focus: focus})
       when TreeNode.empty?(focus) or TreeNode.leaf?(focus),
-    do: nil
+      do: nil
 
   def child_at(%Context{} = ctx, index) when is_integer(index) do
     children = Context.focused_children(ctx)
@@ -412,5 +411,4 @@ defmodule RoseTree.Zipper.Kin do
         }
     end
   end
-
 end

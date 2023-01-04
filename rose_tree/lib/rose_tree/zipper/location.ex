@@ -20,17 +20,17 @@ defmodule RoseTree.Zipper.Location do
       occur after the `term.
   """
   @type t :: %__MODULE__{
-    prev: [TreeNode.t()],
-    term: term(),
-    next: [TreeNode.t()]
-  }
+          prev: [TreeNode.t()],
+          term: term(),
+          next: [TreeNode.t()]
+        }
 
   @spec location?(t()) :: boolean()
   defguard location?(value)
-      when is_struct(value) and
-              value.__struct__ == __MODULE__ and
-              is_list(value.prev) and
-              is_list(value.next)
+           when is_struct(value) and
+                  value.__struct__ == __MODULE__ and
+                  is_list(value.prev) and
+                  is_list(value.next)
 
   @doc """
   Builds a new `Location` given a `term()` or a `TreeNode` as the first
@@ -72,8 +72,7 @@ defmodule RoseTree.Zipper.Location do
   @doc false
   @spec do_new(TreeNode.t() | term(), [TreeNode.t()], [TreeNode.t()]) :: t() | nil
   defp do_new(item, prev, next) when is_list(prev) and is_list(next) do
-    case {TreeNode.all_tree_nodes?(prev),
-          TreeNode.all_tree_nodes?(next)} do
+    case {TreeNode.all_tree_nodes?(prev), TreeNode.all_tree_nodes?(next)} do
       {true, true} ->
         %__MODULE__{
           prev: prev,
@@ -134,5 +133,4 @@ defmodule RoseTree.Zipper.Location do
   @spec index_of_term(t()) :: non_neg_integer()
   def index_of_term(%__MODULE__{prev: prev}),
     do: Enum.count(prev)
-
 end

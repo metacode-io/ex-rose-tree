@@ -13,11 +13,11 @@ defmodule RoseTree.Zipper.Context do
   defstruct ~w(focus prev next path)a
 
   @type t :: %__MODULE__{
-    focus: TreeNode.t(),
-    prev: [TreeNode.t()],
-    next: [TreeNode.t()],
-    path: [Location.t()]
-  }
+          focus: TreeNode.t(),
+          prev: [TreeNode.t()],
+          next: [TreeNode.t()],
+          path: [Location.t()]
+        }
 
   @spec context?(term()) :: boolean()
   defguard context?(value) when is_struct(value) and value.__struct__ == __MODULE__
@@ -29,6 +29,10 @@ defmodule RoseTree.Zipper.Context do
                   value.prev == [] and
                   value.next == [] and
                   value.path == []
+
+  @spec at_root?(term()) :: boolean()
+  defguard at_root?(value)
+           when context?(value) and value.path == []
 
   @doc """
   Returns an empty Context.
@@ -114,12 +118,11 @@ defmodule RoseTree.Zipper.Context do
   @doc false
   @spec do_new(TreeNode.t(), [TreeNode.t()], [TreeNode.t()], [Location.t()]) :: t()
   defp do_new(focus, prev, next, path)
-      when TreeNode.tree_node?(focus) and
-            is_list(prev) and
-            is_list(next) and
-            is_list(path) do
-    case {TreeNode.all_tree_nodes?(prev),
-          TreeNode.all_tree_nodes?(next),
+       when TreeNode.tree_node?(focus) and
+              is_list(prev) and
+              is_list(next) and
+              is_list(path) do
+    case {TreeNode.all_tree_nodes?(prev), TreeNode.all_tree_nodes?(next),
           Location.all_locations?(path)} do
       {true, true, true} ->
         %__MODULE__{
@@ -322,7 +325,6 @@ defmodule RoseTree.Zipper.Context do
   def set_focus(%__MODULE__{} = ctx, new_focus) when TreeNode.tree_node?(new_focus),
     do: %{ctx | focus: new_focus}
 
-
   @doc """
   Applies the given function to the current focus.
 
@@ -486,5 +488,4 @@ defmodule RoseTree.Zipper.Context do
   def new_location(%__MODULE__{focus: focus, prev: prev, next: next}) do
     Location.new(focus, prev: prev, next: next)
   end
-
 end

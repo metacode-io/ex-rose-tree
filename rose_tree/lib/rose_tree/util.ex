@@ -61,7 +61,7 @@ defmodule RoseTree.Util do
 
   def first_of_with_opts(term, [h | t] = _funs, opts)
       when is_function(h) and
-           is_list(opts) do
+             is_list(opts) do
     case h.(term, opts) do
       {:ok, result} -> result
       _ -> first_of_with_opts(term, t, opts)
@@ -92,7 +92,7 @@ defmodule RoseTree.Util do
 
   def first_of_with_args(term, [h | t] = _funs, args)
       when is_function(h) and
-           is_list(args) do
+             is_list(args) do
     case apply(h, [term | args]) do
       {:ok, result} -> result
       _ -> first_of_with_args(term, t, args)
@@ -115,8 +115,8 @@ defmodule RoseTree.Util do
 
   def split_at(elements, index)
       when is_list(elements) and
-           is_integer(index) and
-           index >= 0 do
+             is_integer(index) and
+             index >= 0 do
     {_current_idx, prev, next} =
       elements
       |> Enum.reduce(
@@ -135,5 +135,6 @@ defmodule RoseTree.Util do
 
   def split_at(elements, index)
       when is_list(elements) and
-           is_integer(index), do: {[], []}
+             is_integer(index),
+      do: {[], []}
 end
