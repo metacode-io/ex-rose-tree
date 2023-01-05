@@ -7,7 +7,6 @@ defmodule RoseTree.Zipper.Traversal do
   require RoseTree.TreeNode
   require RoseTree.Zipper.Context
   import RoseTree.Zipper.Kin
-  import RoseTree.Util, only: [first_of: 2]
   alias URI.Error
   alias RoseTree.TreeNode
   alias RoseTree.Zipper.Context

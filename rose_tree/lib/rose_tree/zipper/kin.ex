@@ -11,8 +11,12 @@ defmodule RoseTree.Zipper.Kin do
   alias RoseTree.{TreeNode, Util}
   alias RoseTree.Zipper.Context
 
+  ###
+  ### DIRECT ANCESTORS (PARENTS, GRANDPARENTS, ETC)
+  ###
+
   @doc """
-  Moves the Context to the parent Location. If at the root, thus no
+  Moves the focus to the parent Location. If at the root, thus no
   parent, returns nil.
 
   ## Examples
@@ -51,6 +55,40 @@ defmodule RoseTree.Zipper.Kin do
     %{ctx | prev: parent.prev, next: parent.next, path: g_parents}
     |> Context.set_focus(focused_parent)
   end
+
+  @doc """
+  Moves the focus to the grandparent -- the parent of the parent -- of
+  the focus, if possible. If there is no grandparent, returns nil.
+  """
+  @spec grandparent(Context.t()) :: Context.t() | nil
+  def grandparent(%Context{} = ctx) do
+    with %Context{} = parent <- parent(ctx),
+         %Context{} = grandparent <- parent(parent) do
+      grandparent
+    else
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the great-grandparent -- parent of the grand-parent -- of
+  the focus, if available. If there is no great-grandparent, returns nil.
+  """
+  @spec great_grandparent(Context.t()) :: Context.t() | nil
+  def great_grandparent(%Context{} = ctx) do
+    with %Context{} = grandparent <- grandparent(ctx),
+         %Context{} = great_grandparent <- parent(grandparent) do
+      great_grandparent
+    else
+      nil ->
+        nil
+    end
+  end
+
+  ###
+  ### DESCENDANTS (CHILDREN, GRAND-CHILDREN, ETC.)
+  ###
 
   @doc """
   Moves focus to the first child. If there are no children, and this is
@@ -151,7 +189,7 @@ defmodule RoseTree.Zipper.Kin do
       }
 
   """
-  @spec child_at(Context.t(), integer()) :: Context.t() | nil
+  @spec child_at(Context.t(), non_neg_integer()) :: Context.t() | nil
   def child_at(%Context{focus: focus})
       when TreeNode.empty?(focus) or TreeNode.leaf?(focus),
       do: nil
@@ -180,6 +218,118 @@ defmodule RoseTree.Zipper.Kin do
         }
     end
   end
+
+  @doc """
+  Moves the focus to the first grandchild -- the first child of the
+  first child -- of the focus. If there are no grandchildren, returns nil.
+  """
+  @spec first_grandchild(Context.t()) :: Context.t() | nil
+  def first_grandchild(%Context{} = ctx) do
+    with %Context{} = first_child <- first_child(ctx),
+         %Context{} = next_first_child <- first_child(first_child) do
+      next_first_child
+    else
+      nil -> nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the last grandchild -- the last child of the
+  last child -- of the focus. If there are no grandchildren, returns nil.
+  """
+  @spec last_grandchild(Context.t()) :: Context.t() | nil
+  def last_grandchild(%Context{} = ctx) do
+    with %Context{} = first_child <- first_child(ctx),
+         %Context{} = next_first_child <- first_child(first_child) do
+      next_first_child
+    else
+      nil -> nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the first grandchild repeated `reps` number of times.
+  If any rep fails, returns `nil`.
+  """
+  @spec first_grandchild_at_rep(Context.t(), pos_integer()) :: Context.t() | nil
+  def first_grandchild_at_rep(_ctx, reps)
+      when is_integer(reps) and reps <= 0, do: nil
+
+  def first_grandchild_at_rep(%Context{} = ctx, 1),
+    do: first_grandchild(ctx)
+
+  def first_grandchild_at_rep(%Context{} = ctx, reps)
+      when is_integer(reps) do
+    1..reps
+    |> Enum.reduce_while(ctx, fn _i, context ->
+      case first_grandchild(context) do
+        nil ->
+          {:halt, nil}
+
+        %Context{} = grandchild ->
+          {:cont, grandchild}
+      end
+    end)
+  end
+
+  @doc """
+  Moves the focus to the last grandchild repeated `reps` number of times.
+  If any rep fails, returns `nil`.
+  """
+  @spec last_grandchild_at_rep(Context.t(), pos_integer()) :: Context.t() | nil
+  def last_grandchild_at_rep(_ctx, reps)
+      when is_integer(reps) and reps <= 0, do: nil
+
+  def last_grandchild_at_rep(%Context{} = ctx, 1),
+    do: last_grandchild(ctx)
+
+  def last_grandchild_at_rep(%Context{} = ctx, reps)
+      when is_integer(reps) do
+    1..reps
+    |> Enum.reduce_while(ctx, fn _i, context ->
+      case last_grandchild(context) do
+        nil ->
+          {:halt, nil}
+
+        %Context{} = grandchild ->
+          {:cont, grandchild}
+      end
+    end)
+  end
+
+  @doc """
+  Moves the focus to the first great-grandchild -- the first child of the
+  first grandchild -- of the focus. If there are no great-grandchildren,
+  returns nil.
+  """
+  @spec first_great_grandchild(Context.t()) :: Context.t() | nil
+  def first_great_grandchild(%Context{} = ctx) do
+    with %Context{} = first_grandchild <- first_grandchild(ctx),
+         %Context{} = first_child <- first_child(first_grandchild) do
+      first_child
+    else
+      nil -> nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the last great-grandchild -- the last child of the
+  last grandchild -- of the focus. If there are no great-grandchildren,
+  returns nil.
+  """
+  @spec last_great_grandchild(Context.t()) :: Context.t() | nil
+  def last_great_grandchild(%Context{} = ctx) do
+    with %Context{} = last_grandchild <- last_grandchild(ctx),
+         %Context{} = last_child <- last_child(last_grandchild) do
+      last_child
+    else
+      nil -> nil
+    end
+  end
+
+  ###
+  ### SIBLINGS
+  ###
 
   @doc """
   Moves focus to the first sibling from the current focus. If there are
@@ -384,7 +534,7 @@ defmodule RoseTree.Zipper.Kin do
       }
 
   """
-  @spec sibling_at(Context.t(), integer()) :: Context.t() | nil
+  @spec sibling_at(Context.t(), non_neg_integer()) :: Context.t() | nil
   def sibling_at(%Context{prev: [], next: []} = ctx, index), do: nil
 
   def sibling_at(%Context{} = ctx, index) when is_integer(index) do
@@ -411,4 +561,134 @@ defmodule RoseTree.Zipper.Kin do
         }
     end
   end
+
+  ###
+  ### NIBLINGS (NIECES + NEPHEWS)
+  ###
+
+  @doc """
+  Moves the focus to the first nibling -- the first child of the
+  first sibling -- before the current focus. If not found, returns
+  nil.
+  """
+  @spec first_nibling(Context.t()) :: Context.t() | nil
+  def first_nibling(%Context{} = ctx) do
+    with %Context{} = first_sibling <- first_sibling(ctx),
+         %Context{} = first_child <- first_child(first_sibling) do
+      first_child
+    else
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the last nibling -- the last child of the
+  last sibling -- before the current focus. If not found, returns
+  nil.
+  """
+  @spec last_nibling(Context.t()) :: Context.t() | nil
+  def last_nibling(%Context{} = ctx) do
+    with %Context{} = last_sibling <- last_sibling(ctx),
+         %Context{} = last_child <- last_child(last_sibling) do
+      last_child
+    else
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the previous nibling -- the last child of the
+  previous sibling -- before the current focus. If not found, returns
+  nil.
+  """
+  @spec previous_nibling(Context.t()) :: Context.t() | nil
+  def previous_nibling(%Context{} = ctx) do
+    with %Context{} = previous_sibling <- previous_sibling(ctx),
+         %Context{} = last_child <- last_child(previous_sibling) do
+      last_child
+    else
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the next nibling -- the first child of the
+  next sibling -- before the current focus. If not found, returns
+  nil.
+  """
+  @spec next_nibling(Context.t()) :: Context.t() | nil
+  def next_nibling(%Context{} = ctx) do
+    with %Context{} = next_sibling <- next_sibling(ctx),
+         %Context{} = first_child <- first_child(next_sibling) do
+      first_child
+    else
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the first nibling for a specific sibling -- the
+  first child of the sibling at the given index -- of the current focus.
+  If not found, returns nil.
+  """
+  @spec first_nibling_at_sibling(Context.t(), non_neg_integer()) :: Context.t() | nil
+  def first_nibling_at_sibling(%Context{} = ctx, index) when is_integer(index) do
+    with %Context{} = sibling_at <- sibling_at(ctx, index),
+         %Context{} = first_child <- first_child(sibling_at) do
+      first_child
+    else
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the last nibling for a specific sibling -- the
+  last child of the sibling at the given index -- of the current focus.
+  If not found, returns nil.
+  """
+  @spec last_nibling_at_sibling(Context.t(), non_neg_integer()) :: Context.t() | nil
+  def last_nibling_at_sibling(%Context{} = ctx, index) when is_integer(index) do
+    with %Context{} = sibling_at <- sibling_at(ctx, index),
+         %Context{} = last_child <- last_child(sibling_at) do
+      last_child
+    else
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the previous grand-nibling -- the last grandchild of
+  the previous sibling -- of the current focus. If not found, returns nil.
+  """
+  @spec previous_grandnibling(Context.t()) :: Context.t() | nil
+  def previous_grandnibling(%Context{} = ctx) do
+    with %Context{} = prev_sibling <- previous_sibling(ctx),
+         %Context{} = last_gchild <- last_grandchild(prev_sibling) do
+      last_gchild
+    else
+      nil -> nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the next grand-nibling -- the first grandchild of
+  the next sibling -- of the current focus. If not found, returns nil.
+  """
+  @spec next_grandnibling(Context.t()) :: Context.t() | nil
+  def next_grandnibling(%Context{} = ctx) do
+    with %Context{} = next_sibling <- next_sibling(ctx),
+         %Context{} = first_grandchild <- first_grandchild(next_sibling) do
+      first_grandchild
+    else
+      nil -> nil
+    end
+  end
+
+
 end
