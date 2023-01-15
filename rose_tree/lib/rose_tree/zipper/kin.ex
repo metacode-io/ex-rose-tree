@@ -360,8 +360,6 @@ defmodule RoseTree.Zipper.Kin do
 
   """
   @spec first_sibling(Context.t()) :: Context.t() | nil
-  def first_sibling(%Context{prev: [], next: []}), do: nil
-
   def first_sibling(%Context{prev: []}), do: nil
 
   def first_sibling(%Context{} = ctx) do
@@ -374,6 +372,38 @@ defmodule RoseTree.Zipper.Kin do
       path: ctx.path
     }
   end
+
+  @doc """
+  Moves the focus to the first sibling with children from the current focus.
+  If not found, returns nil.
+  """
+  @spec first_sibling_with_children(Context.t()) :: Context.t() | nil
+  def first_sibling_with_children(%Context{prev: []}), do: nil
+
+  def first_sibling_with_children(%Context{} = ctx) do
+    prev_siblings = ctx.prev |> Enum.reverse()
+
+    case do_first_sibling_with_children({[], prev_siblings}) do
+      {new_prev, [new_focus | new_next]} ->
+        %Context{
+          focus: new_focus,
+          prev: new_prev,
+          next: new_next,
+          path: ctx.path
+        }
+
+      _ -> nil
+    end
+  end
+
+  defp do_first_sibling_with_children({_, []}), do: nil
+
+  defp do_first_sibling_with_children({prev, [next | rest]})
+      when not TreeNode.leaf?(next), do: {prev, [next | rest]}
+
+  defp do_first_sibling_with_children({prev, [next | rest]}),
+      do: do_first_sibling_with_children({[next | prev], rest})
+
 
   @doc """
   Moves focus to the previous sibling to the current focus. If there are
@@ -417,6 +447,19 @@ defmodule RoseTree.Zipper.Kin do
       path: ctx.path
     }
   end
+
+  @doc """
+  Moves the focus to the previous sibling with children of the current focus.
+  If not found, returns nil.
+  """
+  @spec previous_sibling_with_children(Context.t()) :: Context.t() | nil
+  def previous_sibling_with_children(%Context{prev: []}), do: nil
+
+  def previous_sibling_with_children(%Context{prev: [prev | rest]} = ctx)
+      when not TreeNode.leaf?(prev), do: previous_sibling(ctx)
+
+  def previous_sibling_with_children(%Context{} = ctx),
+      do: ctx |> previous_sibling() |> previous_sibling_with_children()
 
   @doc """
   Moves focus to the last sibling from the current focus. If there are
@@ -463,6 +506,35 @@ defmodule RoseTree.Zipper.Kin do
   end
 
   @doc """
+  Moves the focus to the last sibling with children from the current focus.
+  If not found, returns nil.
+  """
+  @spec last_sibling_with_children(Context.t()) :: Context.t() | nil
+  def last_sibling_with_children(%Context{next: []}), do: nil
+
+  def last_sibling_with_children(%Context{} = ctx) do
+    case do_last_sibling_with_children({[ctx.focus | ctx.prev], ctx.next}) do
+      {new_prev, [new_focus | new_next]} ->
+        %Context{
+          focus: new_focus,
+          prev: new_prev,
+          next: new_next,
+          path: ctx.path
+        }
+
+      _ -> nil
+    end
+  end
+
+  defp do_last_sibling_with_children({_, []}), do: nil
+
+  defp do_last_sibling_with_children({prev, [next | rest]})
+      when not TreeNode.leaf?(next), do: {prev, [next | rest]}
+
+  defp do_last_sibling_with_children({prev, [next | rest]}),
+      do: do_last_sibling_with_children({[next | prev], rest})
+
+  @doc """
   Moves focus to the next sibling of the current focus. If there are
   no more siblings after the current focus, returns nil.
 
@@ -492,8 +564,6 @@ defmodule RoseTree.Zipper.Kin do
 
   """
   @spec next_sibling(Context.t()) :: Context.t() | nil
-  def next_sibling(%Context{prev: [], next: []}), do: nil
-
   def next_sibling(%Context{next: []}), do: nil
 
   def next_sibling(%Context{next: [next | rest]} = ctx) do
@@ -504,6 +574,19 @@ defmodule RoseTree.Zipper.Kin do
       path: ctx.path
     }
   end
+
+  @doc """
+  Moves the focus to the next sibling with children of the current focus.
+  If not found, returns nil.
+  """
+  @spec next_sibling_with_children(Context.t()) :: Context.t() | nil
+  def next_sibling_with_children(%Context{next: []}), do: nil
+
+  def next_sibling_with_children(%Context{next: [next | rest]} = ctx)
+      when not TreeNode.leaf?(next), do: next_sibling(ctx)
+
+  def next_sibling_with_children(%Context{} = ctx),
+      do: ctx |> next_sibling() |> next_sibling_with_children()
 
   @doc """
   Moves focus to the sibling of the current focus at the given index.
@@ -690,5 +773,150 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
+  def first_extended_nibling(), do: raise Error, "not implemented"
+  def last_extended_nibling(), do: raise Error, "not implemented"
+  def previous_extended_nibling(), do: raise Error, "not implemented"
+  def next_extended_nibling(), do: raise Error, "not implemented"
+
+
+  ###
+  ### PIBLINGS (UNCLES + AUNTS)
+  ###
+
+  @doc """
+  Moves the focus to the first pibling -- the first sibling of the parent --
+  of the current focus. If not found, returns nil.
+  """
+  @spec first_pibling(Context.t()) :: Context.t() | nil
+  def first_pibling(%Context{} = ctx) do
+    with %Context{} = parent <- parent(ctx),
+         %Context{} = first_sibling <- first_sibling(parent) do
+      first_sibling
+    else
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the last pibling -- the last sibling of the parent --
+  of the current focus. If not found, returns nil.
+  """
+  @spec last_pibling(Context.t()) :: Context.t() | nil
+  def last_pibling(%Context{} = ctx) do
+    with %Context{} = parent <- parent(ctx),
+         %Context{} = last_sibling <- last_sibling(parent) do
+      last_sibling
+    else
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the previous pibling -- the previous sibling of the parent --
+  of the current focus. If not found, returns nil.
+  """
+  @spec previous_pibling(Context.t()) :: Context.t() | nil
+  def previous_pibling(%Context{} = ctx) do
+    with %Context{} = parent <- parent(ctx),
+         %Context{} = previous_sibling <- previous_sibling(parent) do
+      previous_sibling
+    else
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the next pibling -- the next sibling of the parent --
+  of the current focus. If not found, returns nil.
+  """
+  @spec next_pibling(Context.t()) :: Context.t() | nil
+  def next_pibling(%Context{} = ctx) do
+    with %Context{} = parent <- parent(ctx),
+         %Context{} = next_sibling <- next_sibling(parent) do
+      next_sibling
+    else
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the pibling of the current focus at the given index.
+  If no pibling is found at that index, returns nil.
+  """
+  @spec pibling_at(Context.t(), non_neg_integer()) :: Context.t() | nil
+  def pibling_at(%Context{} = ctx, index) when is_integer(index) do
+    with %Context{} = parent <- parent(ctx),
+         %Context{} = sibling_at <- sibling_at(parent, index) do
+      sibling_at
+    else
+      nil ->
+        nil
+    end
+  end
+
+  def first_extended_pibling(), do: raise Error, "not implemented"
+
+  def last_extended_pibling(), do: raise Error, "not implemented"
+
+  def previous_extended_pibling(), do: raise Error, "not implemented"
+
+  def next_extended_pibling(), do: raise Error, "not implemented"
+
+  def previous_ancestral_pibling(), do: raise Error, "not implemented"
+
+  def next_ancestral_pibling(), do: raise Error, "not implemented"
+
+  ###
+  ### FIRST COUSINS
+  ###
+
+  @doc """
+  Moves the focus to the first first-cousin -- the first child of the first
+  pibling -- of the current focus. If not found, returns nil.
+  """
+  @spec first_first_cousin(Context.t()) :: Context.t() | nil
+  def first_first_cousin(%Context{} = ctx) do
+    with %Context{} = first_pibling <- first_pibling(ctx),
+         %Context{} = first_child <- first_child(first_pibling) do
+      first_child
+    else
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the last first-cousin -- the last child of the last
+  pibling -- of the current focus. If not found, returns nil.
+  """
+  @spec last_first_cousin(Context.t()) :: Context.t() | nil
+  def last_first_cousin(%Context{} = ctx) do
+    with %Context{} = last_pibling <- last_pibling(ctx),
+         %Context{} = last_child <- last_child(last_pibling) do
+      last_child
+    else
+      nil ->
+        nil
+    end
+  end
+
+  # @doc """
+  # Moves the focus to the previous first-cousin -- the last child of the previous
+  # pibling -- of the current focus. If not found, returns nil.
+  # """
+  # @spec last_first_cousin(Context.t()) :: Context.t() | nil
+  # def last_first_cousin(%Context{} = ctx) do
+  #   with %Context{} = last_pibling <- last_pibling(ctx),
+  #        %Context{} = last_child <- last_child(last_ext) do
+  #     last_child
+  #   else
+  #     nil ->
+  #       nil
+  #   end
+  # end
 
 end
