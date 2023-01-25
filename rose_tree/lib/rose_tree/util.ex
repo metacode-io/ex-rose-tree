@@ -100,6 +100,21 @@ defmodule RoseTree.Util do
   end
 
   @doc """
+  A function that always returns true, regardless of what is passed to it.
+
+  ## Examples
+
+      iex> RoseTree.Util.always(5)
+      true
+
+      iex> RoseTree.Util.always(false)
+      true
+
+  """
+  @spec always(term()) :: true
+  def always(_term), do: true
+
+  @doc """
   Similar to `Enum.split/2` but is optimized to return the
   list of elements that come before the index in reverse order.
   This is ideal for the context-aware nature of Zippers.
@@ -137,4 +152,57 @@ defmodule RoseTree.Util do
       when is_list(elements) and
              is_integer(index),
       do: {[], []}
+
+  @doc """
+  Similar to `Enum.split/2`, `Enum.split_while/2`, and `Enum.split_with/2`, `split_when/2`
+  instead takes a list of elements and a predicate to apply to each element. The first
+  element that passes the predicate is where the list of elements will be split, with
+  the target element as the head of the second list in the return value. Like
+  with `split_at/2`, the first list of elements are returned in reverse order.
+
+  ## Examples
+
+      iex> RoseTree.Util.split_when([1,2,3,4,5], fn x -> x == 3 end)
+      {[1, 2], [3, 4, 5]}
+
+  """
+  @spec split_when(list(), predicate :: (term() -> boolean())) :: {[term()], [term()]}
+  def split_when([], predicate) when is_function(predicate), do: {[], []}
+
+  def split_when(elements, predicate)
+      when is_list(elements) and is_function(predicate) do
+    do_split_when([], elements, predicate)
+  end
+
+  def do_split_when(_acc, [] = remaining, predicate), do: {[], []}
+
+  def do_split_when(acc, [head | tail] = remaining, predicate) do
+    if predicate.(head) do
+      {acc, remaining}
+    else
+      do_split_when([head|acc], tail, predicate)
+    end
+  end
+
+  # def splitr_when([], predicate) when is_function(predicate), do: {[], []}
+
+  # def splitr_when(elements, predicate)
+  #     when is_list(elements) and is_function(predicate) do
+  #   do_splitr_when([], elements, predicate)
+  # end
+
+  # # def do_splitr_when(acc, remaining, _predicate),
+  # #   do: {remaining, acc}
+
+  # def do_splitr_when(acc, [] = remaining, predicate), do: {acc, []}
+  #   # do: do_split_when({:halt, []}, remaining, predicate)
+
+  # def do_splitr_when(acc, [head | tail] = remaining, predicate) do
+  #   if predicate.(head) do
+  #     {acc, remaining}
+  #   else
+  #     {acc, do_splitr_when([head | acc], tail, predicate)}
+  #   end
+  # end
+
 end

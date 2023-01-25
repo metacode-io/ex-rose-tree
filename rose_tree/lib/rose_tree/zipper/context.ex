@@ -1,6 +1,7 @@
 defmodule RoseTree.Zipper.Context do
   @moduledoc """
-  Data structure representing a Zipper's positional context.
+  Data structure representing a Zipper's positional context within
+  the RoseTree.
   """
 
   require RoseTree.TreeNode
