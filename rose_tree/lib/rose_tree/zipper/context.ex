@@ -37,7 +37,7 @@ defmodule RoseTree.Zipper.Context do
 
   @spec has_children?(term()) :: boolean()
   defguard has_children?(value)
-           when context?(value) and not TreeNode.empty?(value.focus)
+           when context?(value) and not TreeNode.leaf?(value.focus)
 
   @doc """
   Returns an empty Context.
