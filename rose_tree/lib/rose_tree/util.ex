@@ -163,7 +163,7 @@ defmodule RoseTree.Util do
   ## Examples
 
       iex> RoseTree.Util.split_when([1,2,3,4,5], fn x -> x == 3 end)
-      {[1, 2], [3, 4, 5]}
+      {[2, 1], [3, 4, 5]}
 
   """
   @spec split_when(list(), predicate :: (term() -> boolean())) :: {[term()], [term()]}
@@ -184,25 +184,19 @@ defmodule RoseTree.Util do
     end
   end
 
-  # def splitr_when([], predicate) when is_function(predicate), do: {[], []}
+  @doc """
+  A combination of `Enum.split/2` and `Enum.take_random/2`, `split_random/2` takes
+  a random selection of elements from the list up to the given number, and returns
+  two lists: the first is the randomly selected elements, and the latter is the
+  remainder from the original list. An important note is that the remainder list
+  does not preserve the original order of the list.
+  """
+  @spec split_random(list(), take :: non_neg_integer()) :: {[taken :: term()], [remainder :: term()]}
+  def split_random([], _), do: {[], []}
 
-  # def splitr_when(elements, predicate)
-  #     when is_list(elements) and is_function(predicate) do
-  #   do_splitr_when([], elements, predicate)
-  # end
-
-  # # def do_splitr_when(acc, remaining, _predicate),
-  # #   do: {remaining, acc}
-
-  # def do_splitr_when(acc, [] = remaining, predicate), do: {acc, []}
-  #   # do: do_split_when({:halt, []}, remaining, predicate)
-
-  # def do_splitr_when(acc, [head | tail] = remaining, predicate) do
-  #   if predicate.(head) do
-  #     {acc, remaining}
-  #   else
-  #     {acc, do_splitr_when([head | acc], tail, predicate)}
-  #   end
-  # end
-
+  def split_random(list, take) when is_list(list) and is_integer(take) and take >= 0 do
+    list
+    |> Enum.shuffle()
+    |> Enum.split(take)
+  end
 end
