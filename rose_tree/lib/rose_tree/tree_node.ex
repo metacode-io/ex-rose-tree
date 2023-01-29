@@ -19,6 +19,9 @@ defmodule RoseTree.TreeNode do
   @spec leaf?(t()) :: boolean()
   defguard leaf?(value) when tree_node?(value) and value.children == []
 
+  @spec parent?(t()) :: boolean()
+  defguard parent?(value) when tree_node?(value) and is_list(value.children) and value.children != []
+
   @doc """
   Initializes an empty tree.
 
@@ -271,6 +274,81 @@ defmodule RoseTree.TreeNode do
 
   def append_child(%__MODULE__{children: children} = tree, child) do
     %{tree | children: children ++ [new(child)]}
+  end
+
+  @typep unfold_acc() :: %{
+    current: term(),
+    todo: [term()],
+    done: [t()]
+  }
+
+  @typedoc """
+  A function that takes a seed value and returns a new node and a
+  list of new seeds to use for children. Care must be taken that you
+  don't create an function that inifinitely creates new seeds, in
+  other words, the function should have a terminating base case.
+  """
+  @type unfold_fn() :: (seed :: term() -> {term(), [seed :: term()]})
+
+  @doc """
+  Given a seed value and an `unfold_fn`, generates a new rose tree.
+
+  ## Examples
+
+      iex> unfolder = fn
+      ...>   x when x > 0 -> {Integer.to_string(x), Enum.to_list(0..x-1)}
+      ...>   x -> {Integer.to_string(x), []}
+      ...> end
+      ...> TreeNode.unfold(3, unfolder)
+      %RoseTree.TreeNode{
+        term: "3",
+        children: [
+          %RoseTree.TreeNode{term: "0", children: []},
+          %RoseTree.TreeNode{
+            term: "1",
+            children: [%RoseTree.TreeNode{term: "0", children: []}]
+          },
+          %RoseTree.TreeNode{
+            term: "2",
+            children: [
+              %RoseTree.TreeNode{term: "0", children: []},
+              %RoseTree.TreeNode{
+                term: "1",
+                children: [%RoseTree.TreeNode{term: "0", children: []}]
+              }
+            ]
+          }
+        ]
+      }
+
+  """
+  @spec unfold(seed :: term(), unfold_fn()) :: t()
+  def unfold(seed, unfold_fn) when is_function(unfold_fn) do
+    {current, next} = unfold_fn.(seed)
+    %{current: current, todo: next, done: []}
+    |> do_unfold(_stack = [], unfold_fn)
+  end
+
+  @spec do_unfold(unfold_acc(), [term()], unfold_fn()) :: t()
+  defp do_unfold(%{todo: []} = acc, [] = _stack, unfold_fn) when is_function(unfold_fn),
+    do: new(acc.current, Enum.reverse(acc.done))
+
+  defp do_unfold(%{todo: []} = acc, [top | rest] = _stack, unfold_fn) when is_function(unfold_fn) do
+    node = new(acc.current, Enum.reverse(acc.done))
+    %{top | done: [node | top.done]}
+    |> do_unfold(rest, unfold_fn)
+  end
+
+  defp do_unfold(%{todo: [next | rest]} = acc, stack, unfold_fn) when is_list(stack) and is_function(unfold_fn) do
+    case unfold_fn.(next) do
+      {current, []} ->
+        %{acc | todo: rest, done: [new(current) | acc.done]}
+        |> do_unfold(stack, unfold_fn)
+
+      {current, todo} ->
+        %{ current: current, todo: todo, done: []}
+        |> do_unfold([%{acc | todo: rest} | stack], unfold_fn)
+    end
   end
 
   @doc """
