@@ -118,40 +118,40 @@ defmodule RoseTree.TreeNodeTest do
   describe "new/2 when using only the first parameter" do
     test "should return a new leaf TreeNode for any valid erlang term besides nil" do
       for {value, idx} <- @node_values do
-        new_tree = TreeNode.new(value)
+        tree = TreeNode.new(value)
 
-        assert TreeNode.leaf?(new_tree)
-        assert %TreeNode{term: ^value, children: []} = new_tree
+        assert TreeNode.leaf?(tree)
+        assert %TreeNode{term: ^value, children: []} = tree
       end
     end
 
     test "should return a new empty TreeNode when nil is passed" do
-      new_tree = TreeNode.new(nil)
+      tree = TreeNode.new(nil)
 
-      assert TreeNode.empty?(new_tree)
-      assert %TreeNode{term: nil, children: []} = new_tree
+      assert TreeNode.empty?(tree)
+      assert %TreeNode{term: nil, children: []} = tree
     end
   end
 
   describe "new/2 when using both parameters" do
     test "should return a new leaf TreeNode when the second arg is an empty list" do
-      new_tree = TreeNode.new(5, [])
+      tree = TreeNode.new(5, [])
 
-      assert TreeNode.leaf?(new_tree)
-      assert %TreeNode{term: 5, children: []} = new_tree
+      assert TreeNode.leaf?(tree)
+      assert %TreeNode{term: 5, children: []} = tree
     end
 
     test "should return a new empty TreeNode when the first arg is nil and the second arg is an empty list" do
-      new_tree = TreeNode.new(nil, [])
+      tree = TreeNode.new(nil, [])
 
-      assert TreeNode.empty?(new_tree)
-      assert %TreeNode{term: nil, children: []} = new_tree
+      assert TreeNode.empty?(tree)
+      assert %TreeNode{term: nil, children: []} = tree
     end
 
     test "should return a new parent TreeNode when the second arg is a populated list of values" do
-      new_tree = TreeNode.new(5, [4,3,2,1])
+      tree = TreeNode.new(5, [4,3,2,1])
 
-      assert TreeNode.parent?(new_tree)
+      assert TreeNode.parent?(tree)
     end
 
     test "should have each input child turned into a new leaf TreeNode when the second arg is a populated list" do
@@ -159,11 +159,11 @@ defmodule RoseTree.TreeNodeTest do
 
       expected_children = for x <- input_list, do: TreeNode.new(x)
 
-      new_tree = TreeNode.new(5, input_list)
+      tree = TreeNode.new(5, input_list)
 
-      assert %TreeNode{term: 5, children: ^expected_children} = new_tree
+      assert %TreeNode{term: 5, children: ^expected_children} = tree
 
-      for child <- new_tree.children do
+      for child <- tree.children do
         assert TreeNode.leaf?(child) == true
       end
     end
@@ -171,13 +171,31 @@ defmodule RoseTree.TreeNodeTest do
     test "should return a new parent TreeNode with TreeNode children when the second arg is a populated list of TreeNodes" do
       input_list = for x <- 1..4, do: TreeNode.new(x)
 
-      new_tree = TreeNode.new(5, input_list)
+      tree = TreeNode.new(5, input_list)
 
-      assert %TreeNode{term: 5, children: ^input_list} = new_tree
+      assert %TreeNode{term: 5, children: ^input_list} = tree
 
-      for child <- new_tree.children do
+      for child <- tree.children do
         assert TreeNode.leaf?(child) == true
       end
+    end
+  end
+
+  describe "get_term/1" do
+    test "should return the term value of a TreeNode" do
+      assert 5 = TreeNode.get_term(%TreeNode{term: 5, children: []})
+    end
+  end
+
+  describe "set_term/2" do
+    test "should set the term value of a TreeNode to the given value" do
+      expected_term = 10
+
+      tree = %TreeNode{term: 5, children: []}
+
+      updated_tree = TreeNode.set_term(tree, expected_term)
+
+      assert %TreeNode{term: ^expected_term} = updated_tree
     end
   end
 
