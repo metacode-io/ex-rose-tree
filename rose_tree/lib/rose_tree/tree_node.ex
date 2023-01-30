@@ -224,7 +224,7 @@ defmodule RoseTree.TreeNode do
     if all_tree_nodes?(new_children) do
       %{tree | children: new_children}
     else
-      raise BadFunctionError, "map_fn must return a valid RoseTree.TreeNode struct"
+      raise ArgumentError, "map_fn must return a valid RoseTree.TreeNode struct"
     end
   end
 

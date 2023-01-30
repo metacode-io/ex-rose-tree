@@ -345,6 +345,88 @@ defmodule RoseTree.TreeNodeTest do
 
       assert updated_tree.term == tree.term
     end
+
+    test "should raise ArgumentError if the map_fn returns a result that is not a TreeNode", %{
+      simple_tree: tree
+    } do
+      map_fn = fn child -> child.term * 2 end
+
+      assert_raise(ArgumentError, fn -> TreeNode.map_children(tree, map_fn) end)
+    end
+  end
+
+  describe "prepend_child/2" do
+    test "should create a new child from the given value and prepend it to the head of the list of children",
+         %{simple_tree: tree} do
+      new_child = %TreeNode{term: 10, children: []}
+
+      updated_tree = TreeNode.prepend_child(tree, 10)
+
+      assert [^new_child | _] = updated_tree.children
+    end
+
+    test "should prepend the new child to the head of the list of children", %{simple_tree: tree} do
+      new_child = %TreeNode{term: 10, children: []}
+
+      updated_tree = TreeNode.prepend_child(tree, new_child)
+
+      assert [^new_child | _] = updated_tree.children
+    end
+
+    test "should not affect the term value of the TreeNode", %{simple_tree: tree} do
+      new_child = %TreeNode{term: 10, children: []}
+
+      updated_tree = TreeNode.prepend_child(tree, new_child)
+
+      assert updated_tree.term == tree.term
+    end
+
+    test "should not affect the other children", %{simple_tree: tree} do
+      new_child = %TreeNode{term: 10, children: []}
+
+      updated_tree = TreeNode.prepend_child(tree, new_child)
+
+      [_ | rest] = updated_tree.children
+
+      assert rest == tree.children
+    end
+  end
+
+  describe "append_child/2" do
+    test "should create a new child from the given value and append it to the end of the list of children",
+         %{simple_tree: tree} do
+      new_child = %TreeNode{term: 10, children: []}
+
+      updated_tree = TreeNode.append_child(tree, 10)
+
+      assert [^new_child | _] = Enum.reverse(updated_tree.children)
+    end
+
+    test "should append the new child to the end of the list of children", %{simple_tree: tree} do
+      new_child = %TreeNode{term: 10, children: []}
+
+      updated_tree = TreeNode.append_child(tree, new_child)
+
+      assert [^new_child | _] = Enum.reverse(updated_tree.children)
+    end
+
+    test "should not affect the term value of the TreeNode", %{simple_tree: tree} do
+      new_child = %TreeNode{term: 10, children: []}
+
+      updated_tree = TreeNode.append_child(tree, new_child)
+
+      assert updated_tree.term == tree.term
+    end
+
+    test "should not affect the other children", %{simple_tree: tree} do
+      new_child = %TreeNode{term: 10, children: []}
+
+      updated_tree = TreeNode.append_child(tree, new_child)
+
+      [_ | rest] = Enum.reverse(updated_tree.children)
+
+      assert Enum.reverse(rest) == tree.children
+    end
   end
 
   describe "after implementing the Enumerable protocol" do
