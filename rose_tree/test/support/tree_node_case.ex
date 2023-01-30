@@ -19,6 +19,16 @@ defmodule RoseTree.TreeNodeCase do
   end
 
   setup do
+    empty_tree = %TreeNode{term: nil, children: []}
+
+    leaf_tree = %TreeNode{term: "leaf", children: []}
+
+    simple_tree = %TreeNode{term: "root", children: [
+      %TreeNode{term: "child 1", children: []},
+      %TreeNode{term: "child 2", children: []},
+      %TreeNode{term: "child 3", children: []}
+    ]}
+
     tree_x5 = Generators.random_tree(total_nodes: 5)
 
     tree_x25 = Generators.random_tree(total_nodes: 25)
@@ -27,7 +37,22 @@ defmodule RoseTree.TreeNodeCase do
 
     tree_x = Generators.random_tree()
 
+    all_trees_with_idx = [
+      empty_tree,
+      leaf_tree,
+      simple_tree,
+      tree_x5,
+      tree_x25,
+      tree_x100,
+      tree_x
+    ]
+    |> Enum.with_index()
+
     %{
+      all_trees_with_idx: all_trees_with_idx,
+      empty_tree: empty_tree,
+      leaf_tree: leaf_tree,
+      simple_tree: simple_tree,
       tree_x: tree_x,
       tree_x5: tree_x5,
       tree_x25: tree_x25,

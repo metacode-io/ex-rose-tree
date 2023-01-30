@@ -15,13 +15,13 @@ defmodule RoseTree.Support.Generators do
 
     max_children = Keyword.get(options, :max_children, total_nodes - 1)
 
-    root_children = :rand.uniform(max_children)
+    root_children = if max_children == 0 do 0 else :rand.uniform(max_children) end
 
     initial_seed = new_seed(0, root_children, total_nodes - root_children - 1)
 
-    Logger.debug("Total Nodes: #{total_nodes}")
-    Logger.debug("Max Children Per Node: #{max_children}")
-    Logger.debug("Num Root Children: #{root_children}")
+    # Logger.debug("Total Nodes: #{total_nodes}")
+    # Logger.debug("Max Children Per Node: #{max_children}")
+    # Logger.debug("Num Root Children: #{root_children}")
 
     unfolder_fn = &default_unfolder(&1, max_children)
 
