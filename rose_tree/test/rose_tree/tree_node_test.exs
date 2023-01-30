@@ -12,8 +12,8 @@ defmodule RoseTree.TreeNodeTest do
     {"a word", 4},
     {6.4, 5},
     {:a_thing, 6},
-    {[1,2,3], 7},
-    {{1,2}, 8},
+    {[1, 2, 3], 7},
+    {{1, 2}, 8},
     {%TreeNode{term: "parent", children: "bad_child"}, 9},
     {nil, 10}
   ]
@@ -26,22 +26,22 @@ defmodule RoseTree.TreeNodeTest do
     {"a word", 4},
     {6.4, 5},
     {:a_thing, 6},
-    {[1,2,3], 7},
-    {{1,2}, 8},
+    {[1, 2, 3], 7},
+    {{1, 2}, 8}
   ]
 
   describe "tree_node?/1 guard" do
     test "should return true when given a TreeNode struct", %{all_trees_with_idx: all} do
       for {tree, idx} <- all do
         assert TreeNode.tree_node?(tree) == true,
-                "Expected `true` for element at index #{idx}"
+               "Expected `true` for element at index #{idx}"
       end
     end
 
     test "should return false when given bad values" do
       for {value, idx} <- @bad_trees do
         assert TreeNode.tree_node?(value) == false,
-                "Expected `false` for element at index #{idx}"
+               "Expected `false` for element at index #{idx}"
       end
     end
   end
@@ -58,7 +58,7 @@ defmodule RoseTree.TreeNodeTest do
     test "should return false when given bad values" do
       for {value, idx} <- @bad_trees do
         assert TreeNode.empty?(value) == false,
-                "Expected `false` for element at index #{idx}"
+               "Expected `false` for element at index #{idx}"
       end
     end
   end
@@ -72,20 +72,24 @@ defmodule RoseTree.TreeNodeTest do
       assert TreeNode.leaf?(tree) == true
     end
 
-    test "should return false when given a TreeNode struct with one or more children", %{simple_tree: tree} do
+    test "should return false when given a TreeNode struct with one or more children", %{
+      simple_tree: tree
+    } do
       assert TreeNode.leaf?(tree) == false
     end
 
     test "should return false when given bad values" do
       for {value, idx} <- @bad_trees do
         assert TreeNode.leaf?(value) == false,
-                "Expected `false` for element at index #{idx}"
+               "Expected `false` for element at index #{idx}"
       end
     end
   end
 
   describe "parent?/1 guard" do
-    test "should return true when given a TreeNode struct with one or more children", %{simple_tree: tree} do
+    test "should return true when given a TreeNode struct with one or more children", %{
+      simple_tree: tree
+    } do
       assert TreeNode.parent?(tree) == true
     end
 
@@ -100,7 +104,7 @@ defmodule RoseTree.TreeNodeTest do
     test "should return false when given bad values" do
       for {value, idx} <- @bad_trees do
         assert TreeNode.parent?(value) == false,
-                "Expected `false` for element at index #{idx}"
+               "Expected `false` for element at index #{idx}"
       end
     end
   end
@@ -120,15 +124,18 @@ defmodule RoseTree.TreeNodeTest do
       for {value, idx} <- @node_values do
         tree = TreeNode.new(value)
 
-        assert TreeNode.leaf?(tree)
-        assert %TreeNode{term: ^value, children: []} = tree
+        assert TreeNode.leaf?(tree) == true,
+               "Expected a leaf TreeNode for element at index #{idx}"
+
+        assert %TreeNode{term: ^value, children: []} = tree,
+               "Expected term to be #{inspect(value)} and children to be [] for element at index #{idx}"
       end
     end
 
     test "should return a new empty TreeNode when nil is passed" do
       tree = TreeNode.new(nil)
 
-      assert TreeNode.empty?(tree)
+      assert TreeNode.empty?(tree) == true
       assert %TreeNode{term: nil, children: []} = tree
     end
   end
@@ -137,25 +144,25 @@ defmodule RoseTree.TreeNodeTest do
     test "should return a new leaf TreeNode when the second arg is an empty list" do
       tree = TreeNode.new(5, [])
 
-      assert TreeNode.leaf?(tree)
+      assert TreeNode.leaf?(tree) == true
       assert %TreeNode{term: 5, children: []} = tree
     end
 
     test "should return a new empty TreeNode when the first arg is nil and the second arg is an empty list" do
       tree = TreeNode.new(nil, [])
 
-      assert TreeNode.empty?(tree)
+      assert TreeNode.empty?(tree) == true
       assert %TreeNode{term: nil, children: []} = tree
     end
 
     test "should return a new parent TreeNode when the second arg is a populated list of values" do
-      tree = TreeNode.new(5, [4,3,2,1])
+      tree = TreeNode.new(5, [4, 3, 2, 1])
 
-      assert TreeNode.parent?(tree)
+      assert TreeNode.parent?(tree) == true
     end
 
     test "should have each input child turned into a new leaf TreeNode when the second arg is a populated list" do
-      input_list = [4,3,2,1]
+      input_list = [4, 3, 2, 1]
 
       expected_children = for x <- input_list, do: TreeNode.new(x)
 
@@ -163,9 +170,7 @@ defmodule RoseTree.TreeNodeTest do
 
       assert %TreeNode{term: 5, children: ^expected_children} = tree
 
-      for child <- tree.children do
-        assert TreeNode.leaf?(child) == true
-      end
+      for child <- tree.children, do: assert(TreeNode.leaf?(child) == true)
     end
 
     test "should return a new parent TreeNode with TreeNode children when the second arg is a populated list of TreeNodes" do
@@ -175,9 +180,7 @@ defmodule RoseTree.TreeNodeTest do
 
       assert %TreeNode{term: 5, children: ^input_list} = tree
 
-      for child <- tree.children do
-        assert TreeNode.leaf?(child) == true
-      end
+      for child <- tree.children, do: assert(TreeNode.leaf?(child) == true)
     end
   end
 
@@ -189,11 +192,45 @@ defmodule RoseTree.TreeNodeTest do
 
   describe "set_term/2" do
     test "should set the term value of a TreeNode to the given value" do
-      expected_term = 10
-
       tree = %TreeNode{term: 5, children: []}
 
-      updated_tree = TreeNode.set_term(tree, expected_term)
+      for {value, idx} <- @node_values do
+        updated_tree = TreeNode.set_term(tree, value)
+        assert %TreeNode{term: ^value} = updated_tree
+      end
+    end
+  end
+
+  describe "map_term/2" do
+    test "should call the given map_fn value" do
+      expected_log = "Called map_fn from map_term/2"
+
+      map_fn = fn x ->
+        Logger.info(expected_log)
+
+        x * 2
+      end
+
+      tree = TreeNode.new(5)
+
+      log =
+        capture_log(fn ->
+          TreeNode.map_term(tree, map_fn)
+        end)
+
+      assert log =~ expected_log
+    end
+
+    test "should set the term value to the result of the applied map_fn" do
+      map_fn = &(&1 * 2)
+
+      initial_term = 5
+
+      expected_term = map_fn.(initial_term)
+
+      tree = TreeNode.new(initial_term)
+
+      updated_tree = TreeNode.map_term(tree, map_fn)
 
       assert %TreeNode{term: ^expected_term} = updated_tree
     end
@@ -218,7 +255,8 @@ defmodule RoseTree.TreeNodeTest do
       assert false == Enum.member?(tree, 6)
     end
 
-    test "Enum.reduce/3 should be able to reduce over each element, accumulating the application of the given function", %{tree_node: tree} do
+    test "Enum.reduce/3 should be able to reduce over each element, accumulating the application of the given function",
+         %{tree_node: tree} do
       assert [1, 2, 3, 4, 5] = Enum.reduce(tree, [], fn t, acc -> [t | acc] end)
     end
   end

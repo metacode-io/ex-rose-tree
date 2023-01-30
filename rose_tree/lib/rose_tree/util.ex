@@ -180,7 +180,7 @@ defmodule RoseTree.Util do
     if predicate.(head) do
       {acc, remaining}
     else
-      do_split_when([head|acc], tail, predicate)
+      do_split_when([head | acc], tail, predicate)
     end
   end
 
@@ -191,7 +191,8 @@ defmodule RoseTree.Util do
   remainder from the original list. An important note is that the remainder list
   does not preserve the original order of the list.
   """
-  @spec split_random(list(), take :: non_neg_integer()) :: {[taken :: term()], [remainder :: term()]}
+  @spec split_random(list(), take :: non_neg_integer()) ::
+          {[taken :: term()], [remainder :: term()]}
   def split_random([], _), do: {[], []}
 
   def split_random(list, take) when is_list(list) and is_integer(take) and take >= 0 do

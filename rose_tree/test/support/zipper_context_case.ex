@@ -18,6 +18,5 @@ defmodule RoseTree.ZipperContextCase do
   end
 
   setup do
-
   end
 end
