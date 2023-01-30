@@ -179,8 +179,16 @@ defmodule RoseTree.TreeNode do
 
   """
   @spec set_children(t(), [t() | term()]) :: t()
-  def set_children(%__MODULE__{} = tree, children) do
-    new_children = children |> Enum.map(&new(&1))
+  def set_children(%__MODULE__{} = tree, children) when is_list(children) do
+    new_children =
+      children
+      |> Enum.map(fn
+        %__MODULE__{} = child ->
+          child
+
+        child ->
+          new(child)
+      end)
 
     %{tree | children: new_children}
   end

@@ -113,7 +113,7 @@ defmodule RoseTree.TreeNodeTest do
     test "should return an empty TreeNode struct", %{empty_tree: tree} do
       empty_tree = TreeNode.empty()
 
-      assert match?(tree, empty_tree)
+      assert match?(^tree, empty_tree)
       assert TreeNode.empty?(empty_tree) == true
       assert %TreeNode{term: nil, children: []} = empty_tree
     end
@@ -194,10 +194,16 @@ defmodule RoseTree.TreeNodeTest do
     test "should set the term value of a TreeNode to the given value" do
       tree = %TreeNode{term: 5, children: []}
 
-      for {value, idx} <- @node_values do
+      for {value, _idx} <- @node_values do
         updated_tree = TreeNode.set_term(tree, value)
         assert %TreeNode{term: ^value} = updated_tree
       end
+    end
+
+    test "should not modify the children of a TreeNode", %{simple_tree: tree} do
+      updated_tree = TreeNode.set_term(tree, "new value")
+
+      assert updated_tree.children == tree.children
     end
   end
 
@@ -233,6 +239,59 @@ defmodule RoseTree.TreeNodeTest do
       updated_tree = TreeNode.map_term(tree, map_fn)
 
       assert %TreeNode{term: ^expected_term} = updated_tree
+    end
+  end
+
+  describe "get_children/1" do
+    test "should return the list of child nodes for a TreeNode", %{simple_tree: tree} do
+      expected_children = tree.children
+
+      assert ^expected_children = TreeNode.get_children(tree)
+    end
+  end
+
+  describe "set_children/2" do
+    test "should update  a TreeNode to a leaf node when passed an empty list", %{
+      simple_tree: tree
+    } do
+      updated_tree = TreeNode.set_children(tree, [])
+
+      assert TreeNode.leaf?(updated_tree) == true
+      assert %TreeNode{children: []} = updated_tree
+    end
+
+    test "should update the children of a TreeNode to the list of elements", %{simple_tree: tree} do
+      input_list = [4, 3, 2, 1]
+
+      expected_children = for x <- input_list, do: TreeNode.new(x)
+
+      updated_tree = TreeNode.set_children(tree, input_list)
+
+      assert %TreeNode{children: ^expected_children} = updated_tree
+
+      for child <- updated_tree.children, do: assert(TreeNode.leaf?(child) == true)
+    end
+
+    test "should update the children of a TreeNode to the list of TreeNode elements", %{
+      simple_tree: tree
+    } do
+      input_list = for x <- [4, 3, 2, 1], do: TreeNode.new(x)
+
+      updated_tree = TreeNode.set_children(tree, input_list)
+
+      assert %TreeNode{children: ^input_list} = updated_tree
+
+      for child <- updated_tree.children, do: assert(TreeNode.leaf?(child) == true)
+    end
+
+    test "should not modify the term value of a TreeNode when updating its children", %{
+      simple_tree: tree
+    } do
+      input_list = for x <- [4, 3, 2, 1], do: TreeNode.new(x)
+
+      updated_tree = TreeNode.set_children(tree, input_list)
+
+      assert updated_tree.term == tree.term
     end
   end
 
