@@ -208,7 +208,7 @@ defmodule RoseTree.TreeNodeTest do
   end
 
   describe "map_term/2" do
-    test "should call the given map_fn value" do
+    test "should call the given map_fn" do
       expected_log = "Called map_fn from map_term/2"
 
       map_fn = fn x ->
@@ -240,6 +240,18 @@ defmodule RoseTree.TreeNodeTest do
 
       assert %TreeNode{term: ^expected_term} = updated_tree
     end
+
+    test "should not affect the children of the TreeNode when mapping the term" do
+      map_fn = &(&1 * 2)
+
+      expected_children = for x <- [4, 3, 2, 1], do: TreeNode.new(x)
+
+      tree = TreeNode.new(5, expected_children)
+
+      updated_tree = TreeNode.map_term(tree, map_fn)
+
+      assert updated_tree.children == tree.children
+    end
   end
 
   describe "get_children/1" do
@@ -251,7 +263,7 @@ defmodule RoseTree.TreeNodeTest do
   end
 
   describe "set_children/2" do
-    test "should update  a TreeNode to a leaf node when passed an empty list", %{
+    test "should update a TreeNode to a leaf node when passed an empty list", %{
       simple_tree: tree
     } do
       updated_tree = TreeNode.set_children(tree, [])
@@ -290,6 +302,46 @@ defmodule RoseTree.TreeNodeTest do
       input_list = for x <- [4, 3, 2, 1], do: TreeNode.new(x)
 
       updated_tree = TreeNode.set_children(tree, input_list)
+
+      assert updated_tree.term == tree.term
+    end
+  end
+
+  describe "map_children/2" do
+    test "should call the given map_fn", %{simple_tree: tree} do
+      expected_log = "Called map_fn from map_children/2"
+
+      map_fn = fn %TreeNode{} = child ->
+        Logger.info(expected_log)
+
+        %{child | term: child.term * 2}
+      end
+
+      log =
+        capture_log(fn ->
+          TreeNode.map_children(tree, map_fn)
+        end)
+
+      assert log =~ expected_log
+    end
+
+    test "should set the children to the resulting list of children when the map_fn was applied to each",
+         %{simple_tree: tree} do
+      map_fn = fn %TreeNode{} = child -> %{child | term: child.term * 2} end
+
+      expected_children = for x <- tree.children, do: map_fn.(x)
+
+      updated_tree = TreeNode.map_children(tree, map_fn)
+
+      assert updated_tree.children == expected_children
+    end
+
+    test "should not affect the term value of the TreeNode when mapping children", %{
+      simple_tree: tree
+    } do
+      map_fn = fn %TreeNode{} = child -> %{child | term: child.term * 2} end
+
+      updated_tree = TreeNode.map_children(tree, map_fn)
 
       assert updated_tree.term == tree.term
     end

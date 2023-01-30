@@ -24,14 +24,14 @@ defmodule RoseTree.TreeNodeCase do
   setup do
     empty_tree = %TreeNode{term: nil, children: []}
 
-    leaf_tree = %TreeNode{term: "leaf", children: []}
+    leaf_tree = %TreeNode{term: 1, children: []}
 
     simple_tree = %TreeNode{
-      term: "root",
+      term: 1,
       children: [
-        %TreeNode{term: "child 1", children: []},
-        %TreeNode{term: "child 2", children: []},
-        %TreeNode{term: "child 3", children: []}
+        %TreeNode{term: 2, children: []},
+        %TreeNode{term: 3, children: []},
+        %TreeNode{term: 4, children: []}
       ]
     }
 
