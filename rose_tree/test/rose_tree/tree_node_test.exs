@@ -451,6 +451,19 @@ defmodule RoseTree.TreeNodeTest do
       assert %TreeNode{term: 3, children: children} = tree_node
       assert Enum.count(children) > 0 == true
     end
+
+    test "generates a tree with x number of nodes when given an unfold_fn that allows specification of total nodes" do
+      for _ <- 1..10 do
+        random_total = Generators.random_number_of_nodes()
+
+        {initial_seed, unfold_fn} = Generators.default_init(total_nodes: random_total)
+
+        tree = TreeNode.unfold(initial_seed, unfold_fn)
+
+        assert TreeNode.tree_node?(tree) == true
+        assert Enum.count(tree) == random_total
+      end
+    end
   end
 
   describe "after implementing the Enumerable protocol" do

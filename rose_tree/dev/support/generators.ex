@@ -11,23 +11,12 @@ defmodule RoseTree.Support.Generators do
 
   @spec random_tree(keyword()) :: RoseTree.TreeNode.t()
   def random_tree(options \\ []) do
-    total_nodes = Keyword.get(options, :total_nodes, random_number_of_nodes())
-
-    max_children = Keyword.get(options, :max_children, total_nodes - 1)
-
-    root_children = if max_children == 0 do 0 else :rand.uniform(max_children) end
-
-    initial_seed = new_seed(0, root_children, total_nodes - root_children - 1)
-
-    # Logger.debug("Total Nodes: #{total_nodes}")
-    # Logger.debug("Max Children Per Node: #{max_children}")
-    # Logger.debug("Num Root Children: #{root_children}")
-
-    unfolder_fn = &default_unfolder(&1, max_children)
+    {initial_seed, unfolder_fn} = default_init(options)
 
     TreeNode.unfold(initial_seed, unfolder_fn)
   end
 
+  @spec default_unfolder(default_seed(), non_neg_integer()) :: TreeNode.t()
   def default_unfolder(seed, max_children) do
     range = 10_000
 
@@ -87,6 +76,21 @@ defmodule RoseTree.Support.Generators do
     allotted = :rand.uniform(shares)
     [%{seed | shares_for_children: seed.shares_for_children + allotted} | processed]
     |> do_allot_remaining_shares(seeds, shares - allotted)
+  end
+
+  @spec default_init(keyword()) :: {default_seed(), TreeNode.unfold_fn()}
+  def default_init(options \\ []) do
+    total_nodes = Keyword.get(options, :total_nodes, random_number_of_nodes())
+
+    max_children = Keyword.get(options, :max_children, total_nodes - 1)
+
+    root_children = if max_children == 0 do 0 else :rand.uniform(max_children) end
+
+    initial_seed = new_seed(0, root_children, total_nodes - root_children - 1)
+
+    unfolder_fn = &default_unfolder(&1, max_children)
+
+    {initial_seed, unfolder_fn}
   end
 
   @spec new_seed(non_neg_integer(), non_neg_integer(), non_neg_integer()) :: default_seed()
