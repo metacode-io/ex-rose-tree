@@ -20,10 +20,8 @@ defmodule RoseTree.Zipper.Context do
           path: [Location.t()]
         }
 
-  @spec context?(term()) :: boolean()
   defguard context?(value) when is_struct(value) and value.__struct__ == __MODULE__
 
-  @spec empty?(term()) :: boolean()
   defguard empty?(value)
            when context?(value) and
                   TreeNode.empty?(value.focus) and
@@ -31,11 +29,9 @@ defmodule RoseTree.Zipper.Context do
                   value.next == [] and
                   value.path == []
 
-  @spec at_root?(term()) :: boolean()
   defguard at_root?(value)
            when context?(value) and value.path == []
 
-  @spec has_children?(term()) :: boolean()
   defguard has_children?(value)
            when context?(value) and not TreeNode.leaf?(value.focus)
 
@@ -354,7 +350,7 @@ defmodule RoseTree.Zipper.Context do
         set_focus(ctx, new_focus)
 
       err ->
-        raise BadFunctionError, "map_fn must return a valid RoseTree.TreeNode struct"
+        raise ArgumentError, "map_fn must return a valid RoseTree.TreeNode struct"
     end
   end
 
@@ -391,7 +387,7 @@ defmodule RoseTree.Zipper.Context do
     if TreeNode.all_tree_nodes?(new_siblings) do
       %{ctx | prev: new_siblings}
     else
-      raise BadFunctionError, "map_fn must return a valid RoseTree.TreeNode struct"
+      raise ArgumentError, "map_fn must return a valid RoseTree.TreeNode struct"
     end
   end
 
@@ -428,7 +424,7 @@ defmodule RoseTree.Zipper.Context do
     if TreeNode.all_tree_nodes?(new_siblings) do
       %{ctx | next: new_siblings}
     else
-      raise BadFunctionError, "map_fn must return a valid RoseTree.TreeNode struct"
+      raise ArgumentError, "map_fn must return a valid RoseTree.TreeNode struct"
     end
   end
 
@@ -464,7 +460,7 @@ defmodule RoseTree.Zipper.Context do
     if Location.all_locations?(new_locations) do
       %{ctx | path: new_locations}
     else
-      raise BadFunctionError, "map_fn must return a valid RoseTree.Zipper.Location struct"
+      raise ArgumentError, "map_fn must return a valid RoseTree.Zipper.Location struct"
     end
   end
 

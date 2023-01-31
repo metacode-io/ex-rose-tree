@@ -16,7 +16,7 @@ defmodule RoseTree.Support.Generators do
     TreeNode.unfold(initial_seed, unfolder_fn)
   end
 
-  @spec default_unfolder(default_seed(), non_neg_integer()) :: TreeNode.t()
+  @spec default_unfolder(default_seed(), non_neg_integer()) :: {pos_integer(), [default_seed()]}
   def default_unfolder(seed, max_children) do
     range = 10_000
 

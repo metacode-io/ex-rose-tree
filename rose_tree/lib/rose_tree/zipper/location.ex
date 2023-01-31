@@ -25,7 +25,6 @@ defmodule RoseTree.Zipper.Location do
           next: [TreeNode.t()]
         }
 
-  @spec location?(t()) :: boolean()
   defguard location?(value)
            when is_struct(value) and
                   value.__struct__ == __MODULE__ and
@@ -99,7 +98,7 @@ defmodule RoseTree.Zipper.Location do
       true
 
   """
-  @spec all_locations?([Location.t()]) :: boolean()
+  @spec all_locations?([t()]) :: boolean()
   def all_locations?(values) when is_list(values) do
     Enum.all?(values, &location?(&1))
   end

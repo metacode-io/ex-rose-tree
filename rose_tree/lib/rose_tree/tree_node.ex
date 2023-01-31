@@ -10,17 +10,13 @@ defmodule RoseTree.TreeNode do
           children: [t() | nil]
         }
 
-  @spec tree_node?(t()) :: boolean()
   defguard tree_node?(value)
            when is_struct(value) and value.__struct__ == __MODULE__ and is_list(value.children)
 
-  @spec empty?(t()) :: boolean()
   defguard empty?(value) when tree_node?(value) and value.term == nil and value.children == []
 
-  @spec leaf?(t()) :: boolean()
   defguard leaf?(value) when tree_node?(value) and value.children == []
 
-  @spec parent?(t()) :: boolean()
   defguard parent?(value)
            when tree_node?(value) and is_list(value.children) and value.children != []
 
