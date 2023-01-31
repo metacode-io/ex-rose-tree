@@ -20,7 +20,12 @@ defmodule RoseTree.Zipper.Context do
           path: [Location.t()]
         }
 
-  defguard context?(value) when is_struct(value) and value.__struct__ == __MODULE__
+  defguard context?(value)
+           when is_struct(value) and
+                  value.__struct__ == __MODULE__ and
+                  is_list(value.prev) and
+                  is_list(value.next) and
+                  is_list(value.path)
 
   defguard empty?(value)
            when context?(value) and
@@ -34,6 +39,9 @@ defmodule RoseTree.Zipper.Context do
 
   defguard has_children?(value)
            when context?(value) and not TreeNode.leaf?(value.focus)
+
+  defguard has_siblings?(value)
+           when context?(value) and (value.prev != [] or value.next != [])
 
   @doc """
   Returns an empty Context.

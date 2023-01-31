@@ -2,6 +2,7 @@ defmodule RoseTree.Support.Generators do
   require Logger
 
   alias RoseTree.TreeNode
+  alias RoseTree.Zipper.Context
 
   @typep default_seed() :: %{
     current_depth: non_neg_integer(),
@@ -14,6 +15,23 @@ defmodule RoseTree.Support.Generators do
     {initial_seed, unfolder_fn} = default_init(options)
 
     TreeNode.unfold(initial_seed, unfolder_fn)
+  end
+
+  def random_zipper(options \\ []) do
+    num_siblings = Keyword.get(options, :num_siblings, Enum.random(0..5))
+
+    random_trees = for _ <- num_siblings, do: random_tree(options)
+
+    {prev, [focus | next]} =
+      random_trees
+      |> Enum.split_at(0..num_siblings-1)
+
+    %Context{
+      focus: focus,
+      prev: prev,
+      next: next,
+      path: []
+    }
   end
 
   @spec default_unfolder(default_seed(), non_neg_integer()) :: {pos_integer(), [default_seed()]}
