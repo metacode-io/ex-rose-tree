@@ -429,6 +429,30 @@ defmodule RoseTree.TreeNodeTest do
     end
   end
 
+  describe "unfold/2" do
+    test "generates an leaf TreeNode when given an unfold_fn that does not generate more seeds" do
+      unfold_fn = fn x -> {x, []} end
+
+      tree_node = TreeNode.unfold(3, unfold_fn)
+
+      assert TreeNode.leaf?(tree_node) == true
+      assert %TreeNode{term: 3, children: []} = tree_node
+    end
+
+    test "generates a parent tree when given an unfold_fn that recursively returns a new value and list of new seeds to evaluate" do
+      unfold_fn = fn
+        x when x > 0 -> {x, Enum.to_list(0..(x - 1))}
+        x -> {x, []}
+      end
+
+      tree_node = TreeNode.unfold(3, unfold_fn)
+
+      assert TreeNode.parent?(tree_node) == true
+      assert %TreeNode{term: 3, children: children} = tree_node
+      assert Enum.count(children) > 0 == true
+    end
+  end
+
   describe "after implementing the Enumerable protocol" do
     setup do
       tree_node = TreeNode.new(5, [4, 3, 2, 1])
