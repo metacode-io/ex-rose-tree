@@ -17,18 +17,18 @@ defmodule RoseTree.MixProject do
       docs: [
         main: "RoseTree",
         groups_for_modules: [
-          "Tree": [
+          Tree: [
             RoseTree,
             RoseTree.TreeNode
           ],
-          "Zipper": [
+          Zipper: [
             RoseTree.Zipper,
             RoseTree.Zipper.Context,
             RoseTree.Zipper.Location,
             RoseTree.Zipper.Kin,
             RoseTree.Zipper.Traversal
           ],
-          "Util": [
+          Util: [
             RoseTree.Util
           ],
           "Dev Support": [

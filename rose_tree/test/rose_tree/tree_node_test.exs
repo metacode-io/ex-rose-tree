@@ -31,7 +31,7 @@ defmodule RoseTree.TreeNodeTest do
   ]
 
   describe "tree_node?/1 guard" do
-    test "should return true when given a TreeNode struct", %{all_trees_with_idx: all} do
+    test "should return true when given a valid TreeNode struct", %{all_trees_with_idx: all} do
       for {tree, idx} <- all do
         assert TreeNode.tree_node?(tree) == true,
                "Expected `true` for element at index #{idx}"
@@ -471,8 +471,8 @@ defmodule RoseTree.TreeNodeTest do
       list = [
         TreeNode.empty(),
         TreeNode.new(5),
-        TreeNode.new(5, [6,7,8,9]),
-        TreeNode.new(5, [6,7,8,9, TreeNode.new(10)])
+        TreeNode.new(5, [6, 7, 8, 9]),
+        TreeNode.new(5, [6, 7, 8, 9, TreeNode.new(10)])
       ]
 
       assert TreeNode.all_tree_nodes?(list) == true
@@ -482,8 +482,8 @@ defmodule RoseTree.TreeNodeTest do
       list = [
         TreeNode.empty(),
         TreeNode.new(5),
-        TreeNode.new(5, [6,7,8,9]),
-        TreeNode.new(5, [6,7,8,9, TreeNode.new(10)]),
+        TreeNode.new(5, [6, 7, 8, 9]),
+        TreeNode.new(5, [6, 7, 8, 9, TreeNode.new(10)]),
         "gooby pls"
       ]
 
@@ -518,8 +518,10 @@ defmodule RoseTree.TreeNodeTest do
       assert false == Enum.member?(tree, 6)
     end
 
-    test "Enum.slice/2 should return a list of sliced values according to the index range", %{simple_tree: tree} do
-      assert [2,3] == Enum.slice(tree, 1..2)
+    test "Enum.slice/2 should return a list of sliced values according to the index range", %{
+      simple_tree: tree
+    } do
+      assert [2, 3] == Enum.slice(tree, 1..2)
     end
 
     test "Enum.reduce/3 should be able to reduce over each element, accumulating the application of the given function",
