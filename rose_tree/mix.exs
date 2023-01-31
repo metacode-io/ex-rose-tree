@@ -4,12 +4,16 @@ defmodule RoseTree.MixProject do
   def project do
     [
       app: :rose_tree,
+      name: "Rose Tree with Zipper",
       version: "0.1.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      name: "Rose Tree with Zipper",
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test
+      ],
       docs: [
         main: "RoseTree",
         groups_for_modules: [

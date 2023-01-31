@@ -466,6 +466,31 @@ defmodule RoseTree.TreeNodeTest do
     end
   end
 
+  describe "all_tree_nodes?/1" do
+    test "should return true when all elements in the list are tree nodes" do
+      list = [
+        TreeNode.empty(),
+        TreeNode.new(5),
+        TreeNode.new(5, [6,7,8,9]),
+        TreeNode.new(5, [6,7,8,9, TreeNode.new(10)])
+      ]
+
+      assert TreeNode.all_tree_nodes?(list) == true
+    end
+
+    test "should return false when at least one element in the list is not a tree node" do
+      list = [
+        TreeNode.empty(),
+        TreeNode.new(5),
+        TreeNode.new(5, [6,7,8,9]),
+        TreeNode.new(5, [6,7,8,9, TreeNode.new(10)]),
+        "gooby pls"
+      ]
+
+      assert TreeNode.all_tree_nodes?(list) == false
+    end
+  end
+
   describe "after implementing the Enumerable protocol" do
     setup do
       tree_node = TreeNode.new(5, [4, 3, 2, 1])
@@ -473,8 +498,16 @@ defmodule RoseTree.TreeNodeTest do
       %{tree_node: tree_node}
     end
 
+    test "Enum.count/1 should return 0 for an empty TreeNode", %{empty_tree: tree} do
+      assert 0 = Enum.count(tree)
+    end
+
     test "Enum.count/1 should the correct number of elements", %{tree_node: tree} do
       assert 5 = Enum.count(tree)
+    end
+
+    test "Enum.member?/1 should return `false` for an empty TreeNode", %{empty_tree: tree} do
+      assert false == Enum.member?(tree, 5)
     end
 
     test "Enum.member?/1 should return `true` if a member is found", %{tree_node: tree} do
@@ -485,9 +518,32 @@ defmodule RoseTree.TreeNodeTest do
       assert false == Enum.member?(tree, 6)
     end
 
+    test "Enum.slice/2 should return a list of sliced values according to the index range", %{simple_tree: tree} do
+      assert [2,3] == Enum.slice(tree, 1..2)
+    end
+
     test "Enum.reduce/3 should be able to reduce over each element, accumulating the application of the given function",
          %{tree_node: tree} do
       assert [1, 2, 3, 4, 5] = Enum.reduce(tree, [], fn t, acc -> [t | acc] end)
+    end
+
+    test "Enum.reduce/3 should work with the Stream module", %{simple_tree: tree} do
+      stream = Stream.with_index(tree)
+
+      assert [{tree.term, 0}] == Enum.take(stream, 1)
+    end
+
+    test "Enum.reduce/3 should work with :suspend mechanics", %{simple_tree: tree_1} do
+      tree_2 = Generators.random_tree(total_nodes: 4)
+
+      list_1 = Enum.to_list(tree_1)
+      list_2 = Enum.to_list(tree_2)
+
+      expected = Enum.zip(list_1, list_2)
+
+      actual = Enum.zip(tree_1, tree_2)
+
+      assert expected == actual
     end
   end
 end
