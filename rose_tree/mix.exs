@@ -8,7 +8,31 @@ defmodule RoseTree.MixProject do
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      name: "Rose Tree with Zipper",
+      docs: [
+        main: "RoseTree",
+        groups_for_modules: [
+          "Tree": [
+            RoseTree,
+            RoseTree.TreeNode
+          ],
+          "Zipper": [
+            RoseTree.Zipper,
+            RoseTree.Zipper.Context,
+            RoseTree.Zipper.Location,
+            RoseTree.Zipper.Kin,
+            RoseTree.Zipper.Traversal
+          ],
+          "Util": [
+            RoseTree.Util
+          ],
+          "Dev Support": [
+            RoseTree.Support.Generators
+          ]
+        ],
+        extras: []
+      ]
     ]
   end
 
