@@ -1,5 +1,5 @@
 defmodule RoseTree.Zipper.ContextTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   use RoseTree.ZipperContextCase
 
   doctest RoseTree.Zipper.Context
@@ -52,6 +52,30 @@ defmodule RoseTree.Zipper.ContextTest do
     test "should return false when given bad values" do
       for {value, idx} <- @bad_contexts do
         assert Context.empty?(value) == false,
+               "Expected `false` for element at index #{idx}"
+      end
+    end
+  end
+
+  describe "at_root?/1 guard" do
+    test "should return true when given a Context with an empty path", %{simple_ctx: ctx} do
+      assert Context.at_root?(ctx) == true
+    end
+
+    test "should return false when given a Context with a populated path", %{
+      simple_ctx: ctx_1,
+      ctx_x5: ctx_2
+    } do
+      new_loc = Location.new(ctx_1.focus, prev: ctx_1.prev, next: ctx_1.next)
+
+      new_ctx = %Context{ctx_2 | path: [new_loc]}
+
+      assert Context.at_root?(new_ctx) == false
+    end
+
+    test "should return false when given bad values" do
+      for {value, idx} <- @bad_contexts do
+        assert Context.at_root?(value) == false,
                "Expected `false` for element at index #{idx}"
       end
     end
