@@ -213,4 +213,17 @@ defmodule RoseTree.Zipper.ContextTest do
       assert_raise(ArgumentError, fn -> Context.map_prev_siblings(new_ctx, map_fn) end)
     end
   end
+
+  describe "map_next_siblings/2" do
+    test "should raise ArgumentError if the map_fn returns a result that is not a TreeNode", %{
+      simple_ctx: ctx,
+      tree_x5: tree
+    } do
+      map_fn = fn tree_node -> tree_node.term * 2 end
+
+      new_ctx = %Context{ctx | next: [tree]}
+
+      assert_raise(ArgumentError, fn -> Context.map_next_siblings(new_ctx, map_fn) end)
+    end
+  end
 end
