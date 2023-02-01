@@ -23,6 +23,7 @@ defmodule RoseTree.Zipper.Context do
   defguard context?(value)
            when is_struct(value) and
                   value.__struct__ == __MODULE__ and
+                  TreeNode.tree_node?(value.focus) and
                   is_list(value.prev) and
                   is_list(value.next) and
                   is_list(value.path)
