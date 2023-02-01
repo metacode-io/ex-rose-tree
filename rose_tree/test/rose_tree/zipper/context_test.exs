@@ -190,4 +190,14 @@ defmodule RoseTree.Zipper.ContextTest do
       assert nil == Context.parent_term(ctx)
     end
   end
+
+  describe "map_focus/2" do
+    test "should raise ArgumentError if the map_fn returns a resul that is not a TreeNode", %{
+      simple_ctx: ctx
+    } do
+      map_fn = fn focus -> focus.term * 2 end
+
+      assert_raise(ArgumentError, fn -> Context.map_focus(ctx, map_fn) end)
+    end
+  end
 end
