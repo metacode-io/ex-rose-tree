@@ -192,12 +192,25 @@ defmodule RoseTree.Zipper.ContextTest do
   end
 
   describe "map_focus/2" do
-    test "should raise ArgumentError if the map_fn returns a resul that is not a TreeNode", %{
+    test "should raise ArgumentError if the map_fn returns a result that is not a TreeNode", %{
       simple_ctx: ctx
     } do
-      map_fn = fn focus -> focus.term * 2 end
+      map_fn = fn tree_node -> tree_node.term * 2 end
 
       assert_raise(ArgumentError, fn -> Context.map_focus(ctx, map_fn) end)
+    end
+  end
+
+  describe "map_prev_siblings/2" do
+    test "should raise ArgumentError if the map_fn returns a result that is not a TreeNode", %{
+      simple_ctx: ctx,
+      tree_x5: tree
+    } do
+      map_fn = fn tree_node -> tree_node.term * 2 end
+
+      new_ctx = %Context{ctx | prev: [tree]}
+
+      assert_raise(ArgumentError, fn -> Context.map_prev_siblings(new_ctx, map_fn) end)
     end
   end
 end
