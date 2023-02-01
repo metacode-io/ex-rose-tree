@@ -165,4 +165,17 @@ defmodule RoseTree.Zipper.ContextTest do
       assert_raise ArgumentError, fn -> Context.new(tree_1, path: path) end
     end
   end
+
+  describe "root?/1" do
+    test "should return false if given a Context with populated path", %{
+      simple_ctx: ctx,
+      simple_tree: tree
+    } do
+      path = [Location.new(tree)]
+
+      new_ctx = %Context{ctx | path: path}
+
+      assert Context.root?(new_ctx) == false
+    end
+  end
 end
