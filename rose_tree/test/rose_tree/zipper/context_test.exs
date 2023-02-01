@@ -80,4 +80,21 @@ defmodule RoseTree.Zipper.ContextTest do
       end
     end
   end
+
+  describe "has_children?/1 guard" do
+    test "should return true when given a Context whose focus has children", %{simple_ctx: ctx} do
+      assert Context.has_children?(ctx) == true
+    end
+
+    test "should return false when given a Context whose focus has no children", %{leaf_ctx: ctx} do
+      assert Context.has_children?(ctx) == false
+    end
+
+    test "should return false when given bad values" do
+      for {value, idx} <- @bad_contexts do
+        assert Context.has_children?(value) == false,
+               "Expected `false` for element at index #{idx}"
+      end
+    end
+  end
 end
