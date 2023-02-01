@@ -136,4 +136,33 @@ defmodule RoseTree.Zipper.ContextTest do
       end
     end
   end
+
+  describe "new/2" do
+    test "should raise an ArgumentError if `prev` has invalid elements", %{
+      simple_tree: tree_1,
+      tree_x5: tree_2
+    } do
+      previous_siblings = [tree_2, :bad_tree]
+
+      assert_raise ArgumentError, fn -> Context.new(tree_1, prev: previous_siblings) end
+    end
+
+    test "should raise an ArgumentError if `next` has invalid elements", %{
+      simple_tree: tree_1,
+      tree_x5: tree_2
+    } do
+      next_siblings = [tree_2, :bad_tree]
+
+      assert_raise ArgumentError, fn -> Context.new(tree_1, next: next_siblings) end
+    end
+
+    test "should raise an ArgumentError if `path` has invalid elements", %{
+      simple_tree: tree_1,
+      tree_x5: tree_2
+    } do
+      path = [Location.new(tree_2), :bad_location]
+
+      assert_raise ArgumentError, fn -> Context.new(tree_1, path: path) end
+    end
+  end
 end
