@@ -97,4 +97,43 @@ defmodule RoseTree.Zipper.ContextTest do
       end
     end
   end
+
+  describe "has_siblings?/1 guard" do
+    test "should return true when given a Context who has previous TreeNode siblings", %{
+      simple_ctx: ctx,
+      simple_tree: tree
+    } do
+      new_ctx = %Context{ctx | prev: [tree]}
+
+      assert Context.has_siblings?(new_ctx) == true
+    end
+
+    test "should return true when given a Context who has next TreeNode siblings", %{
+      simple_ctx: ctx,
+      simple_tree: tree
+    } do
+      new_ctx = %Context{ctx | next: [tree]}
+
+      assert Context.has_siblings?(new_ctx) == true
+    end
+
+    test "should return true when given a Context who has both previous and next TreeNode siblings",
+         %{simple_ctx: ctx, simple_tree: tree} do
+      new_ctx = %Context{ctx | prev: [tree], next: [tree]}
+
+      assert Context.has_siblings?(new_ctx) == true
+    end
+
+    test "should return false when given a Context who has neither previous or next TreeNode siblings",
+         %{simple_ctx: ctx} do
+      assert Context.has_siblings?(ctx) == false
+    end
+
+    test "should return false when given bad values" do
+      for {value, idx} <- @bad_contexts do
+        assert Context.has_siblings?(value) == false,
+               "Expected `false` for element at index #{idx}"
+      end
+    end
+  end
 end
