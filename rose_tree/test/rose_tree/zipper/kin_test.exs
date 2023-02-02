@@ -183,4 +183,43 @@ defmodule RoseTree.Zipper.KinTest do
       end
     end
   end
+
+  describe "first_great_grandchild/2" do
+    test "should return the first great grandchild that is found for the Context", %{
+      ctx_with_great_grandchildren: ctx_1,
+      ctx_with_great_grandchildren_2: ctx_2
+    } do
+      for ctx <- [ctx_1, ctx_2] do
+        actual = Kin.first_great_grandchild(ctx)
+        assert 13 == actual.focus.term
+      end
+    end
+
+    test "should return the first grandchild that is found that matches the predicate for the Context",
+         %{ctx_with_great_grandchildren: ctx_1, ctx_with_great_grandchildren_2: ctx_2} do
+      predicate = &(&1.term > 16)
+
+      for ctx <- [ctx_1, ctx_2] do
+        actual = Kin.first_great_grandchild(ctx, predicate)
+        assert 17 == actual.focus.term
+      end
+    end
+
+    test "should return nil if Context has children but no grandchildren", %{simple_ctx: ctx} do
+      assert Kin.first_great_grandchild(ctx) == nil
+    end
+
+    test "should return nil if Context has no children", %{leaf_ctx: ctx} do
+      assert Kin.first_great_grandchild(ctx) == nil
+    end
+
+    test "should return nil if no grandchild is found that matches the predicate for the Context",
+         %{ctx_with_great_grandchildren: ctx_1, ctx_with_great_grandchildren_2: ctx_2} do
+      predicate = &(&1.term == 30)
+
+      for ctx <- [ctx_1, ctx_2] do
+        assert Kin.first_great_grandchild(ctx, predicate) == nil
+      end
+    end
+  end
 end

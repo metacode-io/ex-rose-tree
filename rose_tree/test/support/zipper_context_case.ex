@@ -85,7 +85,7 @@ defmodule RoseTree.ZipperContextCase do
       path: []
     }
 
-    ctx_with_grandchildren_3 = %Context{
+    ctx_with_great_grandchildren = %Context{
       focus:
         TreeNode.new(0, [
           TreeNode.new(1, [4, 5, 6]),
@@ -93,6 +93,24 @@ defmodule RoseTree.ZipperContextCase do
             TreeNode.new(7, [13, 14, 15]),
             TreeNode.new(8, [16, 17, 18]),
             TreeNode.new(9, [19, 20, 21])
+          ]),
+          TreeNode.new(3, [10, 11, 12])
+        ]),
+      prev: [],
+      next: [],
+      path: []
+    }
+
+    ctx_with_great_grandchildren_2 = %Context{
+      focus:
+        TreeNode.new(0, [
+          TreeNode.new(1, [4, 5, 6]),
+          TreeNode.new(2, [
+            TreeNode.new(-100),
+            TreeNode.new(7, [13, 14, 15]),
+            TreeNode.new(8, [16, 17, 18]),
+            TreeNode.new(9, [19, 20, 21]),
+            TreeNode.new(100)
           ]),
           TreeNode.new(3, [10, 11, 12])
         ]),
@@ -132,7 +150,8 @@ defmodule RoseTree.ZipperContextCase do
         ctx_with_locations,
         ctx_with_grandchildren,
         ctx_with_grandchildren_2,
-        ctx_with_grandchildren_3
+        ctx_with_great_grandchildren,
+        ctx_with_great_grandchildren_2
       ]
       |> Enum.with_index()
 
@@ -169,7 +188,9 @@ defmodule RoseTree.ZipperContextCase do
       ctx_with_locations: ctx_with_locations,
       ctx_with_grandchildren: ctx_with_grandchildren,
       ctx_with_grandchildren_2: ctx_with_grandchildren_2,
-      ctx_with_grandchildren_3: ctx_with_grandchildren_3,
+      ctx_with_great_grandchildren: ctx_with_great_grandchildren,
+      ctx_with_great_grandchildren_2: ctx_with_great_grandchildren_2,
+
       # locations
       all_locs_with_idx: all_locs_with_idx,
       root_loc: root_loc,
