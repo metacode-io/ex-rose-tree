@@ -107,15 +107,20 @@ defmodule RoseTree.Zipper.KinTest do
   end
 
   describe "first_grandchild/2" do
-    test "should return the first grandchild that is found for the Context", %{ctx_with_grandchildren: ctx_1, ctx_with_grandchildren_2: ctx_2} do
+    test "should return the first grandchild that is found for the Context", %{
+      ctx_with_grandchildren: ctx_1,
+      ctx_with_grandchildren_2: ctx_2
+    } do
       for ctx <- [ctx_1, ctx_2] do
         actual = Kin.first_grandchild(ctx)
         assert 4 == actual.focus.term
       end
     end
 
-    test "should return the first grandchild that is found that matches the predicate for the Context", %{ctx_with_grandchildren: ctx_1, ctx_with_grandchildren_2: ctx_2} do
+    test "should return the first grandchild that is found that matches the predicate for the Context",
+         %{ctx_with_grandchildren: ctx_1, ctx_with_grandchildren_2: ctx_2} do
       predicate = &(&1.term > 7)
+
       for ctx <- [ctx_1, ctx_2] do
         actual = Kin.first_grandchild(ctx, predicate)
         assert 8 == actual.focus.term
@@ -130,10 +135,51 @@ defmodule RoseTree.Zipper.KinTest do
       assert Kin.first_grandchild(ctx) == nil
     end
 
-    test "should return nil if no grandchild is found that matches the predicate for the Context", %{ctx_with_grandchildren: ctx_1, ctx_with_grandchildren_2: ctx_2} do
+    test "should return nil if no grandchild is found that matches the predicate for the Context",
+         %{ctx_with_grandchildren: ctx_1, ctx_with_grandchildren_2: ctx_2} do
       predicate = &(&1.term == 20)
+
       for ctx <- [ctx_1, ctx_2] do
         assert Kin.first_grandchild(ctx, predicate) == nil
+      end
+    end
+  end
+
+  describe "last_grandchild/2" do
+    test "should return the last grandchild that is found for the Context", %{
+      ctx_with_grandchildren: ctx_1,
+      ctx_with_grandchildren_2: ctx_2
+    } do
+      for ctx <- [ctx_1, ctx_2] do
+        actual = Kin.last_grandchild(ctx)
+        assert 12 == actual.focus.term
+      end
+    end
+
+    test "should return the last grandchild that is found that matches the predicate for the Context",
+         %{ctx_with_grandchildren: ctx_1, ctx_with_grandchildren_2: ctx_2} do
+      predicate = &(&1.term < 9)
+
+      for ctx <- [ctx_1, ctx_2] do
+        actual = Kin.last_grandchild(ctx, predicate)
+        assert 8 == actual.focus.term
+      end
+    end
+
+    test "should return nil if Context has children but no grandchildren", %{simple_ctx: ctx} do
+      assert Kin.last_grandchild(ctx) == nil
+    end
+
+    test "should return nil if Context has no children", %{leaf_ctx: ctx} do
+      assert Kin.last_grandchild(ctx) == nil
+    end
+
+    test "should return nil if no grandchild is found that matches the predicate for the Context",
+         %{ctx_with_grandchildren: ctx_1, ctx_with_grandchildren_2: ctx_2} do
+      predicate = &(&1.term == 20)
+
+      for ctx <- [ctx_1, ctx_2] do
+        assert Kin.last_grandchild(ctx, predicate) == nil
       end
     end
   end
