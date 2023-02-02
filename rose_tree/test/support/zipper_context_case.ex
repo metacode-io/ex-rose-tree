@@ -8,7 +8,7 @@ defmodule RoseTree.ZipperContextCase do
   use ExUnit.CaseTemplate
 
   alias RoseTree.TreeNode
-  alias RoseTree.Zipper.Context
+  alias RoseTree.Zipper.{Context, Location}
   alias RoseTree.Support.Generators
 
   using do
@@ -24,8 +24,8 @@ defmodule RoseTree.ZipperContextCase do
     end
   end
 
-  setup do
-    # trees
+  setup_all do
+    # basic trees
     empty_tree = %TreeNode{term: nil, children: []}
     leaf_tree = %TreeNode{term: 1, children: []}
 
@@ -38,16 +38,19 @@ defmodule RoseTree.ZipperContextCase do
       ]
     }
 
+    # random trees
+
     tree_x5 = Generators.random_tree(total_nodes: 5)
     tree_x25 = Generators.random_tree(total_nodes: 25)
     tree_x100 = Generators.random_tree(total_nodes: 100)
     tree_x = Generators.random_tree()
 
-    # zipper contexts
+    # basic zipper contexts
     empty_ctx = %Context{focus: empty_tree, prev: [], next: [], path: []}
     leaf_ctx = %Context{focus: leaf_tree, prev: [], next: [], path: []}
     simple_ctx = %Context{focus: simple_tree, prev: [], next: [], path: []}
 
+    # random zipper contexts
     ctx_x5 = %Context{focus: tree_x5, prev: [], next: [], path: []}
     ctx_x25 = %Context{focus: tree_x25, prev: [], next: [], path: []}
     ctx_x100 = %Context{focus: tree_x100, prev: [], next: [], path: []}
@@ -55,6 +58,12 @@ defmodule RoseTree.ZipperContextCase do
 
     ctx_with_siblings = Generators.random_zipper(num_locations: 0)
     ctx_with_locations = Generators.random_zipper(num_locations: 3)
+
+    root_loc = %Location{prev: [], term: 0, next: []}
+    loc_1 = %Location{prev: [simple_tree], term: 1, next: [simple_tree]}
+    loc_2 = %Location{prev: [simple_tree], term: 2, next: []}
+    loc_3 = %Location{prev: [], term: 3, next: [simple_tree]}
+    loc_4 = %Location{prev: [tree_x25, simple_tree], term: 4, next: [tree_x5, tree_x, tree_x100]}
 
     all_trees_with_idx =
       [
@@ -82,7 +91,18 @@ defmodule RoseTree.ZipperContextCase do
       ]
       |> Enum.with_index()
 
+    all_locs_with_idx =
+      [
+        root_loc,
+        loc_1,
+        loc_2,
+        loc_3,
+        loc_4
+      ]
+      |> Enum.with_index()
+
     %{
+      # trees
       all_trees_with_idx: all_trees_with_idx,
       empty_tree: empty_tree,
       leaf_tree: leaf_tree,
@@ -91,6 +111,7 @@ defmodule RoseTree.ZipperContextCase do
       tree_x5: tree_x5,
       tree_x25: tree_x25,
       tree_x100: tree_x100,
+      # contexts
       all_contexts_with_idx: all_contexts_with_idx,
       empty_ctx: empty_ctx,
       leaf_ctx: leaf_ctx,
@@ -100,7 +121,14 @@ defmodule RoseTree.ZipperContextCase do
       ctx_x100: ctx_x100,
       ctx_x: ctx_x,
       ctx_with_siblings: ctx_with_siblings,
-      ctx_with_locations: ctx_with_locations
+      ctx_with_locations: ctx_with_locations,
+      # locations
+      all_locs_with_idx: all_locs_with_idx,
+      root_loc: root_loc,
+      loc_1: loc_1,
+      loc_2: loc_2,
+      loc_3: loc_3,
+      loc_4: loc_4
     }
   end
 end

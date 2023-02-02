@@ -93,8 +93,8 @@ defmodule RoseTree.Zipper.Location do
 
   ## Examples
 
-      iex> trees = for t <- [5,4,3,2,1], do: RoseTree.TreeNode.new(t)
-      ...> RoseTree.TreeNode.all_tree_nodes?(trees)
+      iex> locs = for loc <- [5,4,3,2,1], do: RoseTree.Zipper.Location.new(loc)
+      ...> RoseTree.Zipper.Location.all_locations?(locs)
       true
 
   """

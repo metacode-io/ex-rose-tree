@@ -498,4 +498,37 @@ defmodule RoseTree.Zipper.Context do
   def new_location(%__MODULE__{focus: focus, prev: prev, next: next}) do
     Location.new(focus, prev: prev, next: next)
   end
+
+  @doc """
+  Builds a new Context from a list of Locations.
+
+  ## Examples
+
+      iex> locs = for loc <- [3,2,1], do: RoseTree.Zipper.Location.new(loc)
+      ...> RoseTree.Zipper.Context.from_locations(locs)
+      %RoseTree.Zipper.Context{
+        focus: %RoseTree.TreeNode{term: 3, children: []},
+        prev: [],
+        next: [],
+        path: [
+          %RoseTree.Zipper.Location{
+            prev: [],
+            term: 2,
+            next: []
+          },
+          %RoseTree.Zipper.Location{
+            prev: [],
+            term: 1,
+            next: []
+          }
+        ]
+      }
+
+  """
+  @spec from_locations([Location.t()]) :: Context.t()
+  def from_locations([%Location{} = loc | locs]) when Location.location?(loc) do
+    loc.term
+    |> TreeNode.new()
+    |> new(prev: loc.prev, next: loc.next, path: locs)
+  end
 end
