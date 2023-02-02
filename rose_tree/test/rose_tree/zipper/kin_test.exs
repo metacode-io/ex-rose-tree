@@ -62,4 +62,21 @@ defmodule RoseTree.Zipper.KinTest do
       assert Kin.first_child(ctx, predicate) == nil
     end
   end
+
+  describe "last_child/2" do
+    test "should return nil when given a Context with an empty focus", %{empty_ctx: ctx} do
+      assert Kin.last_child(ctx) == nil
+    end
+
+    test "should return nil when given a Context with a leaf focus", %{leaf_ctx: ctx} do
+      assert Kin.last_child(ctx) == nil
+    end
+
+    test "should return nil when given a predicate that does not match any children of the Context",
+         %{simple_ctx: ctx} do
+      predicate = &(&1.term == :not_found)
+
+      assert Kin.last_child(ctx, predicate) == nil
+    end
+  end
 end
