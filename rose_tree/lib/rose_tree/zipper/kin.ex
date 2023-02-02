@@ -764,14 +764,6 @@ defmodule RoseTree.Zipper.Kin do
       {[], []} ->
         nil
 
-      {[focus | prev], []} ->
-        %Context{
-          focus: focus,
-          prev: prev,
-          next: [],
-          path: ctx.path
-        }
-
       {prev, [focus | next]} ->
         %Context{
           focus: focus,

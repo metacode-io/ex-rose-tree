@@ -379,4 +379,32 @@ defmodule RoseTree.Zipper.KinTest do
       assert 8 == actual.focus.term
     end
   end
+
+  describe "sibling_at/2" do
+    test "should return nil when given a Context with no siblings", %{simple_ctx: ctx} do
+      for _ <- 0..5 do
+        idx = Enum.random(0..10)
+        assert Kin.sibling_at(ctx, idx) == nil
+      end
+    end
+
+    test "should return nil when given an index that is out of bounds for the siblings of the Context",
+         %{ctx_with_siblings: ctx} do
+      num_siblings = Enum.count(ctx.prev) + Enum.count(ctx.next) + 1
+
+      for _ <- 0..5 do
+        idx = Enum.random(num_siblings..20)
+        assert Kin.sibling_at(ctx, idx) == nil
+      end
+    end
+
+    test "should return the same Context when given an index that matches the current Context's index",
+         %{ctx_with_siblings: ctx} do
+      current_idx = Enum.count(ctx.prev)
+
+      actual = Kin.sibling_at(ctx, current_idx)
+
+      assert ctx.focus == actual.focus
+    end
+  end
 end
