@@ -409,21 +409,25 @@ defmodule RoseTree.Zipper.Kin do
   def last_great_grandchild(context, predicate \\ &Util.always/1)
 
   def last_great_grandchild(%Context{} = ctx, predicate) do
-    with %Context{} = last_grandchild <- last_grandchild(ctx) do
-      do_last_great_grandchild(last_grandchild, predicate)
-    else
-      _ -> nil
+    # last grandchild with children
+    case last_grandchild(ctx, &TreeNode.parent?/1) do
+      nil ->
+        nil
+
+      %Context{} = last_grandchild ->
+        do_last_great_grandchild(last_grandchild, predicate)
     end
   end
 
   defp do_last_great_grandchild(%Context{} = ctx, predicate) do
-    with %Context{} = last_great_grandchild <- last_child(ctx, predicate) do
-      last_great_grandchild
-    else
-      _ ->
+    case last_child(ctx, predicate) do
+      nil ->
         ctx
         |> previous_sibling()
         |> do_last_great_grandchild(predicate)
+
+      %Context{} = last_great_grandchild ->
+        last_great_grandchild
     end
   end
 
