@@ -222,7 +222,7 @@ defmodule RoseTree.Zipper.Kin do
 
   """
   @spec child_at(Context.t(), non_neg_integer()) :: Context.t() | nil
-  def child_at(%Context{focus: focus})
+  def child_at(%Context{focus: focus}, _index)
       when TreeNode.empty?(focus) or TreeNode.leaf?(focus),
       do: nil
 
@@ -232,14 +232,6 @@ defmodule RoseTree.Zipper.Kin do
     case Util.split_at(children, index) do
       {[], []} ->
         nil
-
-      {[focus | prev], []} ->
-        %Context{
-          focus: focus,
-          prev: prev,
-          next: [],
-          path: [Context.new_location(ctx) | ctx.path]
-        }
 
       {prev, [focus | next]} ->
         %Context{

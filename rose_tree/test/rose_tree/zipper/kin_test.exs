@@ -79,4 +79,30 @@ defmodule RoseTree.Zipper.KinTest do
       assert Kin.last_child(ctx, predicate) == nil
     end
   end
+
+  describe "child_at/1" do
+    test "should return nil when given a Context with an empty focus", %{empty_ctx: ctx} do
+      for _ <- 0..5 do
+        idx = Enum.random(0..10)
+        assert Kin.child_at(ctx, idx) == nil
+      end
+    end
+
+    test "should return nil when given a Context with a leaf focus", %{leaf_ctx: ctx} do
+      for _ <- 0..5 do
+        idx = Enum.random(0..10)
+        assert Kin.child_at(ctx, idx) == nil
+      end
+    end
+
+    test "should return nil when given a index that is out of bounds for the children of the Context",
+         %{simple_ctx: ctx} do
+      num_children = Enum.count(ctx.focus.children)
+
+      for _ <- 0..5 do
+        idx = Enum.random(num_children..10)
+        assert Kin.child_at(ctx, idx) == nil
+      end
+    end
+  end
 end

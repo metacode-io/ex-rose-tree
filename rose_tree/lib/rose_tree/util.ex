@@ -132,20 +132,24 @@ defmodule RoseTree.Util do
       when is_list(elements) and
              is_integer(index) and
              index >= 0 do
-    {_current_idx, prev, next} =
-      elements
-      |> Enum.reduce(
-        {0, [], []},
-        fn entry, {current_idx, prev, next} ->
-          if current_idx >= index do
-            {current_idx + 1, prev, [entry | next]}
-          else
-            {current_idx + 1, [entry | prev], next}
+    if index >= Enum.count(elements) do
+      {[], []}
+    else
+      {_current_idx, prev, next} =
+        elements
+        |> Enum.reduce(
+          {0, [], []},
+          fn entry, {current_idx, prev, next} ->
+            if current_idx >= index do
+              {current_idx + 1, prev, [entry | next]}
+            else
+              {current_idx + 1, [entry | prev], next}
+            end
           end
-        end
-      )
+        )
 
-    {prev, Enum.reverse(next)}
+      {prev, Enum.reverse(next)}
+    end
   end
 
   def split_at(elements, index)
