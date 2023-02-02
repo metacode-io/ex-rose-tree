@@ -254,21 +254,23 @@ defmodule RoseTree.Zipper.Kin do
   def first_grandchild(context, predicate \\ &Util.always/1)
 
   def first_grandchild(%Context{} = ctx, predicate) do
-    with %Context{} = first_child <- first_child(ctx) do
-      do_first_grandchild(first_child, predicate)
-    else
-      _ -> nil
+    case first_child(ctx) do
+      nil -> nil
+
+      %Context{} = first_child ->
+        do_first_grandchild(first_child, predicate)
     end
   end
 
   defp do_first_grandchild(%Context{} = ctx, predicate) do
-    with %Context{} = first_grandchild <- first_child(ctx, predicate) do
-      first_grandchild
-    else
-      _ ->
+    case first_child(ctx, predicate) do
+      nil ->
         ctx
         |> next_sibling()
         |> do_first_grandchild(predicate)
+
+      %Context{} = first_grandchild ->
+        first_grandchild
     end
   end
 

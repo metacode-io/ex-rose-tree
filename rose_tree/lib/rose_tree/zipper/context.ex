@@ -10,8 +10,13 @@ defmodule RoseTree.Zipper.Context do
   alias RoseTree.TreeNode
   alias RoseTree.Zipper.Location
 
-  @enforce_keys [:focus, :prev, :next, :path]
-  defstruct ~w(focus prev next path)a
+  @enforce_keys [:focus]
+  defstruct [
+    :focus,
+    prev: [],
+    next: [],
+    path: []
+  ]
 
   @type t :: %__MODULE__{
           focus: TreeNode.t(),

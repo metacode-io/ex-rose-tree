@@ -58,6 +58,45 @@ defmodule RoseTree.ZipperContextCase do
 
     ctx_with_siblings = Generators.random_zipper(num_locations: 0)
     ctx_with_locations = Generators.random_zipper(num_locations: 3)
+    ctx_with_grandchildren =
+      %Context{
+        focus: TreeNode.new(0, [
+          TreeNode.new(1, [4, 5, 6]),
+          TreeNode.new(2, [7, 8, 9]),
+          TreeNode.new(3, [10, 11, 12])
+        ]),
+        prev: [],
+        next: [],
+        path: []
+      }
+    ctx_with_grandchildren_2 =
+      %Context{
+        focus: TreeNode.new(0, [
+          TreeNode.new(-100),
+          TreeNode.new(1, [4, 5, 6]),
+          TreeNode.new(2, [7, 8, 9]),
+          TreeNode.new(3, [10, 11, 12]),
+          TreeNode.new(100)
+        ]),
+        prev: [],
+        next: [],
+        path: []
+      }
+      ctx_with_grandchildren_3 =
+        %Context{
+          focus: TreeNode.new(0, [
+            TreeNode.new(1, [4, 5, 6]),
+            TreeNode.new(2, [
+              TreeNode.new(7, [13, 14, 15]),
+              TreeNode.new(8, [16, 17, 18]),
+              TreeNode.new(9, [19, 20, 21]),
+            ]),
+            TreeNode.new(3, [10, 11, 12]),
+          ]),
+          prev: [],
+          next: [],
+          path: []
+        }
 
     root_loc = %Location{prev: [], term: 0, next: []}
     loc_1 = %Location{prev: [simple_tree], term: 1, next: [simple_tree]}
@@ -87,7 +126,10 @@ defmodule RoseTree.ZipperContextCase do
         ctx_x100,
         ctx_x,
         ctx_with_siblings,
-        ctx_with_locations
+        ctx_with_locations,
+        ctx_with_grandchildren,
+        ctx_with_grandchildren_2,
+        ctx_with_grandchildren_3
       ]
       |> Enum.with_index()
 
@@ -122,6 +164,9 @@ defmodule RoseTree.ZipperContextCase do
       ctx_x: ctx_x,
       ctx_with_siblings: ctx_with_siblings,
       ctx_with_locations: ctx_with_locations,
+      ctx_with_grandchildren: ctx_with_grandchildren,
+      ctx_with_grandchildren_2: ctx_with_grandchildren_2,
+      ctx_with_grandchildren_3: ctx_with_grandchildren_3,
       # locations
       all_locs_with_idx: all_locs_with_idx,
       root_loc: root_loc,
