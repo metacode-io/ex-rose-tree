@@ -613,8 +613,6 @@ defmodule RoseTree.Zipper.Kin do
   @spec last_sibling(Context.t(), predicate()) :: Context.t() | nil
   def last_sibling(context, predicate \\ &Util.always/1)
 
-  def last_sibling(%Context{prev: [], next: []}, _predicate), do: nil
-
   def last_sibling(%Context{next: []}, _predicate), do: nil
 
   def last_sibling(%Context{next: next} = ctx, predicate) do
