@@ -56,8 +56,23 @@ defmodule RoseTree.ZipperContextCase do
     ctx_x100 = %Context{focus: tree_x100, prev: [], next: [], path: []}
     ctx_x = %Context{focus: tree_x, prev: [], next: [], path: []}
 
-    ctx_with_siblings = Generators.random_zipper(num_locations: 0)
     ctx_with_locations = Generators.random_zipper(num_locations: 3)
+
+    ctx_with_siblings = %Context{
+      focus: TreeNode.new(5),
+      prev: [
+        TreeNode.new(4),
+        TreeNode.new(3),
+        TreeNode.new(2),
+        TreeNode.new(1)
+      ],
+      next: [
+        TreeNode.new(6),
+        TreeNode.new(7),
+        TreeNode.new(8),
+        TreeNode.new(9)
+      ]
+    }
 
     ctx_with_grandchildren = %Context{
       focus:

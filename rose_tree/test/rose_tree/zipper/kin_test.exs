@@ -267,10 +267,20 @@ defmodule RoseTree.Zipper.KinTest do
       assert Kin.first_sibling(ctx) == nil
     end
 
-    test "should return nil if no previous sibling is found for Context that matches the predicate", %{ctx_with_siblings: ctx} do
+    test "should return nil if no previous sibling is found for Context that matches the predicate",
+         %{ctx_with_siblings: ctx} do
       predicate = &(&1.term == :not_found)
 
       assert Kin.first_sibling(ctx, predicate) == nil
+    end
+
+    test "should return the first sibling node for Context that matches the predicate", %{
+      ctx_with_siblings: ctx
+    } do
+      predicate = &(&1.term == 3)
+
+      actual = Kin.first_sibling(ctx, predicate)
+      assert 3 == actual.focus.term
     end
   end
 end
