@@ -690,4 +690,43 @@ defmodule RoseTree.Zipper.KinTest do
       assert 21 == actual.focus.term
     end
   end
+
+  describe "next_grandnibling/2" do
+    test "should return nil if no siblings found", %{simple_ctx: ctx} do
+      assert Kin.next_grandnibling(ctx) == nil
+    end
+
+    test "should return nil if no siblings with children are found",
+         %{ctx_with_siblings: ctx} do
+      assert Kin.next_grandnibling(ctx) == nil
+    end
+
+    test "should return nil if no siblings with grandchildren are found",
+         %{ctx_with_niblings: ctx} do
+      assert Kin.next_grandnibling(ctx) == nil
+    end
+
+    test "should return nil if no next grandnibling matching the predicate is found",
+         %{ctx_with_grand_niblings: ctx} do
+      predicate = &(&1.term == :not_found)
+
+      assert Kin.next_grandnibling(ctx, predicate) == nil
+    end
+
+    test "should return the next grandnibling", %{
+      ctx_with_grand_niblings: ctx
+    } do
+      actual = Kin.next_grandnibling(ctx)
+      assert 26 == actual.focus.term
+    end
+
+    test "should return the next grandnibling matching the predicate", %{
+      ctx_with_grand_niblings: ctx
+    } do
+      predicate = &(&1.term == 30)
+
+      actual = Kin.next_grandnibling(ctx, predicate)
+      assert 30 == actual.focus.term
+    end
+  end
 end

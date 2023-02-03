@@ -910,19 +910,29 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  defp do_previous_grandnibling(_ctx, _predicate), do: nil
-
   @doc """
   Moves the focus to the next grand-nibling -- the first grandchild of
   the next sibling -- of the current focus. If not found, returns nil.
   """
-  @spec next_grandnibling(Context.t()) :: Context.t() | nil
-  def next_grandnibling(%Context{} = ctx) do
-    with %Context{} = next_sibling <- next_sibling(ctx),
-         %Context{} = first_grandchild <- first_grandchild(next_sibling) do
-      first_grandchild
-    else
-      nil -> nil
+  @spec next_grandnibling(Context.t(), predicate()) :: Context.t() | nil
+  def next_grandnibling(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    case next_sibling(ctx, &TreeNode.parent?/1) do
+      nil ->
+        nil
+
+      %Context{} = next_sibling ->
+        do_next_grandnibling(next_sibling, predicate)
+    end
+  end
+
+  defp do_next_grandnibling(%Context{} = ctx, predicate) do
+    case first_grandchild(ctx, predicate) do
+      nil ->
+        next_grandnibling(ctx, predicate)
+
+      %Context{} = first_grandchild ->
+        first_grandchild
     end
   end
 
