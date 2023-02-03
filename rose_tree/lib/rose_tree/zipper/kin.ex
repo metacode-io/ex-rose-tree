@@ -994,10 +994,10 @@ defmodule RoseTree.Zipper.Kin do
   Moves the focus to the next pibling -- the next sibling of the parent --
   of the current focus. If not found, returns nil.
   """
-  @spec next_pibling(Context.t()) :: Context.t() | nil
-  def next_pibling(%Context{} = ctx) do
+  @spec next_pibling(Context.t(), predicate()) :: Context.t() | nil
+  def next_pibling(%Context{} = ctx, predicate \\ &Util.always/1) do
     with %Context{} = parent <- parent(ctx),
-         %Context{} = next_sibling <- next_sibling(parent) do
+         %Context{} = next_sibling <- next_sibling(parent, predicate) do
       next_sibling
     else
       nil ->
