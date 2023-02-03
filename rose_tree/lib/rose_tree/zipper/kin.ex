@@ -815,10 +815,10 @@ defmodule RoseTree.Zipper.Kin do
   first previous sibling with children -- before the current focus.
   If not found, returns nil.
   """
-  @spec previous_nibling(Context.t()) :: Context.t() | nil
-  def previous_nibling(%Context{} = ctx) do
+  @spec previous_nibling(Context.t(), predicate()) :: Context.t() | nil
+  def previous_nibling(%Context{} = ctx, predicate \\ &Util.always/1) do
     with %Context{} = previous_sibling <- previous_sibling(ctx, &TreeNode.parent?/1),
-         %Context{} = last_child <- last_child(previous_sibling) do
+         %Context{} = last_child <- last_child(previous_sibling, predicate) do
       last_child
     else
       nil ->
