@@ -871,10 +871,10 @@ defmodule RoseTree.Zipper.Kin do
   last child of the sibling at the given index -- of the current focus.
   If not found, returns nil.
   """
-  @spec last_nibling_at_sibling(Context.t(), non_neg_integer()) :: Context.t() | nil
-  def last_nibling_at_sibling(%Context{} = ctx, index) when is_integer(index) do
+  @spec last_nibling_at_sibling(Context.t(), non_neg_integer(), predicate()) :: Context.t() | nil
+  def last_nibling_at_sibling(%Context{} = ctx, index, predicate \\ &Util.always/1) when is_integer(index) do
     with %Context{} = sibling_at <- sibling_at(ctx, index),
-         %Context{} = last_child <- last_child(sibling_at) do
+         %Context{} = last_child <- last_child(sibling_at, predicate) do
       last_child
     else
       nil ->
