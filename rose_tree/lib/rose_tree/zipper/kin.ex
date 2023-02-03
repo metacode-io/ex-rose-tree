@@ -1046,9 +1046,9 @@ defmodule RoseTree.Zipper.Kin do
       when is_function(predicate) do
     with starting_idx <- Context.index_of_parent(ctx),
          %Context{} = first_pibling <- first_pibling(ctx, &TreeNode.parent?/1),
-         %Context{} = first_cousin <-
+         %Context{} = first_first_cousin <-
            do_first_first_cousin(first_pibling, predicate, starting_idx) do
-      first_cousin
+      first_first_cousin
     else
       _ ->
         nil
@@ -1079,16 +1079,39 @@ defmodule RoseTree.Zipper.Kin do
   Moves the focus to the last first-cousin -- the last child of the last
   pibling -- of the current focus. If not found, returns nil.
   """
-  @spec last_first_cousin(Context.t()) :: Context.t() | nil
-  def last_first_cousin(%Context{} = ctx) do
-    with %Context{} = last_pibling <- last_pibling(ctx, &TreeNode.parent?/1),
-         %Context{} = last_child <- last_child(last_pibling) do
-      last_child
+  @spec last_first_cousin(Context.t(), predicate()) :: Context.t() | nil
+  def last_first_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    with starting_idx <- Context.index_of_parent(ctx),
+         %Context{} = last_pibling <- last_pibling(ctx, &TreeNode.parent?/1),
+         %Context{} = last_first_cousin <-
+           do_last_first_cousin(last_pibling, predicate, starting_idx) do
+      last_first_cousin
     else
-      nil ->
+      _ ->
         nil
     end
   end
+
+  defp do_last_first_cousin(%Context{} = ctx, predicate, starting_idx) do
+    current_idx = Context.index_of_focus(ctx)
+
+    if current_idx > starting_idx do
+      case last_child(ctx, predicate) do
+        nil ->
+          ctx
+          |> previous_sibling(&TreeNode.parent?/1)
+          |> do_last_first_cousin(predicate, starting_idx)
+
+        %Context{} = last_child ->
+          last_child
+      end
+    else
+      nil
+    end
+  end
+
+  defp do_first_first_cousin(_ctx, _predicate), do: nil
 
   # @doc """
   # Moves the focus to the previous first-cousin -- the last child of the previous

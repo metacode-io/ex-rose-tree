@@ -978,4 +978,50 @@ defmodule RoseTree.Zipper.KinTest do
       assert Kin.first_first_cousin(ctx, predicate) == nil
     end
   end
+
+  describe "last_first_cousin/2" do
+    test "should return nil if no parent found", %{simple_ctx: ctx} do
+      assert Kin.last_first_cousin(ctx) == nil
+    end
+
+    test "should return nil if parent has no siblings", %{ctx_with_parent: ctx} do
+      assert Kin.last_first_cousin(ctx) == nil
+    end
+
+    test "should return nil if no next pibling has children",
+         %{ctx_with_piblings: ctx} do
+      assert Kin.last_first_cousin(ctx) == nil
+    end
+
+    test "should return nil if no first-cousin found matching predicate",
+         %{ctx_with_1st_cousins: ctx} do
+      predicate = &(&1.term == :not_found)
+
+      assert Kin.last_first_cousin(ctx, predicate) == nil
+    end
+
+    test "should return the last first-cousin found", %{
+      ctx_with_1st_cousins: ctx
+    } do
+      actual = Kin.last_first_cousin(ctx)
+      assert 30 == actual.focus.term
+    end
+
+    test "should return the last first-cousin matching the predicate", %{
+      ctx_with_1st_cousins: ctx
+    } do
+      predicate = &(&1.term == 26)
+
+      actual = Kin.last_first_cousin(ctx, predicate)
+      assert 26 == actual.focus.term
+    end
+
+    test "should return nil and not seek before the original parent for a predicate match", %{
+      ctx_with_1st_cousins: ctx
+    } do
+      predicate = &(&1.term == 22)
+
+      assert Kin.last_first_cousin(ctx, predicate) == nil
+    end
+  end
 end
