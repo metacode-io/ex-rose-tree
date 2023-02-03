@@ -727,7 +727,8 @@ defmodule RoseTree.Zipper.Kin do
 
   @doc """
   Moves focus to the sibling of the current focus at the given index.
-  If no sibling is found at that index, returns nil.
+  If no sibling is found at that index, or if the provided index
+  is the index for the current focus, returns nil.
 
   ## Examples
 
@@ -758,19 +759,25 @@ defmodule RoseTree.Zipper.Kin do
   def sibling_at(%Context{prev: [], next: []} = ctx, index), do: nil
 
   def sibling_at(%Context{} = ctx, index) when is_integer(index) do
-    siblings = Enum.reverse(ctx.prev) ++ [ctx.focus | ctx.next]
+    current_idx = Context.index_of_focus(ctx)
 
-    case Util.split_at(siblings, index) do
-      {[], []} ->
-        nil
+    if current_idx == index do
+      nil
+    else
+      siblings = Enum.reverse(ctx.prev) ++ [ctx.focus | ctx.next]
 
-      {prev, [focus | next]} ->
-        %Context{
-          focus: focus,
-          prev: prev,
-          next: next,
-          path: ctx.path
-        }
+      case Util.split_at(siblings, index) do
+        {[], []} ->
+          nil
+
+        {prev, [focus | next]} ->
+          %Context{
+            focus: focus,
+            prev: prev,
+            next: next,
+            path: ctx.path
+          }
+      end
     end
   end
 
@@ -847,10 +854,11 @@ defmodule RoseTree.Zipper.Kin do
   first child of the sibling at the given index -- of the current focus.
   If not found, returns nil.
   """
-  @spec first_nibling_at_sibling(Context.t(), non_neg_integer()) :: Context.t() | nil
-  def first_nibling_at_sibling(%Context{} = ctx, index) when is_integer(index) do
+  @spec first_nibling_at_sibling(Context.t(), non_neg_integer(), predicate()) :: Context.t() | nil
+  def first_nibling_at_sibling(%Context{} = ctx, index, predicate \\ &Util.always/1)
+      when is_integer(index) do
     with %Context{} = sibling_at <- sibling_at(ctx, index),
-         %Context{} = first_child <- first_child(sibling_at) do
+         %Context{} = first_child <- first_child(sibling_at, predicate) do
       first_child
     else
       nil ->

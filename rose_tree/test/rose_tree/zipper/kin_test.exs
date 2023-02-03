@@ -404,13 +404,11 @@ defmodule RoseTree.Zipper.KinTest do
       end
     end
 
-    test "should return the same Context when given an index that matches the current Context's index",
+    test "should return nil when given an index that matches the current Context's index",
          %{ctx_with_siblings: ctx} do
       current_idx = Enum.count(ctx.prev)
 
-      actual = Kin.sibling_at(ctx, current_idx)
-
-      assert ctx.focus == actual.focus
+      assert Kin.sibling_at(ctx, current_idx) == nil
     end
   end
 
@@ -548,6 +546,57 @@ defmodule RoseTree.Zipper.KinTest do
       predicate = &(&1.term == 14)
 
       actual = Kin.next_nibling(ctx, predicate)
+      assert 14 == actual.focus.term
+    end
+  end
+
+  describe "first_nibling_at_sibling/3" do
+    test "should return nil if Context has no siblings", %{simple_ctx: ctx} do
+      assert Kin.first_nibling_at_sibling(ctx, 3) == nil
+    end
+
+    test "should return nil if no siblings with children is found for Context",
+         %{ctx_with_siblings: ctx} do
+      assert Kin.first_nibling_at_sibling(ctx, 3) == nil
+    end
+
+    test "should return nil when given an index that is out of bounds for the previous siblings of the Context",
+         %{ctx_with_niblings: ctx} do
+      num_siblings = Enum.count(ctx.prev) + Enum.count(ctx.next) + 1
+
+      for _ <- 0..5 do
+        idx = Enum.random(num_siblings..20)
+        assert Kin.first_nibling_at_sibling(ctx, idx) == nil
+      end
+    end
+
+    test "should return nil when given an index that matches the current Context's index",
+         %{ctx_with_niblings: ctx} do
+      current_idx = Enum.count(ctx.prev)
+
+      assert Kin.first_nibling_at_sibling(ctx, current_idx) == nil
+    end
+
+    test "should return nil if no previous nibling matching the predicate is found for the sibling at index",
+         %{ctx_with_niblings: ctx} do
+      predicate = &(&1.term == :not_found)
+
+      assert Kin.first_nibling_at_sibling(ctx, 6, predicate) == nil
+    end
+
+    test "should return the first nibling for sibling at index", %{
+      ctx_with_niblings: ctx
+    } do
+      actual = Kin.first_nibling_at_sibling(ctx, 6)
+      assert 13 == actual.focus.term
+    end
+
+    test "should return the first nibling for Context that matches the predicate", %{
+      ctx_with_niblings: ctx
+    } do
+      predicate = &(&1.term == 14)
+
+      actual = Kin.first_nibling_at_sibling(ctx, 6, predicate)
       assert 14 == actual.focus.term
     end
   end
