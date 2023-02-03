@@ -6,6 +6,8 @@ defmodule RoseTree.Zipper.KinTest do
 
   doctest RoseTree.Zipper.Kin
 
+  ## ANCESTORS
+
   describe "grandparent/1" do
     test "should return the grandparent of the current Context's focus if it has one",
          %{simple_ctx: ctx, root_loc: root_loc, loc_1: loc_1} do
@@ -45,6 +47,8 @@ defmodule RoseTree.Zipper.KinTest do
       assert Kin.great_grandparent(new_ctx) == nil
     end
   end
+
+  ## DESCENDANTS
 
   describe "first_child/2" do
     test "should return nil when given a Context with an empty focus", %{empty_ctx: ctx} do
@@ -262,6 +266,8 @@ defmodule RoseTree.Zipper.KinTest do
     end
   end
 
+  ## SIBLINGS
+
   describe "first_sibling/2" do
     test "should return nil if Context has no previous siblings", %{simple_ctx: ctx} do
       assert Kin.first_sibling(ctx) == nil
@@ -405,6 +411,42 @@ defmodule RoseTree.Zipper.KinTest do
       actual = Kin.sibling_at(ctx, current_idx)
 
       assert ctx.focus == actual.focus
+    end
+  end
+
+  ## NIBLINGS (NIECES + NEPHEWS)
+
+  describe "first_nibling/2" do
+    test "should return nil if Context has no previous siblings", %{simple_ctx: ctx} do
+      assert Kin.first_nibling(ctx) == nil
+    end
+
+    test "should return nil if no previous sibling with children is found for Context",
+         %{ctx_with_siblings: ctx} do
+      assert Kin.first_nibling(ctx) == nil
+    end
+
+    test "should return nil if no previous nibling that matches the predicate is found for Context",
+         %{ctx_with_niblings: ctx} do
+      predicate = &(&1.term == :not_found)
+
+      assert Kin.first_nibling(ctx, predicate) == nil
+    end
+
+    test "should return the first nibling for Context", %{
+      ctx_with_niblings: ctx
+    } do
+      actual = Kin.first_nibling(ctx)
+      assert 10 == actual.focus.term
+    end
+
+    test "should return the first nibling for Context that matches the predicate", %{
+      ctx_with_niblings: ctx
+    } do
+      predicate = &(&1.term == 11)
+
+      actual = Kin.first_nibling(ctx, predicate)
+      assert 11 == actual.focus.term
     end
   end
 end
