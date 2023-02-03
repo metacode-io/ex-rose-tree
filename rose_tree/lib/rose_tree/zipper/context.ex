@@ -285,6 +285,27 @@ defmodule RoseTree.Zipper.Context do
     do: Enum.count(prev)
 
   @doc """
+  Returns the index (zero-based) of the current focus' parent with
+  respect to any potentital siblings it may have. If the current
+  focus has no parent, returns nil.
+
+  ## Examples
+
+      iex> parent_siblings = for n <- [3,2,1], do: RoseTree.TreeNode.new(n)
+      ...> parent_loc = RoseTree.Zipper.Location.new(4, prev: parent_siblings)
+      ...> node = RoseTree.TreeNode.new(5)
+      ...> ctx = RoseTree.Zipper.Context.new(node, path: [parent_loc])
+      ...> RoseTree.Zipper.Context.index_of_parent(ctx)
+      3
+
+  """
+  @spec index_of_parent(t()) :: non_neg_integer() | nil
+  def index_of_parent(%__MODULE__{path: []}), do: nil
+
+  def index_of_parent(%__MODULE__{path: [parent | _]}),
+    do: Location.index_of_term(parent)
+
+  @doc """
   Returns the current context's parent location.
 
   ## Examples

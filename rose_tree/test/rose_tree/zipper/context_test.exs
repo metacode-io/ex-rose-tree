@@ -179,6 +179,12 @@ defmodule RoseTree.Zipper.ContextTest do
     end
   end
 
+  describe "index_of_parent/1" do
+    test "should return nil if given a Context with no parent", %{simple_ctx: ctx} do
+      assert nil == Context.index_of_parent(ctx)
+    end
+  end
+
   describe "parent_location/1" do
     test "should return nil if given a root Context", %{simple_ctx: ctx} do
       assert nil == Context.parent_location(ctx)

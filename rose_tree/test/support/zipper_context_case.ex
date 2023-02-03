@@ -232,6 +232,42 @@ defmodule RoseTree.ZipperContextCase do
       ]
     }
 
+    ctx_with_1st_cousins = %Context{
+      focus: TreeNode.new(20),
+      prev: [],
+      next: [],
+      path: [
+        Location.new(10,
+          prev: [
+            TreeNode.new(6),
+            TreeNode.new(4, [
+              TreeNode.new(22),
+              TreeNode.new(23),
+              TreeNode.new(24)
+            ]),
+            TreeNode.new(2, [
+              TreeNode.new(19),
+              TreeNode.new(20),
+              TreeNode.new(21)
+            ])
+          ],
+          next: [
+            TreeNode.new(14),
+            TreeNode.new(16, [
+              TreeNode.new(25),
+              TreeNode.new(26),
+              TreeNode.new(27)
+            ]),
+            TreeNode.new(18, [
+              TreeNode.new(28),
+              TreeNode.new(29),
+              TreeNode.new(30)
+            ])
+          ]
+        )
+      ]
+    }
+
     root_loc = %Location{prev: [], term: 0, next: []}
     loc_1 = %Location{prev: [simple_tree], term: 1, next: [simple_tree]}
     loc_2 = %Location{prev: [simple_tree], term: 2, next: []}
@@ -268,7 +304,8 @@ defmodule RoseTree.ZipperContextCase do
         ctx_with_great_grandchildren_2,
         ctx_with_niblings,
         ctx_with_grand_niblings,
-        ctx_with_piblings
+        ctx_with_piblings,
+        ctx_with_1st_cousins
       ]
       |> Enum.with_index()
 
@@ -311,6 +348,7 @@ defmodule RoseTree.ZipperContextCase do
       ctx_with_niblings: ctx_with_niblings,
       ctx_with_grand_niblings: ctx_with_grand_niblings,
       ctx_with_piblings: ctx_with_piblings,
+      ctx_with_1st_cousins: ctx_with_1st_cousins,
 
       # locations
       all_locs_with_idx: all_locs_with_idx,
