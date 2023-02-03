@@ -58,6 +58,15 @@ defmodule RoseTree.ZipperContextCase do
 
     ctx_with_locations = Generators.random_zipper(num_locations: 3)
 
+    ctx_with_parent = %Context{
+      focus: TreeNode.new(20),
+      prev: [],
+      next: [],
+      path: [
+        Location.new(10)
+      ]
+    }
+
     ctx_with_siblings = %Context{
       focus: TreeNode.new(5),
       prev: [
@@ -203,6 +212,26 @@ defmodule RoseTree.ZipperContextCase do
       ]
     }
 
+    ctx_with_piblings = %Context{
+      focus: TreeNode.new(20),
+      prev: [],
+      next: [],
+      path: [
+        Location.new(10,
+          prev: [
+            TreeNode.new(6),
+            TreeNode.new(4),
+            TreeNode.new(2)
+          ],
+          next: [
+            TreeNode.new(14),
+            TreeNode.new(16),
+            TreeNode.new(18)
+          ]
+        )
+      ]
+    }
+
     root_loc = %Location{prev: [], term: 0, next: []}
     loc_1 = %Location{prev: [simple_tree], term: 1, next: [simple_tree]}
     loc_2 = %Location{prev: [simple_tree], term: 2, next: []}
@@ -230,6 +259,7 @@ defmodule RoseTree.ZipperContextCase do
         ctx_x25,
         ctx_x100,
         ctx_x,
+        ctx_with_parent,
         ctx_with_siblings,
         ctx_with_locations,
         ctx_with_grandchildren,
@@ -237,7 +267,8 @@ defmodule RoseTree.ZipperContextCase do
         ctx_with_great_grandchildren,
         ctx_with_great_grandchildren_2,
         ctx_with_niblings,
-        ctx_with_grand_niblings
+        ctx_with_grand_niblings,
+        ctx_with_piblings
       ]
       |> Enum.with_index()
 
@@ -270,6 +301,7 @@ defmodule RoseTree.ZipperContextCase do
       ctx_x25: ctx_x25,
       ctx_x100: ctx_x100,
       ctx_x: ctx_x,
+      ctx_with_parent: ctx_with_parent,
       ctx_with_siblings: ctx_with_siblings,
       ctx_with_locations: ctx_with_locations,
       ctx_with_grandchildren: ctx_with_grandchildren,
@@ -278,6 +310,7 @@ defmodule RoseTree.ZipperContextCase do
       ctx_with_great_grandchildren_2: ctx_with_great_grandchildren_2,
       ctx_with_niblings: ctx_with_niblings,
       ctx_with_grand_niblings: ctx_with_grand_niblings,
+      ctx_with_piblings: ctx_with_piblings,
 
       # locations
       all_locs_with_idx: all_locs_with_idx,

@@ -949,10 +949,10 @@ defmodule RoseTree.Zipper.Kin do
   Moves the focus to the first pibling -- the first sibling of the parent --
   of the current focus. If not found, returns nil.
   """
-  @spec first_pibling(Context.t()) :: Context.t() | nil
-  def first_pibling(%Context{} = ctx) do
+  @spec first_pibling(Context.t(), predicate()) :: Context.t() | nil
+  def first_pibling(%Context{} = ctx, predicate \\ &Util.always/1) do
     with %Context{} = parent <- parent(ctx),
-         %Context{} = first_sibling <- first_sibling(parent) do
+         %Context{} = first_sibling <- first_sibling(parent, predicate) do
       first_sibling
     else
       nil ->
