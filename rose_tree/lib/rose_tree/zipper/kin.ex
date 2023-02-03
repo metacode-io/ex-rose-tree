@@ -979,10 +979,10 @@ defmodule RoseTree.Zipper.Kin do
   Moves the focus to the previous pibling -- the previous sibling of the parent --
   of the current focus. If not found, returns nil.
   """
-  @spec previous_pibling(Context.t()) :: Context.t() | nil
-  def previous_pibling(%Context{} = ctx) do
+  @spec previous_pibling(Context.t(), predicate()) :: Context.t() | nil
+  def previous_pibling(%Context{} = ctx, predicate \\ &Util.always/1) do
     with %Context{} = parent <- parent(ctx),
-         %Context{} = previous_sibling <- previous_sibling(parent) do
+         %Context{} = previous_sibling <- previous_sibling(parent, predicate) do
       previous_sibling
     else
       nil ->

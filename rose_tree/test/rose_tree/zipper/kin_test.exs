@@ -772,7 +772,7 @@ defmodule RoseTree.Zipper.KinTest do
       assert Kin.last_pibling(ctx) == nil
     end
 
-    test "should return nil if no previous pibling found matching the predicate",
+    test "should return nil if no next pibling found matching the predicate",
          %{ctx_with_piblings: ctx} do
       predicate = &(&1.term == :not_found)
 
@@ -793,6 +793,39 @@ defmodule RoseTree.Zipper.KinTest do
 
       actual = Kin.last_pibling(ctx, predicate)
       assert 14 == actual.focus.term
+    end
+  end
+
+  describe "previous_pibling/2" do
+    test "should return nil if no parent found", %{simple_ctx: ctx} do
+      assert Kin.previous_pibling(ctx) == nil
+    end
+
+    test "should return nil if parent has no siblings", %{ctx_with_parent: ctx} do
+      assert Kin.previous_pibling(ctx) == nil
+    end
+
+    test "should return nil if no previous pibling found matching the predicate",
+         %{ctx_with_piblings: ctx} do
+      predicate = &(&1.term == :not_found)
+
+      assert Kin.previous_pibling(ctx, predicate) == nil
+    end
+
+    test "should return the first previous pibling found", %{
+      ctx_with_piblings: ctx
+    } do
+      actual = Kin.previous_pibling(ctx)
+      assert 6 == actual.focus.term
+    end
+
+    test "should return the first previous pibling matching the predicate", %{
+      ctx_with_piblings: ctx
+    } do
+      predicate = &(&1.term == 4)
+
+      actual = Kin.previous_pibling(ctx, predicate)
+      assert 4 == actual.focus.term
     end
   end
 end
