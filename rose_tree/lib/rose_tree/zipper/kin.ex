@@ -180,7 +180,7 @@ defmodule RoseTree.Zipper.Kin do
       when TreeNode.empty?(focus) or TreeNode.leaf?(focus),
       do: nil
 
-  def last_child(%Context{} = ctx, predicate) do
+  def last_child(%Context{} = ctx, predicate) when is_function(predicate) do
     children =
       ctx
       |> Context.focused_children()
@@ -253,7 +253,7 @@ defmodule RoseTree.Zipper.Kin do
   @spec first_grandchild(Context.t(), predicate()) :: Context.t() | nil
   def first_grandchild(context, predicate \\ &Util.always/1)
 
-  def first_grandchild(%Context{} = ctx, predicate) do
+  def first_grandchild(%Context{} = ctx, predicate) when is_function(predicate) do
     case first_child(ctx) do
       nil ->
         nil
@@ -287,7 +287,7 @@ defmodule RoseTree.Zipper.Kin do
   @spec last_grandchild(Context.t(), predicate()) :: Context.t() | nil
   def last_grandchild(context, predicate \\ &Util.always/1)
 
-  def last_grandchild(%Context{} = ctx, predicate) do
+  def last_grandchild(%Context{} = ctx, predicate) when is_function(predicate) do
     case last_child(ctx) do
       nil ->
         nil
@@ -373,7 +373,7 @@ defmodule RoseTree.Zipper.Kin do
   @spec first_great_grandchild(Context.t(), predicate()) :: Context.t() | nil
   def first_great_grandchild(context, predicate \\ &Util.always/1)
 
-  def first_great_grandchild(%Context{} = ctx, predicate) do
+  def first_great_grandchild(%Context{} = ctx, predicate) when is_function(predicate) do
     # first grandchild with children
     case first_grandchild(ctx, &TreeNode.parent?/1) do
       nil ->
@@ -408,7 +408,7 @@ defmodule RoseTree.Zipper.Kin do
   @spec last_great_grandchild(Context.t(), predicate()) :: Context.t() | nil
   def last_great_grandchild(context, predicate \\ &Util.always/1)
 
-  def last_great_grandchild(%Context{} = ctx, predicate) do
+  def last_great_grandchild(%Context{} = ctx, predicate) when is_function(predicate) do
     # last grandchild with children
     case last_grandchild(ctx, &TreeNode.parent?/1) do
       nil ->
@@ -470,7 +470,7 @@ defmodule RoseTree.Zipper.Kin do
 
   def first_sibling(%Context{prev: []}, _predicate), do: nil
 
-  def first_sibling(%Context{prev: prev} = ctx, predicate) do
+  def first_sibling(%Context{prev: prev} = ctx, predicate) when is_function(predicate) do
     previous_siblings = Enum.reverse(prev)
 
     case Util.split_when(previous_siblings, predicate) do
@@ -553,7 +553,7 @@ defmodule RoseTree.Zipper.Kin do
 
   def previous_sibling(%Context{prev: []}, _predicate), do: nil
 
-  def previous_sibling(%Context{prev: prev} = ctx, predicate) do
+  def previous_sibling(%Context{prev: prev} = ctx, predicate) when is_function(predicate) do
     case Util.split_when(prev, predicate) do
       {[], []} ->
         nil
@@ -615,7 +615,7 @@ defmodule RoseTree.Zipper.Kin do
 
   def last_sibling(%Context{next: []}, _predicate), do: nil
 
-  def last_sibling(%Context{next: next} = ctx, predicate) do
+  def last_sibling(%Context{next: next} = ctx, predicate) when is_function(predicate) do
     last_siblings = Enum.reverse(next)
 
     case Util.split_when(last_siblings, predicate) do
@@ -696,7 +696,7 @@ defmodule RoseTree.Zipper.Kin do
 
   def next_sibling(%Context{next: []}, _predicate), do: nil
 
-  def next_sibling(%Context{next: next} = ctx, predicate) do
+  def next_sibling(%Context{next: next} = ctx, predicate) when is_function(predicate) do
     case Util.split_when(next, predicate) do
       {[], []} ->
         nil
@@ -791,7 +791,7 @@ defmodule RoseTree.Zipper.Kin do
   found, returns nil.
   """
   @spec first_nibling(Context.t(), predicate()) :: Context.t() | nil
-  def first_nibling(%Context{} = ctx, predicate \\ &Util.always/1) do
+  def first_nibling(%Context{} = ctx, predicate \\ &Util.always/1) when is_function(predicate) do
     with %Context{} = first_sibling <- first_sibling(ctx, &TreeNode.parent?/1),
          %Context{} = first_child <- first_child(first_sibling, predicate) do
       first_child
@@ -807,7 +807,7 @@ defmodule RoseTree.Zipper.Kin do
   found, returns nil.
   """
   @spec last_nibling(Context.t(), predicate()) :: Context.t() | nil
-  def last_nibling(%Context{} = ctx, predicate \\ &Util.always/1) do
+  def last_nibling(%Context{} = ctx, predicate \\ &Util.always/1) when is_function(predicate) do
     with %Context{} = last_sibling <- last_sibling(ctx, &TreeNode.parent?/1),
          %Context{} = last_child <- last_child(last_sibling, predicate) do
       last_child
@@ -823,7 +823,8 @@ defmodule RoseTree.Zipper.Kin do
   If not found, returns nil.
   """
   @spec previous_nibling(Context.t(), predicate()) :: Context.t() | nil
-  def previous_nibling(%Context{} = ctx, predicate \\ &Util.always/1) do
+  def previous_nibling(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
     with %Context{} = previous_sibling <- previous_sibling(ctx, &TreeNode.parent?/1),
          %Context{} = last_child <- last_child(previous_sibling, predicate) do
       last_child
@@ -839,7 +840,7 @@ defmodule RoseTree.Zipper.Kin do
   If not found, returns nil.
   """
   @spec next_nibling(Context.t(), predicate()) :: Context.t() | nil
-  def next_nibling(%Context{} = ctx, predicate \\ &Util.always/1) do
+  def next_nibling(%Context{} = ctx, predicate \\ &Util.always/1) when is_function(predicate) do
     with %Context{} = next_sibling <- next_sibling(ctx, &TreeNode.parent?/1),
          %Context{} = first_child <- first_child(next_sibling, predicate) do
       first_child
@@ -856,7 +857,7 @@ defmodule RoseTree.Zipper.Kin do
   """
   @spec first_nibling_at_sibling(Context.t(), non_neg_integer(), predicate()) :: Context.t() | nil
   def first_nibling_at_sibling(%Context{} = ctx, index, predicate \\ &Util.always/1)
-      when is_integer(index) do
+      when is_integer(index) and is_function(predicate) do
     with %Context{} = sibling_at <- sibling_at(ctx, index),
          %Context{} = first_child <- first_child(sibling_at, predicate) do
       first_child
@@ -872,7 +873,8 @@ defmodule RoseTree.Zipper.Kin do
   If not found, returns nil.
   """
   @spec last_nibling_at_sibling(Context.t(), non_neg_integer(), predicate()) :: Context.t() | nil
-  def last_nibling_at_sibling(%Context{} = ctx, index, predicate \\ &Util.always/1) when is_integer(index) do
+  def last_nibling_at_sibling(%Context{} = ctx, index, predicate \\ &Util.always/1)
+      when is_integer(index) and is_function(predicate) do
     with %Context{} = sibling_at <- sibling_at(ctx, index),
          %Context{} = last_child <- last_child(sibling_at, predicate) do
       last_child
@@ -886,15 +888,29 @@ defmodule RoseTree.Zipper.Kin do
   Moves the focus to the previous grand-nibling -- the last grandchild of
   the previous sibling -- of the current focus. If not found, returns nil.
   """
-  @spec previous_grandnibling(Context.t()) :: Context.t() | nil
-  def previous_grandnibling(%Context{} = ctx) do
-    with %Context{} = prev_sibling <- previous_sibling(ctx),
-         %Context{} = last_gchild <- last_grandchild(prev_sibling) do
-      last_gchild
-    else
-      nil -> nil
+  @spec previous_grandnibling(Context.t(), predicate()) :: Context.t() | nil
+  def previous_grandnibling(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    case previous_sibling(ctx, &TreeNode.parent?/1) do
+      nil ->
+        nil
+
+      %Context{} = previous_sibling ->
+        do_previous_grandnibling(previous_sibling, predicate)
     end
   end
+
+  defp do_previous_grandnibling(%Context{} = ctx, predicate) do
+    case last_grandchild(ctx, predicate) do
+      nil ->
+        previous_grandnibling(ctx, predicate)
+
+      %Context{} = last_grandchild ->
+        last_grandchild
+    end
+  end
+
+  defp do_previous_grandnibling(_ctx, _predicate), do: nil
 
   @doc """
   Moves the focus to the next grand-nibling -- the first grandchild of
