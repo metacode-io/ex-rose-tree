@@ -861,4 +861,39 @@ defmodule RoseTree.Zipper.KinTest do
       assert 18 == actual.focus.term
     end
   end
+
+  describe "pibling_at/2" do
+    test "should return nil when parent has no siblings", %{simple_ctx: ctx} do
+      for _ <- 0..5 do
+        idx = Enum.random(0..10)
+        assert Kin.pibling_at(ctx, idx) == nil
+      end
+    end
+
+    test "should return nil when given an index that is out of bounds for the parent's siblings",
+         %{ctx_with_piblings: ctx} do
+      [parent | _] = ctx.path
+
+      num_piblings = Enum.count(parent.prev) + Enum.count(parent.next) + 1
+
+      for _ <- 0..5 do
+        idx = Enum.random(num_piblings..20)
+        assert Kin.pibling_at(ctx, idx) == nil
+      end
+    end
+
+    test "should return nil when given an index that matches the current Context's index",
+         %{ctx_with_piblings: ctx} do
+      [parent | _] = ctx.path
+
+      current_idx = Enum.count(parent.prev)
+
+      assert Kin.pibling_at(ctx, current_idx) == nil
+    end
+
+    test "should return the pibling at the given index", %{ctx_with_piblings: ctx} do
+      actual = Kin.pibling_at(ctx, 0)
+      assert 2 == actual.focus.term
+    end
+  end
 end
