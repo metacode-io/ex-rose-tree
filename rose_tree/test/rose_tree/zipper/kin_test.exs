@@ -449,4 +449,38 @@ defmodule RoseTree.Zipper.KinTest do
       assert 11 == actual.focus.term
     end
   end
+
+  describe "last_nibling/2" do
+    test "should return nil if Context has no next siblings", %{simple_ctx: ctx} do
+      assert Kin.last_nibling(ctx) == nil
+    end
+
+    test "should return nil if no next sibling with children is found for Context",
+         %{ctx_with_siblings: ctx} do
+      assert Kin.last_nibling(ctx) == nil
+    end
+
+    test "should return nil if no next nibling that matches the predicate is found for Context",
+         %{ctx_with_niblings: ctx} do
+      predicate = &(&1.term == :not_found)
+
+      assert Kin.last_nibling(ctx, predicate) == nil
+    end
+
+    test "should return the last nibling for Context", %{
+      ctx_with_niblings: ctx
+    } do
+      actual = Kin.last_nibling(ctx)
+      assert 15 == actual.focus.term
+    end
+
+    test "should return the last nibling for Context that matches the predicate", %{
+      ctx_with_niblings: ctx
+    } do
+      predicate = &(&1.term == 14)
+
+      actual = Kin.last_nibling(ctx, predicate)
+      assert 14 == actual.focus.term
+    end
+  end
 end

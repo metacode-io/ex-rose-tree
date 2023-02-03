@@ -799,10 +799,10 @@ defmodule RoseTree.Zipper.Kin do
   last sibling  with children -- before the current focus. If not
   found, returns nil.
   """
-  @spec last_nibling(Context.t()) :: Context.t() | nil
-  def last_nibling(%Context{} = ctx) do
+  @spec last_nibling(Context.t(), predicate()) :: Context.t() | nil
+  def last_nibling(%Context{} = ctx, predicate \\ &Util.always/1) do
     with %Context{} = last_sibling <- last_sibling(ctx, &TreeNode.parent?/1),
-         %Context{} = last_child <- last_child(last_sibling) do
+         %Context{} = last_child <- last_child(last_sibling, predicate) do
       last_child
     else
       nil ->
