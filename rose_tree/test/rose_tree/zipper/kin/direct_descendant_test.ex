@@ -8,11 +8,11 @@ defmodule RoseTree.Zipper.Kin.DirectDescendantTest do
     %{
       empty_ctx: Zippers.empty_ctx(),
       leaf_ctx: Zippers.leaf_ctx(),
-      simple_ctx: Zipper.simple_ctx(),
-      ctx_with_grandchildren: Zipper.ctx_with_grandchildren(),
-      ctx_with_grandchildren_2: Zipper.ctx_with_grandchildren_2(),
-      ctx_with_great_grandchildren: Zipper.ctx_with_great_grandchildren(),
-      ctx_with_great_grandchildren_2: Zipper.ctx_with_great_grandchildren_2()
+      simple_ctx: Zippers.simple_ctx(),
+      ctx_with_grandchildren: Zippers.ctx_with_grandchildren(),
+      ctx_with_grandchildren_2: Zippers.ctx_with_grandchildren_2(),
+      ctx_with_great_grandchildren: Zippers.ctx_with_great_grandchildren(),
+      ctx_with_great_grandchildren_2: Zippers.ctx_with_great_grandchildren_2()
     }
   end
 

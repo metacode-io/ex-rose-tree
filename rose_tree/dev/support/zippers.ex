@@ -4,6 +4,7 @@ defmodule RoseTree.Support.Zippers do
   """
 
   alias RoseTree.Support.Trees
+  alias RoseTree.TreeNode
   alias RoseTree.Zipper.{Context, Location}
 
   def empty_ctx() do
@@ -15,7 +16,7 @@ defmodule RoseTree.Support.Zippers do
   end
 
   def simple_ctx() do
-    %Context{focus: Tree.simple_tree(), prev: [], next: [], path: []}
+    %Context{focus: Trees.simple_tree(), prev: [], next: [], path: []}
   end
 
   def ctx_with_parent() do
