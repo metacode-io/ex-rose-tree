@@ -21,6 +21,20 @@ defmodule RoseTree.Zipper.Kin do
   Moves the focus to the parent Location. If at the root, thus no
   parent, returns nil.
 
+  ## Diagram
+
+  ```mermaid
+  graph TD
+
+  finish(["Parent (FINISH)"]) --- start(["Focus (START)"])
+  start -.-> finish
+
+  style start fill:#A9FFF7,stroke:#82ABA1,stroke-width:2px
+  style finish fill:#94FBAB,stroke:#82ABA1,stroke-width:2px
+  linkStyle 0 stroke:#FFF,color:#FFF
+
+  ```
+
   ## Examples
 
       iex> prev = for n <- [4,3], do: RoseTree.TreeNode.new(n)
@@ -61,6 +75,23 @@ defmodule RoseTree.Zipper.Kin do
   @doc """
   Moves the focus to the grandparent -- the parent of the parent -- of
   the focus, if possible. If there is no grandparent, returns nil.
+
+  ## Diagram
+
+  ```mermaid
+  graph TD
+
+  finish(["Grandparent (FINISH)"]) --- p(Parent)
+  p --- start(["Focus (START)"])
+  start -.-> p
+  p -.-> finish
+
+  style start fill:#A9FFF7
+  style finish fill:#94FBAB
+  linkStyle 0 stroke:#FFF,color:#FFF
+  linkStyle 1 stroke:#FFF,color:#FFF
+
+  ```
   """
   @spec grandparent(Context.t()) :: Context.t() | nil
   def grandparent(%Context{} = ctx) do
@@ -95,6 +126,76 @@ defmodule RoseTree.Zipper.Kin do
   @doc """
   Moves focus to the first child. If there are no children, and this is
   a leaf, returns nil.
+
+  ## Diagram (Before)
+
+  ```mermaid
+  flowchart TD
+
+  subgraph PREV
+    empty1("[]")
+  end
+  subgraph FOCUS
+    start(["0 (START)"])
+  end
+  subgraph CHILDREN
+    direction LR
+    finish(["1 (FINISH)"]) --> c1(2)
+    c1 --> c2(3)
+    c2 --> c3(4)
+  end
+  subgraph NEXT
+    empty2("[]")
+  end
+
+  FOCUS -.-> PREV
+  FOCUS --> CHILDREN
+  FOCUS -.-> NEXT
+
+  style start fill:#A9FFF7
+  style finish fill:#94FBAB
+
+  ```
+
+  ## Diagram (After)
+
+  ```mermaid
+  flowchart BT
+
+  subgraph ANCESTORS
+    start(["0 (START)"])
+  end
+  subgraph SIBLINGS
+    direction TB
+    subgraph FOCUS
+      finish(["1 (FINISH)"])
+    end
+    subgraph PREV
+      empty1("[]")
+    end
+    subgraph NEXT
+      direction LR
+      n1(2) --> n2(3)
+      n2 --> n3(4)
+    end
+  end
+  subgraph DESCENDANTS
+    subgraph CHILDREN
+      empty2("[]")
+    end
+  end
+
+  DESCENDANTS --- SIBLINGS -.-> ANCESTORS
+  SIBLINGS --> DESCENDANTS
+  FOCUS -.-> PREV
+  FOCUS -.-> NEXT
+
+  style start fill:#A9FFF7
+  style finish fill:#94FBAB
+  linkStyle 2 stroke:#FFF
+
+  ```
+
 
   ## Examples
 

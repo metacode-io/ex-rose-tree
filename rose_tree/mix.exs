@@ -35,7 +35,8 @@ defmodule RoseTree.MixProject do
             RoseTree.Support.Generators
           ]
         ],
-        extras: []
+        extras: [],
+        before_closing_body_tag: &before_closing_body_tag/1
       ]
     ]
   end
@@ -62,4 +63,31 @@ defmodule RoseTree.MixProject do
   defp elixirc_paths(:test), do: ["lib", "dev", "test/support"]
   defp elixirc_paths(:dev), do: ["lib", "dev"]
   defp elixirc_paths(_env), do: ["lib"]
+
+  defp before_closing_body_tag(:html) do
+    """
+    <!-- mermaid.js -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        mermaid.initialize({ startOnLoad: false });
+        let id = 0;
+        for (const codeEl of document.querySelectorAll("pre code.mermaid")) {
+          const preEl = codeEl.parentElement;
+          const graphDefinition = codeEl.textContent;
+          const graphEl = document.createElement("div");
+          const graphId = "mermaid-graph-" + id++;
+          mermaid.render(graphId, graphDefinition, function (svgSource, bindListeners) {
+            graphEl.innerHTML = svgSource;
+            bindListeners && bindListeners(graphEl);
+            preEl.insertAdjacentElement("afterend", graphEl);
+            preEl.remove();
+          });
+        }
+      });
+    </script>
+    """
+  end
+
+  defp before_closing_body_tag(_), do: ""
 end
