@@ -1073,8 +1073,6 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  defp do_first_first_cousin(_ctx, _predicate, _starting_idx), do: nil
-
   @doc """
   Moves the focus to the last first-cousin -- the last child of the last
   pibling with children -- of the current focus. If not found, returns nil.
@@ -1110,8 +1108,6 @@ defmodule RoseTree.Zipper.Kin do
       nil
     end
   end
-
-  defp do_first_first_cousin(_ctx, _predicate, _starting_idx), do: nil
 
   @doc """
   Moves the focus to the previous first-cousin -- the last child of the
