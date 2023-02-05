@@ -296,4 +296,64 @@ defmodule RoseTree.Support.Zippers do
       ]
     }
   end
+
+  def ctx_with_2nd_cousins() do
+    %Context{
+      focus: TreeNode.new(20),
+      prev: [],
+      next: [],
+      path: [
+        Location.new(15),
+        Location.new(10,
+          prev: [
+            TreeNode.new(6),
+            TreeNode.new(4, [
+              TreeNode.new(22, [
+                TreeNode.new(44),
+                TreeNode.new(45),
+                TreeNode.new(46)
+              ]),
+              TreeNode.new(23),
+              TreeNode.new(24, [
+                TreeNode.new(47),
+                TreeNode.new(48),
+                TreeNode.new(49)
+              ])
+            ]),
+            TreeNode.new(2, [
+              TreeNode.new(19),
+              TreeNode.new(20, [
+                TreeNode.new(50),
+                TreeNode.new(51)
+              ]),
+              TreeNode.new(21)
+            ])
+          ],
+          next: [
+            TreeNode.new(14),
+            TreeNode.new(16, [
+              TreeNode.new(25),
+              TreeNode.new(26, [
+                TreeNode.new(52),
+                TreeNode.new(53)
+              ]),
+              TreeNode.new(27)
+            ]),
+            TreeNode.new(18, [
+              TreeNode.new(28, [
+                TreeNode.new(54),
+                TreeNode.new(55),
+                TreeNode.new(56)
+              ]),
+              TreeNode.new(29),
+              TreeNode.new(30, [
+                TreeNode.new(57),
+                TreeNode.new(58)
+              ])
+            ])
+          ]
+        )
+      ]
+    }
+  end
 end

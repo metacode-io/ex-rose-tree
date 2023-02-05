@@ -1239,10 +1239,41 @@ defmodule RoseTree.Zipper.Kin do
   ### SECOND COUSINS
   ###
 
+  @doc """
+  Moves the focus to the first second-cousin -- the first grandchild of
+  the first grandpibling with grandchildren -- of the current focus. If not
+  found, returns nil.
+  """
   @spec first_second_cousin(Context.t(), predicate()) :: Context.t() | nil
   def first_second_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    raise(Error, "not implemented")
+    with starting_idx <- Context.index_of_grandparent(ctx),
+         %Context{} = first_grandpibling <- first_grandpibling(ctx, &TreeNode.parent?/1),
+         %Context{} = first_second_cousin <-
+           do_first_second_cousin(first_grandpibling, predicate, starting_idx) do
+      first_second_cousin
+    else
+      _ ->
+        nil
+    end
+  end
+
+  defp do_first_second_cousin(%Context{} = ctx, predicate, starting_idx) do
+    current_idx = Context.index_of_focus(ctx)
+
+    if current_idx < starting_idx do
+      case first_grandchild(ctx, predicate) do
+        nil ->
+          ctx
+          |> next_sibling(&TreeNode.parent?/1)
+          |> do_first_second_cousin(predicate, starting_idx)
+
+        %Context{} = first_grandchild ->
+          first_grandchild
+      end
+    else
+      nil
+    end
   end
 
   @spec last_second_cousin(Context.t(), predicate()) :: Context.t() | nil
