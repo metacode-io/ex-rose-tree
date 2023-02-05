@@ -32,7 +32,10 @@ defmodule RoseTree.Util do
   def first_of(term, [h | t] = _funs) when is_function(h) do
     case h.(term) do
       {:ok, result} -> result
-      _ -> first_of(term, t)
+      {:error, error} -> first_of(term, t)
+      :error -> first_of(term, t)
+      nil -> first_of(term, t)
+      result -> result
     end
   end
 
@@ -64,7 +67,10 @@ defmodule RoseTree.Util do
              is_list(opts) do
     case h.(term, opts) do
       {:ok, result} -> result
-      _ -> first_of_with_opts(term, t, opts)
+      {:error, error} -> first_of_with_opts(term, t, opts)
+      :error -> first_of_with_opts(term, t, opts)
+      nil -> first_of_with_opts(term, t, opts)
+      result -> result
     end
   end
 
@@ -95,7 +101,10 @@ defmodule RoseTree.Util do
              is_list(args) do
     case apply(h, [term | args]) do
       {:ok, result} -> result
-      _ -> first_of_with_args(term, t, args)
+      {:error, error} -> first_of_with_args(term, t, args)
+      :error -> first_of_with_args(term, t, args)
+      nil -> first_of_with_args(term, t, args)
+      result -> result
     end
   end
 

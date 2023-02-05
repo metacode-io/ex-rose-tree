@@ -1,10 +1,18 @@
 defmodule RoseTree.Zipper.TraversalTest do
   use ExUnit.Case
 
-  alias RoseTree.Support.Generators
+  alias RoseTree.Support.{Generators, Zippers}
   alias RoseTree.Zipper.{Context, Traversal}
 
   doctest RoseTree.Zipper.Traversal
+
+  setup_all do
+    %{
+      empty_ctx: Zippers.empty_ctx(),
+      leaf_ctx: Zippers.leaf_ctx(),
+      simple_ctx: Zippers.simple_ctx()
+    }
+  end
 
   describe "to_root/1" do
     test "should return the current Context if already at the root" do
@@ -27,6 +35,21 @@ defmodule RoseTree.Zipper.TraversalTest do
         assert %Context{focus: focus, path: []} = Traversal.to_root(some_context)
         assert focus.term == root_location.term
       end
+    end
+  end
+
+  describe "descend/1" do
+    test "should return nil if given an empty Context with no siblings", %{empty_ctx: ctx} do
+      assert Traversal.descend(ctx) == nil
+    end
+
+    test "should return nil if given a leaf Context with no siblings", %{leaf_ctx: ctx} do
+      assert Traversal.descend(ctx) == nil
+    end
+
+    test "should return the first child if given a Context with children", %{simple_ctx: ctx} do
+      assert %Context{focus: focus} = Traversal.descend(ctx)
+      assert 2 == focus.term
     end
   end
 end

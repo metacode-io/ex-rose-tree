@@ -7,9 +7,12 @@ defmodule RoseTree.Zipper.Traversal do
   require RoseTree.TreeNode
   require RoseTree.Zipper.Context
   import RoseTree.Zipper.Kin
+  import RoseTree.Util, only: [first_of_with_args: 3, always: 1]
   alias URI.Error
   alias RoseTree.TreeNode
   alias RoseTree.Zipper.Context
+
+  @typep predicate() :: (term() -> boolean())
 
   ###
   ### BASIC TRAVERSAL
@@ -134,22 +137,67 @@ defmodule RoseTree.Zipper.Traversal do
   Traverses forward through the zipper in a depth-first manner.
   """
   @spec descend(Context.t()) :: Context.t() | nil
-  def descend(%Context{} = ctx) when Context.empty?(ctx), do: nil
-
-  def descend(%Context{path: []} = ctx), do: first_child(ctx)
-
   def descend(%Context{} = ctx) do
-    raise Error, "not yet implemented"
+    funs = [
+      &first_child/2,
+      &next_sibling/2,
+      &next_ancestral_pibling/2,
+    ]
+
+    ctx
+    |> first_of_with_args(funs, [&always/1])
   end
 
   @doc """
   Repeats a call to `descend/1` by the given number of `reps`.
   """
   @spec descend_for(Context.t(), pos_integer()) :: Context.t() | nil
-  def descend_for(%Context{} = ctx, reps) when reps > 0,
+  def descend_for(%Context{} = ctx, reps)
+      when reps > 0,
     do: move_for(ctx, reps, &descend/1)
 
-  def descend_for(%Context{}, _reps), do: nil
+  def descend_for(%Context{}, _reps, _predicate), do: nil
+
+  @doc """
+  Descends into the Zipper if the provided predicate function
+  returns true when applied to the next Context. Otherwise,
+  returns nil.
+  """
+  @spec descend_if(Context.t(), predicate()) :: Context.t() | nil
+  def descend_if(%Context{} = ctx, predicate) when is_function(predicate) do
+    case descend(ctx) do
+      nil ->
+        nil
+
+      %Context{} = next_ctx ->
+        if predicate.(next_ctx) do
+          next_ctx
+        else
+          nil
+        end
+    end
+  end
+
+  @doc """
+  Descends into the Zipper continuously until the provided predicate
+  function returns true when applied to the Context. Otherwise,
+  returns nil.
+  """
+  @spec descend_until(Context.t(), predicate()) :: Context.t() | nil
+  def descend_until(%Context{} = ctx, predicate) when is_function(predicate) do
+    case descend(ctx) do
+      nil ->
+        nil
+
+      %Context{} = next_ctx ->
+        if predicate.(next_ctx) do
+          next_ctx
+        else
+          descend_until(next_ctx, predicate)
+        end
+    end
+  end
+
 
   ###
   ### ASCEND, BREADTH-FIRST TRAVERSAL
