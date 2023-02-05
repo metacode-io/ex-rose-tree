@@ -141,7 +141,7 @@ defmodule RoseTree.Zipper.Traversal do
     funs = [
       &first_child/2,
       &next_sibling/2,
-      &next_ancestral_pibling/2,
+      &next_ancestral_pibling/2
     ]
 
     ctx
@@ -154,7 +154,7 @@ defmodule RoseTree.Zipper.Traversal do
   @spec descend_for(Context.t(), pos_integer()) :: Context.t() | nil
   def descend_for(%Context{} = ctx, reps)
       when reps > 0,
-    do: move_for(ctx, reps, &descend/1)
+      do: move_for(ctx, reps, &descend/1)
 
   def descend_for(%Context{}, _reps, _predicate), do: nil
 
@@ -198,9 +198,8 @@ defmodule RoseTree.Zipper.Traversal do
     end
   end
 
-
   ###
-  ### ASCEND, BREADTH-FIRST TRAVERSAL
+  ### ASCEND, DEPTH-FIRST TRAVERSAL
   ###
 
   @doc """

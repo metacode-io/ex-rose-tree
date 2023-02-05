@@ -10,7 +10,9 @@ defmodule RoseTree.Zipper.TraversalTest do
     %{
       empty_ctx: Zippers.empty_ctx(),
       leaf_ctx: Zippers.leaf_ctx(),
-      simple_ctx: Zippers.simple_ctx()
+      simple_ctx: Zippers.simple_ctx(),
+      ctx_with_siblings: Zippers.ctx_with_siblings(),
+      ctx_with_ancestral_piblings: Zippers.ctx_with_ancestral_piblings()
     }
   end
 
@@ -26,6 +28,7 @@ defmodule RoseTree.Zipper.TraversalTest do
     test "should move the Context back to the root of the tree" do
       for _ <- 1..10 do
         num_locations = Enum.random(1..20)
+
         some_context =
           %Context{focus: "current"}
           |> Generators.add_zipper_locations(num_locations: num_locations)
@@ -50,6 +53,18 @@ defmodule RoseTree.Zipper.TraversalTest do
     test "should return the first child if given a Context with children", %{simple_ctx: ctx} do
       assert %Context{focus: focus} = Traversal.descend(ctx)
       assert 2 == focus.term
+    end
+
+    test "should return the next sibling if given a Context with no children but with next siblings",
+         %{ctx_with_siblings: ctx} do
+      assert %Context{focus: focus} = Traversal.descend(ctx)
+      assert 6 == focus.term
+    end
+
+    test "should return the next ancestral pibling if given a Context with no children or siblings, but with next piblings",
+         %{ctx_with_ancestral_piblings: ctx} do
+      assert %Context{focus: focus} = Traversal.descend(ctx)
+      assert 6 == focus.term
     end
   end
 end
