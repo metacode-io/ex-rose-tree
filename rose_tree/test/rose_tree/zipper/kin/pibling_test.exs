@@ -198,42 +198,83 @@ defmodule RoseTree.Zipper.PiblingTest do
 
   describe "first_grandpibling/2" do
     test "should return nil if no parent found", %{simple_ctx: ctx} do
-      assert Kin.first_pibling(ctx) == nil
+      assert Kin.first_grandpibling(ctx) == nil
     end
 
     test "should return nil if no grandparent found", %{ctx_with_parent: ctx} do
-      assert Kin.first_pibling(ctx) == nil
+      assert Kin.first_grandpibling(ctx) == nil
     end
 
-    test "should return nil if no previous pibling found matching the predicate",
-         %{ctx_with_piblings: ctx} do
+    test "should return nil if no previous grandpibling found matching the predicate",
+         %{ctx_with_grandpiblings: ctx} do
       predicate = &(&1.term == :not_found)
 
-      assert Kin.first_pibling(ctx, predicate) == nil
+      assert Kin.first_grandpibling(ctx, predicate) == nil
     end
 
-    test "should return the first pibling found", %{
-      ctx_with_piblings: ctx
+    test "should return the first grandpibling found", %{
+      ctx_with_grandpiblings: ctx
     } do
-      actual = Kin.first_pibling(ctx)
+      actual = Kin.first_grandpibling(ctx)
       assert 2 == actual.focus.term
     end
 
-    test "should return the first first pibling matching the predicate", %{
-      ctx_with_piblings: ctx
+    test "should return the first first grandpibling matching the predicate", %{
+      ctx_with_grandpiblings: ctx
     } do
-      predicate = &(&1.term == 4)
+      predicate = &(&1.term == 3)
 
-      actual = Kin.first_pibling(ctx, predicate)
-      assert 4 == actual.focus.term
+      actual = Kin.first_grandpibling(ctx, predicate)
+      assert 3 == actual.focus.term
     end
 
-    test "should return nil and not seek past the original parent for a predicate match", %{
-      ctx_with_piblings: ctx
+    test "should return nil and not seek past the original grandparent for a predicate match", %{
+      ctx_with_grandpiblings: ctx
     } do
-      predicate = &(&1.term == 14)
+      predicate = &(&1.term == 6)
 
-      assert Kin.first_pibling(ctx, predicate) == nil
+      assert Kin.first_grandpibling(ctx, predicate) == nil
+    end
+  end
+
+  describe "last_grandpibling/2" do
+    test "should return nil if no parent found", %{simple_ctx: ctx} do
+      assert Kin.last_grandpibling(ctx) == nil
+    end
+
+    test "should return nil if no grandparent found", %{ctx_with_parent: ctx} do
+      assert Kin.last_grandpibling(ctx) == nil
+    end
+
+    test "should return nil if no previous grandpibling found matching the predicate",
+         %{ctx_with_grandpiblings: ctx} do
+      predicate = &(&1.term == :not_found)
+
+      assert Kin.last_grandpibling(ctx, predicate) == nil
+    end
+
+    test "should return the last grandpibling found", %{
+      ctx_with_grandpiblings: ctx
+    } do
+      actual = Kin.last_grandpibling(ctx)
+      assert 8 == actual.focus.term
+    end
+
+    test "should return the first last grandpibling matching the predicate", %{
+      ctx_with_grandpiblings: ctx
+    } do
+      predicate = &(&1.term == 7)
+
+      actual = Kin.last_grandpibling(ctx, predicate)
+      assert 7 == actual.focus.term
+    end
+
+    test "should return nil and not seek before the original grandparent for a predicate match", %{
+      ctx_with_grandpiblings: ctx
+    } do
+      predicate = &(&1.term == 3)
+
+      assert Kin.last_grandpibling(ctx, predicate) == nil
     end
   end
 end

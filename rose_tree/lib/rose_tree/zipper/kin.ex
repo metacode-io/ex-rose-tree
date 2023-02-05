@@ -1037,6 +1037,22 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
+  @doc """
+  Moves the focus to the last grandpibling -- the last sibling of the grandparent --
+  of the current focus. If not found, returns nil.
+  """
+  @spec last_grandpibling(Context.t(), predicate()) :: Context.t() | nil
+  def last_grandpibling(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    with %Context{} = grandparent <- grandparent(ctx),
+         %Context{} = last_sibling <- last_sibling(grandparent, predicate) do
+      last_sibling
+    else
+      nil ->
+        nil
+    end
+  end
+
   def first_extended_pibling(), do: raise(Error, "not implemented")
 
   def last_extended_pibling(), do: raise(Error, "not implemented")
