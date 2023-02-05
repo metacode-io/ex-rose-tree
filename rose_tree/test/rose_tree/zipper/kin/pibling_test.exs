@@ -8,6 +8,7 @@ defmodule RoseTree.Zipper.PiblingTest do
     %{
       simple_ctx: Zippers.simple_ctx(),
       ctx_with_parent: Zippers.ctx_with_parent(),
+      ctx_with_grandparent: Zippers.ctx_with_grandparent(),
       ctx_with_piblings: Zippers.ctx_with_piblings(),
       ctx_with_grandpiblings: Zippers.ctx_with_grandpiblings()
     }
@@ -205,6 +206,10 @@ defmodule RoseTree.Zipper.PiblingTest do
       assert Kin.first_grandpibling(ctx) == nil
     end
 
+    test "should return nil if grandparent has no siblings", %{ctx_with_grandparent: ctx} do
+      assert Kin.first_grandpibling(ctx) == nil
+    end
+
     test "should return nil if no previous grandpibling found matching the predicate",
          %{ctx_with_grandpiblings: ctx} do
       predicate = &(&1.term == :not_found)
@@ -246,6 +251,10 @@ defmodule RoseTree.Zipper.PiblingTest do
       assert Kin.last_grandpibling(ctx) == nil
     end
 
+    test "should return nil if grandparent has no siblings", %{ctx_with_grandparent: ctx} do
+      assert Kin.last_grandpibling(ctx) == nil
+    end
+
     test "should return nil if no previous grandpibling found matching the predicate",
          %{ctx_with_grandpiblings: ctx} do
       predicate = &(&1.term == :not_found)
@@ -269,12 +278,87 @@ defmodule RoseTree.Zipper.PiblingTest do
       assert 7 == actual.focus.term
     end
 
-    test "should return nil and not seek before the original grandparent for a predicate match", %{
+    test "should return nil and not seek before the original grandparent for a predicate match",
+         %{
+           ctx_with_grandpiblings: ctx
+         } do
+      predicate = &(&1.term == 3)
+
+      assert Kin.last_grandpibling(ctx, predicate) == nil
+    end
+  end
+
+  describe "previous_grandpibling/2" do
+    test "should return nil if no parent found", %{simple_ctx: ctx} do
+      assert Kin.previous_grandpibling(ctx) == nil
+    end
+
+    test "should return nil if no grandparent found", %{ctx_with_parent: ctx} do
+      assert Kin.previous_grandpibling(ctx) == nil
+    end
+
+    test "should return nil if grandparent has no siblings", %{ctx_with_grandparent: ctx} do
+      assert Kin.previous_grandpibling(ctx) == nil
+    end
+
+    test "should return nil if no previous grandpibling found matching the predicate",
+         %{ctx_with_grandpiblings: ctx} do
+      predicate = &(&1.term == :not_found)
+
+      assert Kin.previous_grandpibling(ctx, predicate) == nil
+    end
+
+    test "should return the first grandpibling found", %{
+      ctx_with_grandpiblings: ctx
+    } do
+      actual = Kin.previous_grandpibling(ctx)
+      assert 4 == actual.focus.term
+    end
+
+    test "should return the first first grandpibling matching the predicate", %{
       ctx_with_grandpiblings: ctx
     } do
       predicate = &(&1.term == 3)
 
-      assert Kin.last_grandpibling(ctx, predicate) == nil
+      actual = Kin.previous_grandpibling(ctx, predicate)
+      assert 3 == actual.focus.term
+    end
+  end
+
+  describe "next_grandpibling/2" do
+    test "should return nil if no parent found", %{simple_ctx: ctx} do
+      assert Kin.next_grandpibling(ctx) == nil
+    end
+
+    test "should return nil if no grandparent found", %{ctx_with_parent: ctx} do
+      assert Kin.next_grandpibling(ctx) == nil
+    end
+
+    test "should return nil if grandparent has no siblings", %{ctx_with_grandparent: ctx} do
+      assert Kin.next_grandpibling(ctx) == nil
+    end
+
+    test "should return nil if no previous grandpibling found matching the predicate",
+         %{ctx_with_grandpiblings: ctx} do
+      predicate = &(&1.term == :not_found)
+
+      assert Kin.next_grandpibling(ctx, predicate) == nil
+    end
+
+    test "should return the first grandpibling found", %{
+      ctx_with_grandpiblings: ctx
+    } do
+      actual = Kin.next_grandpibling(ctx)
+      assert 6 == actual.focus.term
+    end
+
+    test "should return the first first grandpibling matching the predicate", %{
+      ctx_with_grandpiblings: ctx
+    } do
+      predicate = &(&1.term == 7)
+
+      actual = Kin.next_grandpibling(ctx, predicate)
+      assert 7 == actual.focus.term
     end
   end
 end

@@ -1053,6 +1053,38 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
+  @doc """
+  Moves the focus to the previous grandpibling -- the previous sibling of the grandparent --
+  of the current focus. If not found, returns nil.
+  """
+  @spec previous_grandpibling(Context.t(), predicate()) :: Context.t() | nil
+  def previous_grandpibling(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    with %Context{} = grandparent <- grandparent(ctx),
+         %Context{} = previous_sibling <- previous_sibling(grandparent, predicate) do
+      previous_sibling
+    else
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Moves the focus to the next grandpibling -- the next sibling of the grandparent --
+  of the current focus. If not found, returns nil.
+  """
+  @spec next_grandpibling(Context.t(), predicate()) :: Context.t() | nil
+  def next_grandpibling(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    with %Context{} = grandparent <- grandparent(ctx),
+         %Context{} = next_sibling <- next_sibling(grandparent, predicate) do
+      next_sibling
+    else
+      nil ->
+        nil
+    end
+  end
+
   def first_extended_pibling(), do: raise(Error, "not implemented")
 
   def last_extended_pibling(), do: raise(Error, "not implemented")
