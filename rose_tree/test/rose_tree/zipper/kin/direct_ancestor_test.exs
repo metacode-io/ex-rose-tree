@@ -2,16 +2,16 @@ defmodule RoseTree.Zipper.Kin.DirectAncestorTest do
   use ExUnit.Case, async: true
 
   alias RoseTree.Support.Zippers
-  alias RoseTree.Zipper.Kin
+  alias RoseTree.Zipper.{Context, Kin}
 
   setup_all do
     %{
       empty_ctx: Zippers.empty_ctx(),
       leaf_ctx: Zippers.leaf_ctx(),
-      simple_ctx: Zipper.simple_ctx(),
-      ctx_with_parent: Zipper.ctx_with_parent(),
-      ctx_with_grandparent: Zipper.ctx_with_grandparent(),
-      ctx_with_great_grandparent: Zipper.ctx_with_great_grandparent()
+      simple_ctx: Zippers.simple_ctx(),
+      ctx_with_parent: Zippers.ctx_with_parent(),
+      ctx_with_grandparent: Zippers.ctx_with_grandparent(),
+      ctx_with_great_grandparent: Zippers.ctx_with_great_grandparent()
     }
   end
 
@@ -45,7 +45,7 @@ defmodule RoseTree.Zipper.Kin.DirectAncestorTest do
 
     test "should move focus to grandparent if one is found",
          %{ctx_with_grandparent: ctx} do
-      %Context{focus: focus} = Kin.grandparent(new_ctx)
+      %Context{focus: focus} = Kin.grandparent(ctx)
 
       assert focus.term == 5
     end
@@ -70,7 +70,7 @@ defmodule RoseTree.Zipper.Kin.DirectAncestorTest do
 
     test "should move focus to great grandparent if one is found",
          %{ctx_with_great_grandparent: ctx} do
-      %Context{focus: focus} = Kin.great_grandparent(new_ctx)
+      %Context{focus: focus} = Kin.great_grandparent(ctx)
 
       assert focus.term == 1
     end
