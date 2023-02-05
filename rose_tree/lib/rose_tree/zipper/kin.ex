@@ -275,7 +275,7 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  defp do_first_grandchild(_ctx, _predicate), do: nil
+  defp do_first_grandchild(nil, _predicate), do: nil
 
   @doc """
   Moves the focus to the last grandchild -- the last child of the
@@ -309,7 +309,7 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  defp do_last_grandchild(_ctx, _predicate), do: nil
+  defp do_last_grandchild(nil, _predicate), do: nil
 
   @doc """
   Moves the focus to the first grandchild repeated `reps` number of times.
@@ -396,7 +396,7 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  defp do_first_great_grandchild(_ctx, _predicate), do: nil
+  defp do_first_great_grandchild(nil, _predicate), do: nil
 
   @doc """
   Moves the focus to the last great-grandchild -- the last child of the
@@ -431,7 +431,7 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  defp do_last_great_grandchild(_ctx, _predicate), do: nil
+  defp do_last_great_grandchild(nil, _predicate), do: nil
 
   ###
   ### SIBLINGS
@@ -1093,9 +1093,51 @@ defmodule RoseTree.Zipper.Kin do
 
   def next_extended_pibling(), do: raise(Error, "not implemented")
 
-  def previous_ancestral_pibling(), do: raise(Error, "not implemented")
+  @doc """
+  Recursively searches the `path` for the first, previous "ancestral" pibling. That is,
+  if a previous pibling is not found for the parent, it will search the grandparent. If
+  one is not found for the grandparent, it will search the great-grandparent. And so on,
+  until it reaches the root. If the root is reached and it does not have a previous pibling,
+  the function returns nil.
+  """
+  @spec previous_ancestral_pibling(Context.t(), predicate()) :: Context.t() | nil
+  def previous_ancestral_pibling(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    case previous_pibling(ctx, predicate) do
+      nil ->
+        ctx
+        |> parent()
+        |> previous_ancestral_pibling(predicate)
 
-  def next_ancestral_pibling(), do: raise(Error, "not implemented")
+      %Context{} = previous_ancestral_pibling ->
+        previous_ancestral_pibling
+    end
+  end
+
+  def previous_ancestral_pibling(nil, _predicate), do: nil
+
+  @doc """
+  Recursively searches the `path` for the first, next "ancestral" pibling. That is,
+  if a next pibling is not found for the parent, it will search the grandparent. If
+  one is not found for the grandparent, it will search the great-grandparent. And so on,
+  until it reaches the root. If the root is reached and it does not have a next pibling,
+  the function returns nil.
+  """
+  @spec next_ancestral_pibling(Context.t(), predicate()) :: Context.t() | nil
+  def next_ancestral_pibling(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    case next_pibling(ctx, predicate) do
+      nil ->
+        ctx
+        |> parent()
+        |> next_ancestral_pibling(predicate)
+
+      %Context{} = next_ancestral_pibling ->
+        next_ancestral_pibling
+    end
+  end
+
+  def next_ancestral_pibling(nil, _predicate), do: nil
 
   ###
   ### FIRST COUSINS
@@ -1202,7 +1244,7 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  defp do_previous_first_cousin(_ctx, _predicate), do: nil
+  defp do_previous_first_cousin(nil, _predicate), do: nil
 
   @doc """
   Moves the focus to the next first-cousin -- the first child of the
@@ -1233,7 +1275,7 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  defp do_next_first_cousin(_ctx, _opts), do: nil
+  defp do_next_first_cousin(nil, _opts), do: nil
 
   ###
   ### SECOND COUSINS
@@ -1333,7 +1375,7 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  defp do_previous_second_cousin(_ctx, _predicate), do: nil
+  defp do_previous_second_cousin(nil, _predicate), do: nil
 
   @spec next_second_cousin(Context.t(), predicate()) :: Context.t() | nil
   def next_second_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
@@ -1360,5 +1402,5 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  defp do_next_second_cousin(_ctx, _opts), do: nil
+  defp do_next_second_cousin(nil, _opts), do: nil
 end

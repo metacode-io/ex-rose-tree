@@ -259,6 +259,46 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
+  def ctx_with_ancestral_piblings() do
+    %Context{
+      focus: TreeNode.new(20),
+      prev: [],
+      next: [],
+      path: [
+        Location.new(13),
+        Location.new(12),
+        Location.new(11),
+        Location.new(10),
+        Location.new(5,
+          prev: [
+            TreeNode.new(4),
+            TreeNode.new(3),
+            TreeNode.new(2)
+          ],
+          next: [
+            TreeNode.new(6),
+            TreeNode.new(7),
+            TreeNode.new(8)
+          ]
+        )
+      ]
+    }
+  end
+
+  def ctx_with_no_ancestral_piblings() do
+    %Context{
+      focus: TreeNode.new(20),
+      prev: [],
+      next: [],
+      path: [
+        Location.new(12),
+        Location.new(11),
+        Location.new(10),
+        Location.new(5)
+      ]
+    }
+  end
+
   def ctx_with_1st_cousins() do
     %Context{
       focus: TreeNode.new(20),
