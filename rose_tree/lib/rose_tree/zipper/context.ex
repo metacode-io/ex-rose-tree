@@ -306,6 +306,30 @@ defmodule RoseTree.Zipper.Context do
     do: Location.index_of_term(parent)
 
   @doc """
+  Returns the index (zero-based) of the current focus' grandparent with
+  respect to any potentital siblings it may have. If the current
+  focus has no grandparent, returns nil.
+
+  ## Examples
+
+      iex> grandparent_siblings = for n <- [3,2,1], do: RoseTree.TreeNode.new(n)
+      ...> grandparent_loc = RoseTree.Zipper.Location.new(4, prev: grandparent_siblings)
+      ...> parent_loc = RoseTree.Zipper.Location.new(5)
+      ...> node = RoseTree.TreeNode.new(6)
+      ...> ctx = RoseTree.Zipper.Context.new(node, path: [parent_loc, grandparent_loc])
+      ...> RoseTree.Zipper.Context.index_of_grandparent(ctx)
+      3
+
+  """
+  @spec index_of_grandparent(t()) :: non_neg_integer() | nil
+  def index_of_grandparent(%__MODULE__{path: []}), do: nil
+
+  def index_of_grandparent(%__MODULE__{path: [_parent | []]}), do: nil
+
+  def index_of_grandparent(%__MODULE__{path: [_parent | [grandparent | _]]}),
+    do: Location.index_of_term(grandparent)
+
+  @doc """
   Returns the current context's parent location.
 
   ## Examples

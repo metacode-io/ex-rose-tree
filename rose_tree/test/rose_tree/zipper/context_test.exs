@@ -2,6 +2,8 @@ defmodule RoseTree.Zipper.ContextTest do
   use ExUnit.Case, async: true
   use RoseTree.ZipperContextCase
 
+  alias RoseTree.Support.Zippers
+
   doctest RoseTree.Zipper.Context
 
   @bad_contexts [
@@ -23,6 +25,13 @@ defmodule RoseTree.Zipper.ContextTest do
      12},
     {nil, 13}
   ]
+
+  setup do
+    %{
+      ctx_with_parent: Zippers.ctx_with_parent(),
+      ctx_with_grandparent: Zippers.ctx_with_grandparent()
+    }
+  end
 
   describe "context?/1 guard" do
     test "should return true when given a valid Context struct", %{all_contexts_with_idx: all} do
@@ -182,6 +191,24 @@ defmodule RoseTree.Zipper.ContextTest do
   describe "index_of_parent/1" do
     test "should return nil if given a Context with no parent", %{simple_ctx: ctx} do
       assert nil == Context.index_of_parent(ctx)
+    end
+
+    test "should return 0 if parent has no siblings", %{ctx_with_parent: ctx} do
+      assert 0 == Context.index_of_parent(ctx)
+    end
+  end
+
+  describe "index_of_grandparent/1" do
+    test "should return nil if given a Context with no parent", %{simple_ctx: ctx} do
+      assert nil == Context.index_of_grandparent(ctx)
+    end
+
+    test "should return nil if given a Context with no grandparent", %{ctx_with_parent: ctx} do
+      assert nil == Context.index_of_grandparent(ctx)
+    end
+
+    test "should return 0 if grandparent has no siblings", %{ctx_with_grandparent: ctx} do
+      assert 0 == Context.index_of_grandparent(ctx)
     end
   end
 
