@@ -4,8 +4,6 @@ defmodule RoseTree.Zipper.Kin.DirectAncestorTest do
   alias RoseTree.Support.Zippers
   alias RoseTree.Zipper.Kin
 
-  ## DIRECT ANCESTORS
-
   setup_all do
     %{
       empty_ctx: Zippers.empty_ctx(),

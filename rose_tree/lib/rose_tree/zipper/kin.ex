@@ -1026,7 +1026,8 @@ defmodule RoseTree.Zipper.Kin do
   of the current focus. If not found, returns nil.
   """
   @spec first_grandpibling(Context.t(), predicate()) :: Context.t() | nil
-  def first_grandpibling(%Context{} = ctx, predicate \\ &Util.always/1) when is_function(predicate) do
+  def first_grandpibling(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
     with %Context{} = grandparent <- grandparent(ctx),
          %Context{} = first_sibling <- first_sibling(grandparent, predicate) do
       first_sibling
@@ -1191,22 +1192,26 @@ defmodule RoseTree.Zipper.Kin do
   ###
 
   @spec first_second_cousin(Context.t(), predicate()) :: Context.t() | nil
-  def first_second_cousin(%Context{} = ctx, predicate \\ &Util.always/1) when is_function(predicate) do
+  def first_second_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
     raise(Error, "not implemented")
   end
 
   @spec last_second_cousin(Context.t(), predicate()) :: Context.t() | nil
-  def last_second_cousin(%Context{} = ctx, predicate \\ &Util.always/1) when is_function(predicate) do
+  def last_second_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
     raise(Error, "not implemented")
   end
 
   @spec previous_second_cousin(Context.t(), predicate()) :: Context.t() | nil
-  def previous_second_cousin(%Context{} = ctx, predicate \\ &Util.always/1) when is_function(predicate) do
+  def previous_second_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
     raise(Error, "not implemented")
   end
 
   @spec next_second_cousin(Context.t(), predicate()) :: Context.t() | nil
-  def next_second_cousin(%Context{} = ctx, predicate \\ &Util.always/1) when is_function(predicate) do
+  def next_second_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
     raise(Error, "not implemented")
   end
 end
