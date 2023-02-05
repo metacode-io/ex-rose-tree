@@ -1279,7 +1279,33 @@ defmodule RoseTree.Zipper.Kin do
   @spec last_second_cousin(Context.t(), predicate()) :: Context.t() | nil
   def last_second_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    raise(Error, "not implemented")
+    with starting_idx <- Context.index_of_grandparent(ctx),
+         %Context{} = last_grandpibling <- last_grandpibling(ctx, &TreeNode.parent?/1),
+         %Context{} = last_second_cousin <-
+           do_last_second_cousin(last_grandpibling, predicate, starting_idx) do
+      last_second_cousin
+    else
+      _ ->
+        nil
+    end
+  end
+
+  defp do_last_second_cousin(%Context{} = ctx, predicate, starting_idx) do
+    current_idx = Context.index_of_focus(ctx)
+
+    if current_idx > starting_idx do
+      case last_grandchild(ctx, predicate) do
+        nil ->
+          ctx
+          |> previous_sibling(&TreeNode.parent?/1)
+          |> do_last_second_cousin(predicate, starting_idx)
+
+        %Context{} = last_grandchild ->
+          last_grandchild
+      end
+    else
+      nil
+    end
   end
 
   @spec previous_second_cousin(Context.t(), predicate()) :: Context.t() | nil
