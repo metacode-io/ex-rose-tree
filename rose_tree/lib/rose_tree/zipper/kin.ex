@@ -1338,6 +1338,27 @@ defmodule RoseTree.Zipper.Kin do
   @spec next_second_cousin(Context.t(), predicate()) :: Context.t() | nil
   def next_second_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    raise(Error, "not implemented")
+    with %Context{} = next_grandpibling <- next_grandpibling(ctx, &TreeNode.parent?/1),
+         %Context{} = next_second_cousin <-
+           do_next_second_cousin(next_grandpibling, predicate) do
+      next_second_cousin
+    else
+      _ ->
+        nil
+    end
   end
+
+  defp do_next_second_cousin(%Context{} = ctx, predicate) do
+    case first_grandchild(ctx, predicate) do
+      nil ->
+        ctx
+        |> next_sibling(&TreeNode.parent?/1)
+        |> do_next_second_cousin(predicate)
+
+      %Context{} = first_grandchild ->
+        first_grandchild
+    end
+  end
+
+  defp do_next_second_cousin(_ctx, _opts), do: nil
 end

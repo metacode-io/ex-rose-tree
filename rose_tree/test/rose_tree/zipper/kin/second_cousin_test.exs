@@ -165,4 +165,55 @@ defmodule RoseTree.Zipper.SecondCousinTest do
       assert Kin.previous_second_cousin(ctx, predicate) == nil
     end
   end
+
+  describe "next_second_cousin/2" do
+    test "should return nil if no parent found", %{simple_ctx: ctx} do
+      assert Kin.next_second_cousin(ctx) == nil
+    end
+
+    test "should return nil if no grandparent found", %{ctx_with_parent: ctx} do
+      assert Kin.next_second_cousin(ctx) == nil
+    end
+
+    test "should return nil if grandparent has no siblings", %{ctx_with_grandparent: ctx} do
+      assert Kin.next_second_cousin(ctx) == nil
+    end
+
+    test "should return nil if no next grandpibling has children",
+         %{ctx_with_grandpiblings: ctx} do
+      assert Kin.next_second_cousin(ctx) == nil
+    end
+
+    test "should return nil if no second-cousin found matching predicate",
+         %{ctx_with_2nd_cousins: ctx} do
+      predicate = &(&1.term == :not_found)
+
+      assert Kin.next_second_cousin(ctx, predicate) == nil
+    end
+
+    test "should return the next second-cousin found", %{
+      ctx_with_2nd_cousins: ctx
+    } do
+      actual = Kin.next_second_cousin(ctx)
+      assert 52 == actual.focus.term
+    end
+
+    test "should return the next second-cousin matching the predicate", %{
+      ctx_with_2nd_cousins: ctx
+    } do
+      predicate = &(&1.term == 55)
+
+      actual = Kin.next_second_cousin(ctx, predicate)
+      assert 55 == actual.focus.term
+    end
+
+    test "should return nil and not seek before the original grandparent for a predicate match",
+         %{
+           ctx_with_2nd_cousins: ctx
+         } do
+      predicate = &(&1.term == 45)
+
+      assert Kin.next_second_cousin(ctx, predicate) == nil
+    end
+  end
 end
