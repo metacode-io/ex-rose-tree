@@ -2,14 +2,15 @@ defmodule RoseTree.Zipper.Kin.NiblingTest do
   use ExUnit.Case, async: true
 
   alias RoseTree.Support.Zippers
-  alias RoseTree.Zipper.Kin
+  alias RoseTree.Zipper.{Context, Kin}
 
   setup_all do
     %{
       simple_ctx: Zippers.simple_ctx(),
       ctx_with_siblings: Zippers.ctx_with_siblings(),
       ctx_with_niblings: Zippers.ctx_with_niblings(),
-      ctx_with_grand_niblings: Zippers.ctx_with_grand_niblings()
+      ctx_with_grand_niblings: Zippers.ctx_with_grand_niblings(),
+      ctx_with_descendant_niblings: Zippers.ctx_with_descendant_niblings()
     }
   end
 
@@ -326,6 +327,74 @@ defmodule RoseTree.Zipper.Kin.NiblingTest do
 
       actual = Kin.next_grandnibling(ctx, predicate)
       assert 30 == actual.focus.term
+    end
+  end
+
+  describe "previous_descendant_nibling/2" do
+    test "should return nil if no previous sibling found", %{simple_ctx: ctx} do
+      assert Kin.previous_descendant_nibling(ctx) == nil
+    end
+
+    test "should return nil if previous sibling has no children", %{ctx_with_siblings: ctx} do
+      assert Kin.previous_descendant_nibling(ctx) == nil
+    end
+
+    test "should return nil if no previous descendant nibling found matching predicate", %{
+      ctx_with_descendant_niblings: ctx
+    } do
+      predicate = &(&1.focus.term == :not_found)
+
+      assert Kin.previous_descendant_nibling(ctx, predicate) == nil
+    end
+
+    test "should return the last previous descendant nibling found", %{
+      ctx_with_descendant_niblings: ctx
+    } do
+      actual = Kin.previous_descendant_nibling(ctx)
+      assert 25 == actual.focus.term
+    end
+
+    test "should return the last previous descendant nibling found matching the predicate", %{
+      ctx_with_descendant_niblings: ctx
+    } do
+      predicate = &(&1.focus.term == 12)
+
+      assert %Context{focus: focus} = Kin.previous_descendant_nibling(ctx, predicate)
+      assert 12 == focus.term
+    end
+  end
+
+  describe "next_descendant_nibling/2" do
+    test "should return nil if no next sibling found", %{simple_ctx: ctx} do
+      assert Kin.next_descendant_nibling(ctx) == nil
+    end
+
+    test "should return nil if next sibling has no children", %{ctx_with_siblings: ctx} do
+      assert Kin.next_descendant_nibling(ctx) == nil
+    end
+
+    test "should return nil if no next descendant nibling found matching predicate", %{
+      ctx_with_descendant_niblings: ctx
+    } do
+      predicate = &(&1.focus.term == :not_found)
+
+      assert Kin.next_descendant_nibling(ctx, predicate) == nil
+    end
+
+    test "should return the last next descendant nibling found", %{
+      ctx_with_descendant_niblings: ctx
+    } do
+      actual = Kin.next_descendant_nibling(ctx)
+      assert 37 == actual.focus.term
+    end
+
+    test "should return the last next descendant nibling found matching the predicate", %{
+      ctx_with_descendant_niblings: ctx
+    } do
+      predicate = &(&1.focus.term == 29)
+
+      assert %Context{focus: focus} = Kin.next_descendant_nibling(ctx, predicate)
+      assert 29 == focus.term
     end
   end
 end

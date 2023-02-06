@@ -936,6 +936,92 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
+  @doc """
+  Recursively searches the descendant branches of the previous sibling for the
+  previous "descendant nibling" of the current focus. That is, if a previous
+  nibling is found, it will then look for the last child of that node (the
+  "descendant nibling"). It will repeat the search if one is found, and it will
+  continue until no more are found, returning the last one visited.
+  """
+  @spec previous_descendant_nibling(Context.t(), predicate()) :: Context.t() | nil
+  def previous_descendant_nibling(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    case previous_nibling(ctx) do
+      nil ->
+        nil
+
+      %Context{} = previous_nibling ->
+        last_match =
+          if predicate.(previous_nibling) do
+            previous_nibling
+          else
+            nil
+          end
+
+        do_previous_descendant_nibling(previous_nibling, predicate, last_match)
+    end
+  end
+
+  defp do_previous_descendant_nibling(%Context{} = ctx, predicate, last_match) do
+    case last_child(ctx) do
+      nil ->
+        last_match
+
+      %Context{} = last_child ->
+        last_match =
+          if predicate.(last_child) do
+            last_child
+          else
+            last_match
+          end
+
+        do_previous_descendant_nibling(last_child, predicate, last_match)
+    end
+  end
+
+  @doc """
+  Recursively searches the descendant branches of the next sibling for the
+  next "descendant nibling" of the current focus. That is, if a next
+  nibling is found, it will then look for the first child of that node (the
+  "descendant nibling"). It will repeat the search if one is found, and it will
+  continue until no more are found, returning the last one visited.
+  """
+  @spec next_descendant_nibling(Context.t(), predicate()) :: Context.t() | nil
+  def next_descendant_nibling(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    case next_nibling(ctx) do
+      nil ->
+        nil
+
+      %Context{} = next_nibling ->
+        last_match =
+          if predicate.(next_nibling) do
+            next_nibling
+          else
+            nil
+          end
+
+        do_next_descendant_nibling(next_nibling, predicate, last_match)
+    end
+  end
+
+  defp do_next_descendant_nibling(%Context{} = ctx, predicate, last_match) do
+    case first_child(ctx) do
+      nil ->
+        last_match
+
+      %Context{} = first_child ->
+        last_match =
+          if predicate.(first_child) do
+            first_child
+          else
+            last_match
+          end
+
+        do_next_descendant_nibling(first_child, predicate, last_match)
+    end
+  end
+
   def first_extended_nibling(), do: raise(Error, "not implemented")
   def last_extended_nibling(), do: raise(Error, "not implemented")
   def previous_extended_nibling(), do: raise(Error, "not implemented")

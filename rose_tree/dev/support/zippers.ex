@@ -214,6 +214,63 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
+  def ctx_with_descendant_niblings() do
+    %Context{
+      focus: TreeNode.new(5),
+      prev: [
+        TreeNode.new(3, [
+          TreeNode.new(10, [
+            TreeNode.new(18),
+            TreeNode.new(19),
+          ]),
+          TreeNode.new(11, [
+            TreeNode.new(20),
+            TreeNode.new(21),
+          ]),
+          TreeNode.new(12, [
+            TreeNode.new(22),
+            TreeNode.new(23, [
+              TreeNode.new(24),
+              TreeNode.new(25)
+            ])
+          ])
+        ]),
+        TreeNode.new(2, [
+          TreeNode.new(16),
+          TreeNode.new(17)
+        ]),
+        TreeNode.new(1)
+      ],
+      next: [
+        TreeNode.new(7, [
+          TreeNode.new(13, [
+            TreeNode.new(29, [
+              TreeNode.new(37),
+              TreeNode.new(38)
+            ]),
+            TreeNode.new(30),
+            TreeNode.new(31)
+          ]),
+          TreeNode.new(14, [
+            TreeNode.new(32),
+            TreeNode.new(33),
+            TreeNode.new(34)
+          ]),
+          TreeNode.new(15)
+        ]),
+        TreeNode.new(8, [
+          TreeNode.new(26),
+          TreeNode.new(27),
+          TreeNode.new(28, [
+            TreeNode.new(35),
+            TreeNode.new(36)
+          ])
+        ]),
+        TreeNode.new(9)
+      ]
+    }
+  end
+
   def ctx_with_piblings() do
     %Context{
       focus: TreeNode.new(20),
