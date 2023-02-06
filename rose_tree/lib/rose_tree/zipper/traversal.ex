@@ -7,7 +7,7 @@ defmodule RoseTree.Zipper.Traversal do
   require RoseTree.TreeNode
   require RoseTree.Zipper.Context
   import RoseTree.Zipper.Kin
-  import RoseTree.Util, only: [first_of_with_args: 3, always: 1]
+  import RoseTree.Util
   alias URI.Error
   alias RoseTree.TreeNode
   alias RoseTree.Zipper.Context
@@ -206,10 +206,15 @@ defmodule RoseTree.Zipper.Traversal do
   Traverses back through the zipper in a depth-first manner.
   """
   @spec ascend(Context.t()) :: Context.t()
-  def ascend(%Context{path: []} = ctx), do: nil
-
   def ascend(%Context{} = ctx) do
-    raise Error, "not yet implemented"
+    funs = [
+      fn x -> previous_descendant_nibling(x) end,
+      fn x -> previous_sibling(x) end,
+      &parent/1
+    ]
+
+    ctx
+    |> first_of(funs)
   end
 
   @doc """

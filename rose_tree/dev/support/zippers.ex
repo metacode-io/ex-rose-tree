@@ -267,6 +267,9 @@ defmodule RoseTree.Support.Zippers do
           ])
         ]),
         TreeNode.new(9)
+      ],
+      path: [
+        Location.new(100)
       ]
     }
   end

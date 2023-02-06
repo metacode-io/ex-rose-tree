@@ -11,9 +11,11 @@ defmodule RoseTree.Zipper.TraversalTest do
       empty_ctx: Zippers.empty_ctx(),
       leaf_ctx: Zippers.leaf_ctx(),
       simple_ctx: Zippers.simple_ctx(),
+      ctx_with_parent: Zippers.ctx_with_parent(),
       ctx_with_grandchildren: Zippers.ctx_with_grandchildren(),
       ctx_with_siblings: Zippers.ctx_with_siblings(),
-      ctx_with_ancestral_piblings: Zippers.ctx_with_ancestral_piblings()
+      ctx_with_ancestral_piblings: Zippers.ctx_with_ancestral_piblings(),
+      ctx_with_descendant_niblings: Zippers.ctx_with_descendant_niblings()
     }
   end
 
@@ -127,6 +129,32 @@ defmodule RoseTree.Zipper.TraversalTest do
     } do
       assert %Context{focus: focus} = Traversal.descend_until(ctx, &(&1.focus.term == 12))
       assert focus.term == 12
+    end
+  end
+
+  describe "ascend/1" do
+    test "should return nil if given a Context with no parents", %{simple_ctx: ctx} do
+      assert Traversal.ascend(ctx) == nil
+    end
+
+    test "should return the parent if given a Context with parents and no previous siblings", %{
+      ctx_with_parent: ctx
+    } do
+      assert %Context{focus: focus} = Traversal.ascend(ctx)
+      assert 10 == focus.term
+    end
+
+    test "should return the previous sibling if given a Context with parent and previous siblings that have no children",
+         %{ctx_with_siblings: ctx} do
+      ctx = Generators.add_zipper_locations(ctx, num_locations: 1)
+      assert %Context{focus: focus} = Traversal.ascend(ctx)
+      assert 4 == focus.term
+    end
+
+    test "should return the previous descendant nibling if given a Context with parent and previous siblings with children",
+         %{ctx_with_descendant_niblings: ctx} do
+      assert %Context{focus: focus} = Traversal.ascend(ctx)
+      assert 25 == focus.term
     end
   end
 end
