@@ -153,7 +153,7 @@ defmodule RoseTree.Zipper.Traversal do
   """
   @spec descend_for(Context.t(), pos_integer()) :: Context.t() | nil
   def descend_for(%Context{} = ctx, reps) when reps > 0,
-      do: move_for(ctx, reps, &descend/1)
+    do: move_for(ctx, reps, &descend/1)
 
   def descend_for(%Context{}, _reps), do: nil
 

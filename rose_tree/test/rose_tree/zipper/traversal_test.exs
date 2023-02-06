@@ -93,7 +93,8 @@ defmodule RoseTree.Zipper.TraversalTest do
         1..10
         |> Enum.map(fn reps ->
           assert %Context{focus: focus} = Traversal.descend_for(ctx, reps),
-                  "Expected a new Context for #{reps} reps "
+                 "Expected a new Context for #{reps} reps "
+
           focus.term
         end)
 
@@ -166,7 +167,9 @@ defmodule RoseTree.Zipper.TraversalTest do
       end
     end
 
-    test "should return nil if given a Context with no previous descendant niblings, siblings, or parent", %{simple_ctx: ctx} do
+    test "should return nil if no previous descendant niblings, siblings, or parent", %{
+      simple_ctx: ctx
+    } do
       for reps <- 1..5 do
         assert Traversal.ascend_for(ctx, reps) == nil
       end
@@ -183,11 +186,33 @@ defmodule RoseTree.Zipper.TraversalTest do
         1..10
         |> Enum.map(fn reps ->
           assert %Context{focus: focus} = Traversal.ascend_for(new_ctx, reps),
-                  "Expected a new Context for #{reps} reps "
+                 "Expected a new Context for #{reps} reps "
+
           focus.term
         end)
 
       assert actual_results == expected_results
+    end
+  end
+
+  describe "ascend_if/2" do
+    test "should return nil if no previous descendant niblings, siblings, or parent", %{
+      simple_ctx: ctx
+    } do
+      assert Traversal.ascend_if(ctx, &(&1.focus.term == 5)) == nil
+    end
+
+    test "should return nil if the given predicate fails to match", %{
+      ctx_with_descendant_niblings: ctx
+    } do
+      assert Traversal.ascend_if(ctx, &(&1.focus.term == :not_found)) == nil
+    end
+
+    test "should return the new context if the given predicate matches", %{
+      ctx_with_descendant_niblings: ctx
+    } do
+      assert %Context{focus: focus} = Traversal.ascend_if(ctx, &(&1.focus.term == 25))
+      assert focus.term == 25
     end
   end
 end

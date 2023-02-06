@@ -335,7 +335,9 @@ defmodule RoseTree.Zipper.Kin.NiblingTest do
       assert Kin.previous_descendant_nibling(ctx) == nil
     end
 
-    test "should return nil if immediately previous sibling has no children", %{ctx_with_niblings: ctx} do
+    test "should return nil if immediately previous sibling has no children", %{
+      ctx_with_niblings: ctx
+    } do
       assert Kin.previous_descendant_nibling(ctx) == nil
     end
 
@@ -369,7 +371,9 @@ defmodule RoseTree.Zipper.Kin.NiblingTest do
       assert Kin.next_descendant_nibling(ctx) == nil
     end
 
-    test "should return nil if immediately next sibling has no children", %{ctx_with_niblings: ctx} do
+    test "should return nil if immediately next sibling has no children", %{
+      ctx_with_niblings: ctx
+    } do
       assert Kin.next_descendant_nibling(ctx) == nil
     end
 
