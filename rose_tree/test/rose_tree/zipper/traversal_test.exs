@@ -112,4 +112,19 @@ defmodule RoseTree.Zipper.TraversalTest do
       assert focus.term == 2
     end
   end
+
+  describe "descend_until/2" do
+    test "should return nil if there are no descendants", %{leaf_ctx: ctx} do
+      assert Traversal.descend_until(ctx, &(&1.focus.term == 5)) == nil
+    end
+
+    test "should return nil if the given predicate fails to match", %{simple_ctx: ctx} do
+      assert Traversal.descend_until(ctx, &(&1.focus.term == :not_found)) == nil
+    end
+
+    test "should return the new context if the given predicate is eventually matched", %{ctx_with_grandchildren: ctx} do
+      assert %Context{focus: focus} = Traversal.descend_until(ctx, &(&1.focus.term == 12))
+      assert focus.term == 12
+    end
+  end
 end
