@@ -152,8 +152,7 @@ defmodule RoseTree.Zipper.Traversal do
   Repeats a call to `descend/1` by the given number of `reps`.
   """
   @spec descend_for(Context.t(), pos_integer()) :: Context.t() | nil
-  def descend_for(%Context{} = ctx, reps)
-      when reps > 0,
+  def descend_for(%Context{} = ctx, reps) when reps > 0,
       do: move_for(ctx, reps, &descend/1)
 
   def descend_for(%Context{}, _reps), do: nil
@@ -225,6 +224,46 @@ defmodule RoseTree.Zipper.Traversal do
     do: move_for(ctx, reps, &ascend/1)
 
   def ascend_for(%Context{}, _reps), do: nil
+
+  @doc """
+  Ascends the Zipper if the provided predicate function
+  returns true when applied to the next Context. Otherwise,
+  returns nil.
+  """
+  @spec ascend_if(Context.t(), predicate()) :: Context.t() | nil
+  def ascend_if(%Context{} = ctx, predicate) when is_function(predicate) do
+    case ascend(ctx) do
+      nil ->
+        nil
+
+      %Context{} = next_ctx ->
+        if predicate.(next_ctx) do
+          next_ctx
+        else
+          nil
+        end
+    end
+  end
+
+  @doc """
+  Ascends the Zipper continuously until the provided predicate
+  function returns true when applied to the Context. Otherwise,
+  returns nil.
+  """
+  @spec ascend_until(Context.t(), predicate()) :: Context.t() | nil
+  def ascend_until(%Context{} = ctx, predicate) when is_function(predicate) do
+    case ascend(ctx) do
+      nil ->
+        nil
+
+      %Context{} = next_ctx ->
+        if predicate.(next_ctx) do
+          next_ctx
+        else
+          ascend_until(next_ctx, predicate)
+        end
+    end
+  end
 
   ###
   ### SEARCHING

@@ -946,19 +946,12 @@ defmodule RoseTree.Zipper.Kin do
   @spec previous_descendant_nibling(Context.t(), predicate()) :: Context.t() | nil
   def previous_descendant_nibling(%Context{} = ctx, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    case previous_nibling(ctx) do
+    case previous_sibling(ctx) do
       nil ->
         nil
 
-      %Context{} = previous_nibling ->
-        last_match =
-          if predicate.(previous_nibling) do
-            previous_nibling
-          else
-            nil
-          end
-
-        do_previous_descendant_nibling(previous_nibling, predicate, last_match)
+      %Context{} = previous_sibling ->
+        do_previous_descendant_nibling(previous_sibling, predicate, nil)
     end
   end
 
@@ -989,19 +982,12 @@ defmodule RoseTree.Zipper.Kin do
   @spec next_descendant_nibling(Context.t(), predicate()) :: Context.t() | nil
   def next_descendant_nibling(%Context{} = ctx, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    case next_nibling(ctx) do
+    case next_sibling(ctx) do
       nil ->
         nil
 
-      %Context{} = next_nibling ->
-        last_match =
-          if predicate.(next_nibling) do
-            next_nibling
-          else
-            nil
-          end
-
-        do_next_descendant_nibling(next_nibling, predicate, last_match)
+      %Context{} = next_sibling ->
+        do_next_descendant_nibling(next_sibling, predicate, nil)
     end
   end
 
