@@ -156,7 +156,7 @@ defmodule RoseTree.Zipper.Traversal do
       when reps > 0,
       do: move_for(ctx, reps, &descend/1)
 
-  def descend_for(%Context{}, _reps, _predicate), do: nil
+  def descend_for(%Context{}, _reps), do: nil
 
   @doc """
   Descends into the Zipper if the provided predicate function

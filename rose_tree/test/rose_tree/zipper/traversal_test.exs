@@ -11,6 +11,7 @@ defmodule RoseTree.Zipper.TraversalTest do
       empty_ctx: Zippers.empty_ctx(),
       leaf_ctx: Zippers.leaf_ctx(),
       simple_ctx: Zippers.simple_ctx(),
+      ctx_with_grandchildren: Zippers.ctx_with_grandchildren(),
       ctx_with_siblings: Zippers.ctx_with_siblings(),
       ctx_with_ancestral_piblings: Zippers.ctx_with_ancestral_piblings()
     }
@@ -65,6 +66,35 @@ defmodule RoseTree.Zipper.TraversalTest do
          %{ctx_with_ancestral_piblings: ctx} do
       assert %Context{focus: focus} = Traversal.descend(ctx)
       assert 6 == focus.term
+    end
+  end
+
+  describe "descend_for/2" do
+    test "should return nil if given a number of reps <= 0", %{simple_ctx: ctx} do
+      for reps <- 0..-5 do
+        assert Traversal.descend_for(ctx, reps) == nil
+      end
+    end
+
+    test "should return nil if given a Context with no depth-first descendants", %{leaf_ctx: ctx} do
+      for reps <- 1..5 do
+        assert Traversal.descend_for(ctx, reps) == nil
+      end
+    end
+
+    test "should return correct result of descending x number of times", %{
+      ctx_with_grandchildren: ctx
+    } do
+      expected_results = [1, 4, 5, 6, 2, 7, 8, 9, 3, 10]
+
+      actual_results =
+        1..10
+        |> Enum.map(fn reps ->
+          assert %Context{focus: focus} = Traversal.descend_for(ctx, reps)
+          focus.term
+        end)
+
+      assert actual_results == expected_results
     end
   end
 end
