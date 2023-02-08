@@ -43,44 +43,6 @@ defmodule RoseTree.Zipper.Traversal do
     end
   end
 
-  @doc """
-  Repeats a call to the given move function, `move_fn`, by the
-  given number of `reps`.
-
-  ## Examples
-
-      iex> loc_nodes = for n <- [4,3,2,1], do: RoseTree.TreeNode.new(n)
-      ...> locs = for n <- loc_nodes, do: RoseTree.Zipper.Location.new(n)
-      ...> node = RoseTree.TreeNode.new(5)
-      ...> ctx = RoseTree.Zipper.Context.new(node, path: locs)
-      ...> move_fn = &RoseTree.Zipper.Kin.parent/1
-      ...> ctx = RoseTree.Zipper.Traversal.move_for(ctx, 2, move_fn)
-      ...> RoseTree.Zipper.Context.current_focus(ctx).term
-      3
-
-  """
-  @spec move_for(
-          Context.t(),
-          pos_integer(),
-          (Context.t() -> Context.t() | nil)
-        ) :: Context.t() | nil
-  def move_for(%Context{} = ctx, 0, _move_fn), do: ctx
-
-  def move_for(%Context{} = ctx, reps, move_fn) when reps > 0 and is_function(move_fn) do
-    1..reps
-    |> Enum.reduce_while(ctx, fn _rep, context ->
-      case move_fn.(context) do
-        nil ->
-          {:halt, nil}
-
-        %Context{} = next ->
-          {:cont, next}
-      end
-    end)
-  end
-
-  def move_for(%Context{}, _reps, _move_fn), do: nil
-
   ###
   ### FORWARD, BREADTH-FIRST TRAVERSAL
   ###
@@ -89,12 +51,17 @@ defmodule RoseTree.Zipper.Traversal do
   Traverses forward through the zipper in a breadth-first manner.
   """
   @spec forward(Context.t()) :: Context.t() | nil
-  def forward(%Context{} = ctx) when Context.empty?(ctx), do: nil
-
-  def forward(%Context{path: []} = ctx), do: first_child(ctx)
-
   def forward(%Context{} = ctx) do
-    raise Error, "not yet implemented"
+    funs = [
+      &next_sibling/2
+      # &next_extended_cousin/2,
+      # &first_extended_nibling/2,
+      # &first_nibling/2,
+      # &first_child/2
+    ]
+
+    ctx
+    |> first_of_with_args(funs, [&always/1])
   end
 
   @doc """

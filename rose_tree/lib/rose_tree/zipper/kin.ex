@@ -14,6 +14,48 @@ defmodule RoseTree.Zipper.Kin do
   @typep predicate() :: (term() -> boolean())
 
   ###
+  ### GENERIC
+  ###
+
+  @doc """
+  Repeats a call to the given move function, `move_fn`, by the
+  given number of `reps`.
+
+  ## Examples
+
+      iex> loc_nodes = for n <- [4,3,2,1], do: RoseTree.TreeNode.new(n)
+      ...> locs = for n <- loc_nodes, do: RoseTree.Zipper.Location.new(n)
+      ...> node = RoseTree.TreeNode.new(5)
+      ...> ctx = RoseTree.Zipper.Context.new(node, path: locs)
+      ...> move_fn = &RoseTree.Zipper.Kin.parent/1
+      ...> ctx = RoseTree.Zipper.Kin.move_for(ctx, 2, move_fn)
+      ...> RoseTree.Zipper.Context.current_focus(ctx).term
+      3
+
+  """
+  @spec move_for(
+          Context.t(),
+          pos_integer(),
+          (Context.t() -> Context.t() | nil)
+        ) :: Context.t() | nil
+  def move_for(%Context{} = ctx, 0, _move_fn), do: ctx
+
+  def move_for(%Context{} = ctx, reps, move_fn) when reps > 0 and is_function(move_fn) do
+    1..reps
+    |> Enum.reduce_while(ctx, fn _rep, context ->
+      case move_fn.(context) do
+        nil ->
+          {:halt, nil}
+
+        %Context{} = next ->
+          {:cont, next}
+      end
+    end)
+  end
+
+  def move_for(%Context{}, _reps, _move_fn), do: nil
+
+  ###
   ### DIRECT ANCESTORS (PARENTS, GRANDPARENTS, ETC)
   ###
 
@@ -48,11 +90,11 @@ defmodule RoseTree.Zipper.Kin do
   def parent(%Context{path: []}), do: nil
 
   def parent(%Context{path: [parent | g_parents]} = ctx) do
-    consolidated_ctx = Enum.reverse(ctx.prev) ++ [ctx.focus | ctx.next]
+    combined_ctx = Enum.reverse(ctx.prev) ++ [ctx.focus | ctx.next]
 
     focused_parent =
       parent.term
-      |> TreeNode.new(consolidated_ctx)
+      |> TreeNode.new(combined_ctx)
 
     %{ctx | prev: parent.prev, next: parent.next, path: g_parents}
     |> Context.set_focus(focused_parent)
@@ -85,6 +127,25 @@ defmodule RoseTree.Zipper.Kin do
     else
       nil ->
         nil
+    end
+  end
+
+  @doc """
+  Searches the list of parents comparing at each step to the given predicate,
+  stopping either when the match is successful, or no more parents exist.
+  """
+  @spec find_parent(Context.t(), predicate()) :: Context.t() | nil
+  def find_parent(%Context{} = ctx, predicate) when is_function(predicate) do
+    case parent(ctx) do
+      nil ->
+        nil
+
+      %Context{} = parent ->
+        if predicate.(parent) do
+          parent
+        else
+          find_parent(parent, predicate)
+        end
     end
   end
 
@@ -312,58 +373,6 @@ defmodule RoseTree.Zipper.Kin do
   defp do_last_grandchild(nil, _predicate), do: nil
 
   @doc """
-  Moves the focus to the first grandchild repeated `reps` number of times.
-  If any rep fails, returns `nil`.
-  """
-  @spec first_grandchild_at_rep(Context.t(), pos_integer()) :: Context.t() | nil
-  def first_grandchild_at_rep(_ctx, reps)
-      when is_integer(reps) and reps <= 0,
-      do: nil
-
-  def first_grandchild_at_rep(%Context{} = ctx, 1),
-    do: first_grandchild(ctx)
-
-  def first_grandchild_at_rep(%Context{} = ctx, reps)
-      when is_integer(reps) do
-    1..reps
-    |> Enum.reduce_while(ctx, fn _i, context ->
-      case first_grandchild(context) do
-        nil ->
-          {:halt, nil}
-
-        %Context{} = grandchild ->
-          {:cont, grandchild}
-      end
-    end)
-  end
-
-  @doc """
-  Moves the focus to the last grandchild repeated `reps` number of times.
-  If any rep fails, returns `nil`.
-  """
-  @spec last_grandchild_at_rep(Context.t(), pos_integer()) :: Context.t() | nil
-  def last_grandchild_at_rep(_ctx, reps)
-      when is_integer(reps) and reps <= 0,
-      do: nil
-
-  def last_grandchild_at_rep(%Context{} = ctx, 1),
-    do: last_grandchild(ctx)
-
-  def last_grandchild_at_rep(%Context{} = ctx, reps)
-      when is_integer(reps) do
-    1..reps
-    |> Enum.reduce_while(ctx, fn _i, context ->
-      case last_grandchild(context) do
-        nil ->
-          {:halt, nil}
-
-        %Context{} = grandchild ->
-          {:cont, grandchild}
-      end
-    end)
-  end
-
-  @doc """
   Moves the focus to the first great-grandchild -- the first child of the
   first grandchild -- of the focus. If there are no great-grandchildren, moves to
   the next sibling of the first grandchild and looks for that node's first
@@ -488,37 +497,6 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  # @doc """
-  # Moves the focus to the first sibling with children from the current focus.
-  # If not found, returns nil.
-  # """
-  # @spec first_sibling_with_children(Context.t())   :: Context.t() | nil
-  # def first_sibling_with_children(%Context{prev: []}), do: nil
-
-  # def first_sibling_with_children(%Context{} = ctx) do
-  #   prev_siblings = ctx.prev |> Enum.reverse()
-
-  #   case do_first_sibling_with_children({[], prev_siblings}) do
-  #     {new_prev, [new_focus | new_next]} ->
-  #       %Context{
-  #         focus: new_focus,
-  #         prev: new_prev,
-  #         next: new_next,
-  #         path: ctx.path
-  #       }
-
-  #     _ -> nil
-  #   end
-  # end
-
-  # defp do_first_sibling_with_children({_, []}), do: nil
-
-  # defp do_first_sibling_with_children({prev, [next | rest]})
-  #     when not TreeNode.leaf?(next), do: {prev, [next | rest]}
-
-  # defp do_first_sibling_with_children({prev, [next | rest]}),
-  #     do: do_first_sibling_with_children({[next | prev], rest})
-
   @doc """
   Moves focus to the previous sibling to the current focus. If there are
   no more siblings before the current focus, returns nil.
@@ -568,19 +546,6 @@ defmodule RoseTree.Zipper.Kin do
         }
     end
   end
-
-  # @doc """
-  # Moves the focus to the previous sibling with children of the current focus.
-  # If not found, returns nil.
-  # """
-  # @spec previous_sibling_with_children(Context.t()) :: Context.t() | nil
-  # def previous_sibling_with_children(%Context{prev: []}), do: nil
-
-  # def previous_sibling_with_children(%Context{prev: [prev | rest]} = ctx)
-  #     when not TreeNode.leaf?(prev), do: previous_sibling(ctx)
-
-  # def previous_sibling_with_children(%Context{} = ctx),
-  #     do: ctx |> previous_sibling() |> previous_sibling_with_children()
 
   @doc """
   Moves focus to the last sibling from the current focus. If there are
@@ -633,35 +598,6 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  # @doc """
-  # Moves the focus to the last sibling with children from the current focus.
-  # If not found, returns nil.
-  # """
-  # @spec last_sibling_with_children(Context.t()) :: Context.t() | nil
-  # def last_sibling_with_children(%Context{next: []}), do: nil
-
-  # def last_sibling_with_children(%Context{} = ctx) do
-  #   case do_last_sibling_with_children({[ctx.focus | ctx.prev], ctx.next}) do
-  #     {new_prev, [new_focus | new_next]} ->
-  #       %Context{
-  #         focus: new_focus,
-  #         prev: new_prev,
-  #         next: new_next,
-  #         path: ctx.path
-  #       }
-
-  #     _ -> nil
-  #   end
-  # end
-
-  # defp do_last_sibling_with_children({_, []}), do: nil
-
-  # defp do_last_sibling_with_children({prev, [next | rest]})
-  #     when not TreeNode.leaf?(next), do: {prev, [next | rest]}
-
-  # defp do_last_sibling_with_children({prev, [next | rest]}),
-  #     do: do_last_sibling_with_children({[next | prev], rest})
-
   @doc """
   Moves focus to the next sibling of the current focus. If there are
   no more siblings after the current focus, returns nil.
@@ -711,19 +647,6 @@ defmodule RoseTree.Zipper.Kin do
         }
     end
   end
-
-  # @doc """
-  # Moves the focus to the next sibling with children of the current focus.
-  # If not found, returns nil.
-  # """
-  # @spec next_sibling_with_children(Context.t()) :: Context.t() | nil
-  # def next_sibling_with_children(%Context{next: []}), do: nil
-
-  # def next_sibling_with_children(%Context{next: [next | rest]} = ctx)
-  #     when not TreeNode.leaf?(next), do: next_sibling(ctx)
-
-  # def next_sibling_with_children(%Context{} = ctx),
-  #     do: ctx |> next_sibling() |> next_sibling_with_children()
 
   @doc """
   Moves focus to the sibling of the current focus at the given index.
@@ -1166,6 +1089,29 @@ defmodule RoseTree.Zipper.Kin do
   def next_extended_pibling(), do: raise(Error, "not implemented")
 
   @doc """
+  Recursively searches the `path` for the first, first "ancestral" pibling. That is,
+  if a first pibling is not found for the parent, it will search the grandparent. If
+  one is not found for the grandparent, it will search the great-grandparent. And so on,
+  until it reaches the root. If the root is reached and it does not have a first pibling,
+  the function returns nil.
+  """
+  @spec first_ancestral_pibling(Context.t(), predicate()) :: Context.t() | nil
+  def first_ancestral_pibling(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    case first_pibling(ctx, predicate) do
+      nil ->
+        ctx
+        |> parent()
+        |> first_ancestral_pibling(predicate)
+
+      %Context{} = first_ancestral_pibling ->
+        first_ancestral_pibling
+    end
+  end
+
+  def first_ancestral_pibling(nil, _predicate), do: nil
+
+  @doc """
   Recursively searches the `path` for the first, previous "ancestral" pibling. That is,
   if a previous pibling is not found for the parent, it will search the grandparent. If
   one is not found for the grandparent, it will search the great-grandparent. And so on,
@@ -1210,6 +1156,29 @@ defmodule RoseTree.Zipper.Kin do
   end
 
   def next_ancestral_pibling(nil, _predicate), do: nil
+
+  @doc """
+  Recursively searches the `path` for the first, last "ancestral" pibling. That is,
+  if a last pibling is not found for the parent, it will search the grandparent. If
+  one is not found for the grandparent, it will search the great-grandparent. And so on,
+  until it reaches the root. If the root is reached and it does not have a last pibling,
+  the function returns nil.
+  """
+  @spec last_ancestral_pibling(Context.t(), predicate()) :: Context.t() | nil
+  def last_ancestral_pibling(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    case last_pibling(ctx, predicate) do
+      nil ->
+        ctx
+        |> parent()
+        |> last_ancestral_pibling(predicate)
+
+      %Context{} = last_ancestral_pibling ->
+        last_ancestral_pibling
+    end
+  end
+
+  def last_ancestral_pibling(nil, _predicate), do: nil
 
   ###
   ### FIRST COUSINS
@@ -1475,4 +1444,159 @@ defmodule RoseTree.Zipper.Kin do
   end
 
   defp do_next_second_cousin(nil, _opts), do: nil
+
+  ###
+  ### EXTENDED COUSINS
+  ###
+
+  @doc """
+  Searches for the first extended cousin or the first first-cousin of the focused node.
+  """
+  @spec first_extended_cousin(Context.t(), keyword()) :: Context.t() | nil
+  def first_extended_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    target_depth = Context.depth_of_focus(ctx)
+
+    find_extended_cousin(ctx, target_depth, %{
+      predicate: predicate,
+      ancestral_pibling_fn: &first_ancestral_pibling/2,
+      sibling_fn: &next_sibling/1,
+      child_fn: &first_child/1
+    })
+  end
+
+  @doc """
+  Searches for the last extended cousin or the last first-cousin of the focused node.
+  """
+  @spec last_extended_cousin(Context.t(), keyword()) :: Context.t() | nil
+  def last_extended_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    target_depth = Context.depth_of_focus(ctx)
+
+    find_extended_cousin(ctx, target_depth, %{
+      predicate: predicate,
+      ancestral_pibling_fn: &last_ancestral_pibling/2,
+      sibling_fn: &previous_sibling/1,
+      child_fn: &last_child/1
+    })
+  end
+
+  @doc """
+  Searches for the previous extended cousin or the previous first-cousin of the focused node.
+  """
+  @spec previous_extended_cousin(Context.t(), keyword()) :: Context.t() | nil
+  def previous_extended_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    target_depth = Context.depth_of_focus(ctx)
+
+    find_extended_cousin(ctx, target_depth, %{
+      predicate: predicate,
+      ancestral_pibling_fn: &previous_ancestral_pibling/2,
+      sibling_fn: &previous_sibling/1,
+      child_fn: &last_child/1
+    })
+  end
+
+  @doc """
+  Searches for the next extended cousin or the next first-cousin of the focused node.
+  """
+  @spec next_extended_cousin(Context.t(), keyword()) :: Context.t() | nil
+  def next_extended_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    target_depth = Context.depth_of_focus(ctx)
+
+    find_extended_cousin(ctx, target_depth, %{
+      predicate: predicate,
+      ancestral_pibling_fn: &next_ancestral_pibling/2,
+      sibling_fn: &next_sibling/1,
+      child_fn: &first_child/1
+    })
+  end
+
+  @spec find_extended_cousin(Context.t(), non_neg_integer(), map()) :: Context.t() | nil
+  defp find_extended_cousin(%Context{} = ctx, target_depth, opts) do
+    case opts.ancestral_pibling_fn.(ctx, &TreeNode.parent?/1) do
+      nil ->
+        nil
+
+      %Context{} = ancestral_pibling ->
+        new_depth = Context.depth_of_focus(ancestral_pibling)
+
+        ancestral_pibling
+        |> find_extended_cousin_at_depth(new_depth, target_depth, opts)
+    end
+  end
+
+  @spec find_extended_cousin_at_depth(Context.t(), non_neg_integer(), non_neg_integer(), map()) ::
+          Context.t() | nil
+  defp find_extended_cousin_at_depth(
+         %Context{path: [], next: []} = ctx,
+         current_depth,
+         target_depth,
+         opts
+       )
+       when current_depth == target_depth do
+    if opts.predicate.(ctx.focus) do
+      ctx
+    else
+      nil
+    end
+  end
+
+  defp find_extended_cousin_at_depth(%Context{next: []} = ctx, current_depth, target_depth, opts)
+       when current_depth == target_depth do
+    if opts.predicate.(ctx.focus) do
+      ctx
+    else
+      find_extended_cousin(ctx, target_depth, opts)
+    end
+  end
+
+  defp find_extended_cousin_at_depth(%Context{} = ctx, current_depth, target_depth, opts)
+       when current_depth == target_depth do
+    if opts.predicate.(ctx.focus) do
+      ctx
+    else
+      ctx
+      |> opts.sibling_fn.()
+      |> find_extended_cousin_at_depth(current_depth, target_depth, opts)
+    end
+  end
+
+  defp find_extended_cousin_at_depth(
+         %Context{path: [], next: []} = ctx,
+         current_depth,
+         target_depth,
+         opts
+       ) do
+    case opts.child_fn.(ctx) do
+      nil ->
+        nil
+
+      %Context{} = child ->
+        find_extended_cousin_at_depth(child, current_depth + 1, target_depth, opts)
+    end
+  end
+
+  defp find_extended_cousin_at_depth(%Context{next: []} = ctx, current_depth, target_depth, opts) do
+    case opts.child_fn.(ctx) do
+      nil ->
+        find_extended_cousin(ctx, target_depth, opts)
+
+      %Context{} = child ->
+        find_extended_cousin_at_depth(child, current_depth + 1, target_depth, opts)
+    end
+  end
+
+  defp find_extended_cousin_at_depth(%Context{} = ctx, current_depth, target_depth, opts) do
+    case opts.child_fn.(ctx) do
+      nil ->
+        ctx
+        |> opts.sibling_fn.()
+        |> find_extended_cousin_at_depth(current_depth, target_depth, opts)
+
+      %Context{} = child ->
+        find_extended_cousin_at_depth(child, current_depth + 1, target_depth, opts)
+    end
+  end
 end

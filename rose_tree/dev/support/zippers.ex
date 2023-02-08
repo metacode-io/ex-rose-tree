@@ -386,6 +386,7 @@ defmodule RoseTree.Support.Zippers do
               TreeNode.new(26),
               TreeNode.new(27)
             ]),
+            TreeNode.new(17),
             TreeNode.new(18, [
               TreeNode.new(28),
               TreeNode.new(29),
@@ -453,6 +454,140 @@ defmodule RoseTree.Support.Zippers do
             ])
           ]
         )
+      ]
+    }
+  end
+
+  def ctx_with_extended_cousins() do
+    %Context{
+      focus: TreeNode.new(20),
+      prev: [],
+      next: [],
+      path: [
+        Location.new(100),
+        Location.new(15),
+        Location.new(10,
+          prev: [
+            TreeNode.new(6),
+            TreeNode.new(4, [
+              TreeNode.new(22, [
+                TreeNode.new(44),
+                TreeNode.new(45, [
+                  TreeNode.new(101),
+                  TreeNode.new(102)
+                ]),
+                TreeNode.new(46)
+              ]),
+              TreeNode.new(23),
+              TreeNode.new(24, [
+                TreeNode.new(47),
+                TreeNode.new(48),
+                TreeNode.new(49)
+              ])
+            ]),
+            TreeNode.new(2, [
+              TreeNode.new(19),
+              TreeNode.new(20, [
+                TreeNode.new(50, [
+                  TreeNode.new(103)
+                ]),
+                TreeNode.new(51, [
+                  TreeNode.new(104)
+                ])
+              ]),
+              TreeNode.new(21)
+            ])
+          ],
+          next: [
+            TreeNode.new(14),
+            TreeNode.new(16, [
+              TreeNode.new(25),
+              TreeNode.new(26, [
+                TreeNode.new(52, [
+                  TreeNode.new(105),
+                  TreeNode.new(110)
+                ]),
+                TreeNode.new(53, [
+                  TreeNode.new(106)
+                ])
+              ]),
+              TreeNode.new(27)
+            ]),
+            TreeNode.new(18, [
+              TreeNode.new(28, [
+                TreeNode.new(54),
+                TreeNode.new(55, [
+                  TreeNode.new(107),
+                  TreeNode.new(108)
+                ]),
+                TreeNode.new(56)
+              ]),
+              TreeNode.new(29),
+              TreeNode.new(30, [
+                TreeNode.new(57),
+                TreeNode.new(58)
+              ])
+            ])
+          ]
+        )
+      ]
+    }
+  end
+
+  def ctx_with_extended_cousins_2() do
+    %Context{
+      focus: 3,
+      prev: [
+        TreeNode.new(1),
+        TreeNode.new(2)
+      ],
+      next: [],
+      path: [
+        Location.new(5,
+          prev: [TreeNode.new(4)],
+          next: [TreeNode.new(6)]),
+        Location.new(8,
+          prev: [TreeNode.new(7)],
+          next: [TreeNode.new(9)]),
+        Location.new(10,
+          prev: [],
+          next: [
+            TreeNode.new(11),
+            TreeNode.new(12, [
+              TreeNode.new(13),
+              TreeNode.new(14)
+            ])
+          ]),
+        Location.new(15,
+          prev: [],
+          next: [
+            TreeNode.new(16, [
+              TreeNode.new(18, [
+                TreeNode.new(21),
+                TreeNode.new(22)
+              ]),
+              TreeNode.new(19, [
+                TreeNode.new(23),
+                TreeNode.new(24, [
+                  TreeNode.new(26),
+                  TreeNode.new(27, [
+                    TreeNode.new(29),
+                    TreeNode.new(30),
+                    TreeNode.new(31)
+                  ]),
+                  TreeNode.new(28)
+                ]),
+                TreeNode.new(25)
+              ]),
+              TreeNode.new(20, [
+                TreeNode.new(32),
+                TreeNode.new(33),
+                TreeNode.new(34)
+              ])
+            ]),
+            TreeNode.new(17)
+          ]),
+        Location.new(35)
       ]
     }
   end
