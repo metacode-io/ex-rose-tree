@@ -172,6 +172,34 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
       assert actual.term == expected.term
       assert actual.term == 49
     end
+
+    test "should return the next extended cousin found",
+         %{ctx_with_extended_cousins: ctx} do
+      assert %Context{focus: actual} = Kin.previous_extended_cousin(ctx)
+      assert 102 == actual.term
+    end
+
+    test "should return the next extended cousin found matching the predicate",
+         %{ctx_with_extended_cousins: ctx} do
+      predicate = &(&1.term == 103)
+
+      actual = Kin.previous_extended_cousin(ctx, predicate)
+      assert 103 == actual.focus.term
+    end
+
+    test "should return the next extended cousin found in scenario 2",
+         %{ctx_with_extended_cousins_2: ctx} do
+      actual = Kin.previous_extended_cousin(ctx)
+      assert -31 == actual.focus.term
+    end
+
+    test "should return the next extended cousin found matching the predicate in scenario 2",
+         %{ctx_with_extended_cousins_2: ctx} do
+      predicate = &(&1.term == -29)
+
+      actual = Kin.previous_extended_cousin(ctx, predicate)
+      assert -29 == actual.focus.term
+    end
   end
 
   describe "next_extended_cousin/2" do

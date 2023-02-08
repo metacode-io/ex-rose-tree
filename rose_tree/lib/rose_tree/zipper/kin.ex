@@ -1458,6 +1458,7 @@ defmodule RoseTree.Zipper.Kin do
     target_depth = Context.depth_of_focus(ctx)
 
     find_extended_cousin(ctx, target_depth, %{
+      method: :first,
       predicate: predicate,
       ancestral_pibling_fn: &first_ancestral_pibling/2,
       sibling_fn: &next_sibling/1,
@@ -1474,6 +1475,7 @@ defmodule RoseTree.Zipper.Kin do
     target_depth = Context.depth_of_focus(ctx)
 
     find_extended_cousin(ctx, target_depth, %{
+      method: :last,
       predicate: predicate,
       ancestral_pibling_fn: &last_ancestral_pibling/2,
       sibling_fn: &previous_sibling/1,
@@ -1490,6 +1492,7 @@ defmodule RoseTree.Zipper.Kin do
     target_depth = Context.depth_of_focus(ctx)
 
     find_extended_cousin(ctx, target_depth, %{
+      method: :previous,
       predicate: predicate,
       ancestral_pibling_fn: &previous_ancestral_pibling/2,
       sibling_fn: &previous_sibling/1,
@@ -1506,6 +1509,7 @@ defmodule RoseTree.Zipper.Kin do
     target_depth = Context.depth_of_focus(ctx)
 
     find_extended_cousin(ctx, target_depth, %{
+      method: :next,
       predicate: predicate,
       ancestral_pibling_fn: &next_ancestral_pibling/2,
       sibling_fn: &next_sibling/1,
@@ -1535,7 +1539,21 @@ defmodule RoseTree.Zipper.Kin do
          target_depth,
          opts
        )
-       when current_depth == target_depth do
+       when current_depth == target_depth and opts.method in [:first, :next] do
+    if opts.predicate.(ctx.focus) do
+      ctx
+    else
+      nil
+    end
+  end
+
+  defp find_extended_cousin_at_depth(
+         %Context{path: [], prev: []} = ctx,
+         current_depth,
+         target_depth,
+         opts
+       )
+       when current_depth == target_depth and opts.method in [:last, :previous] do
     if opts.predicate.(ctx.focus) do
       ctx
     else
@@ -1544,7 +1562,16 @@ defmodule RoseTree.Zipper.Kin do
   end
 
   defp find_extended_cousin_at_depth(%Context{next: []} = ctx, current_depth, target_depth, opts)
-       when current_depth == target_depth do
+       when current_depth == target_depth and opts.method in [:first, :next] do
+    if opts.predicate.(ctx.focus) do
+      ctx
+    else
+      find_extended_cousin(ctx, target_depth, opts)
+    end
+  end
+
+  defp find_extended_cousin_at_depth(%Context{prev: []} = ctx, current_depth, target_depth, opts)
+       when current_depth == target_depth and opts.method in [:last, :previous] do
     if opts.predicate.(ctx.focus) do
       ctx
     else
@@ -1568,7 +1595,7 @@ defmodule RoseTree.Zipper.Kin do
          current_depth,
          target_depth,
          opts
-       ) do
+       ) when opts.method in [:first, :next] do
     case opts.child_fn.(ctx) do
       nil ->
         nil
@@ -1578,7 +1605,34 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  defp find_extended_cousin_at_depth(%Context{next: []} = ctx, current_depth, target_depth, opts) do
+  defp find_extended_cousin_at_depth(
+         %Context{path: [], prev: []} = ctx,
+         current_depth,
+         target_depth,
+         opts
+       ) when opts.method in [:last, :previous] do
+    case opts.child_fn.(ctx) do
+      nil ->
+        nil
+
+      %Context{} = child ->
+        find_extended_cousin_at_depth(child, current_depth + 1, target_depth, opts)
+    end
+  end
+
+  defp find_extended_cousin_at_depth(%Context{next: []} = ctx, current_depth, target_depth, opts)
+      when opts.method in [:first, :next] do
+    case opts.child_fn.(ctx) do
+      nil ->
+        find_extended_cousin(ctx, target_depth, opts)
+
+      %Context{} = child ->
+        find_extended_cousin_at_depth(child, current_depth + 1, target_depth, opts)
+    end
+  end
+
+  defp find_extended_cousin_at_depth(%Context{prev: []} = ctx, current_depth, target_depth, opts)
+      when opts.method in [:last, :previous] do
     case opts.child_fn.(ctx) do
       nil ->
         find_extended_cousin(ctx, target_depth, opts)
