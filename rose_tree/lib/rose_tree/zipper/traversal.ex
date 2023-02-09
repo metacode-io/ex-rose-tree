@@ -15,35 +15,6 @@ defmodule RoseTree.Zipper.Traversal do
   @typep predicate() :: (term() -> boolean())
 
   ###
-  ### BASIC TRAVERSAL
-  ###
-
-  @doc """
-  Rewinds a zipper back to the root.
-
-  ## Examples
-
-      iex> loc_nodes = for n <- [4,3,2,1], do: RoseTree.TreeNode.new(n)
-      ...> locs = for n <- loc_nodes, do: RoseTree.Zipper.Location.new(n)
-      ...> node = RoseTree.TreeNode.new(5)
-      ...> ctx = RoseTree.Zipper.Context.new(node, path: locs)
-      ...> ctx = RoseTree.Zipper.Traversal.to_root(ctx)
-      ...> RoseTree.Zipper.Context.root?(ctx)
-      true
-
-  """
-  @spec to_root(Context.t()) :: Context.t()
-  def to_root(%Context{} = ctx) do
-    case parent(ctx) do
-      nil ->
-        ctx
-
-      parent ->
-        to_root(parent)
-    end
-  end
-
-  ###
   ### FORWARD, BREADTH-FIRST TRAVERSAL
   ###
 
