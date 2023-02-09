@@ -124,6 +124,28 @@ defmodule RoseTree.Util do
   def always(_term), do: true
 
   @doc """
+  A function that applies a predicate to a term. If the function application
+  is true, returns the original term. If false, returns nil.
+
+  ## Examples
+
+      iex> RoseTree.Util.maybe(5, &(&1 == 5))
+      5
+
+      iex> RoseTree.Util.maybe(5, &(&1 == 1))
+      nil
+
+  """
+  @spec maybe(term(), (term() -> boolean())) :: term() | nil
+  def maybe(value, predicate) when is_function(predicate) do
+    if predicate.(value) do
+      value
+    else
+      nil
+    end
+  end
+
+  @doc """
   Similar to `Enum.split/2` but is optimized to return the
   list of elements that come before the index in reverse order.
   This is ideal for the context-aware nature of Zippers.
