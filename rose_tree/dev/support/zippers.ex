@@ -578,13 +578,13 @@ defmodule RoseTree.Support.Zippers do
                 ]),
                 TreeNode.new(-25)
               ]),
-              TreeNode.new(-20, [
-                TreeNode.new(-32),
-                TreeNode.new(-33),
-                TreeNode.new(-34)
-              ])
+              TreeNode.new(-20)
             ]),
-            TreeNode.new(-17)
+            TreeNode.new(-17, [
+              TreeNode.new(-32),
+              TreeNode.new(-33),
+              TreeNode.new(-34)
+            ])
           ],
           next: [
             TreeNode.new(16, [
@@ -605,13 +605,13 @@ defmodule RoseTree.Support.Zippers do
                 ]),
                 TreeNode.new(25)
               ]),
-              TreeNode.new(20, [
-                TreeNode.new(32),
-                TreeNode.new(33),
-                TreeNode.new(34)
-              ])
+              TreeNode.new(20)
             ]),
-            TreeNode.new(17)
+            TreeNode.new(17, [
+              TreeNode.new(32),
+              TreeNode.new(33),
+              TreeNode.new(34)
+            ])
           ]),
         Location.new(35)
       ]
