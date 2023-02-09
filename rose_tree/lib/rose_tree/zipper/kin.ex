@@ -17,7 +17,6 @@ defmodule RoseTree.Zipper.Kin do
   ### GENERIC
   ###
 
-
   @doc """
   Rewinds a zipper back to the root.
 
@@ -528,26 +527,26 @@ defmodule RoseTree.Zipper.Kin do
 
   @spec do_leftmost_descendant(Context.t()) :: Context.t()
   defp do_leftmost_descendant(%Context{} = ctx) do
-    case last_child(ctx) do
+    case first_child(ctx) do
       nil ->
         ctx
 
-      %Context{} = last_child ->
-        do_leftmost_descendant(last_child)
+      %Context{} = first_child ->
+        do_leftmost_descendant(first_child)
     end
   end
 
   @spec do_leftmost_descendant_until(Context.t(), predicate()) :: Context.t() | nil
   defp do_leftmost_descendant_until(%Context{} = ctx, predicate) do
-    case last_child(ctx) do
+    case first_child(ctx) do
       nil ->
         ctx
 
-      %Context{} = last_child ->
-        if predicate.(last_child) do
-          last_child
+      %Context{} = first_child ->
+        if predicate.(first_child) do
+          first_child
         else
-          do_leftmost_descendant_until(last_child, predicate)
+          do_leftmost_descendant_until(first_child, predicate)
         end
     end
   end
@@ -1631,51 +1630,170 @@ defmodule RoseTree.Zipper.Kin do
   ### EXTENDED COUSINS
   ###
 
-  # @doc """
-  # Searches for the first extended cousin or the first first-cousin of the focused node.
-  # """
-  # @spec first_extended_cousin(Context.t(), keyword()) :: Context.t() | nil
-  # def first_extended_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
-  #     when is_function(predicate) do
-  #   target_depth = Context.depth_of_focus(ctx)
+  @doc """
+  Searches for the first extended cousin or the first first-cousin of the focused node.
+  """
 
-  #   ctx
-  #   |> to_root()
-  #   |> find_extended_cousin_outside_in(target_depth, %{
-  #     method: :first,
-  #     predicate: predicate,
-  #     descendant_fn: &rightmost_descendant/1,
-  #     # ancestral_pibling_fn: &first_ancestral_pibling/2,
-  #     sibling_fn: &next_sibling/1,
-  #     child_fn: &first_child/1
-  #   })
-  # end
+  @spec first_extended_cousin(Context.t(), keyword()) :: Context.t() | nil
+  def first_extended_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    target_depth = Context.depth_of_focus(ctx)
 
-  # @doc """
-  # Searches for the last extended cousin or the last first-cousin of the focused node.
-  # """
-  # @spec last_extended_cousin(Context.t(), keyword()) :: Context.t() | nil
-  # def last_extended_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
-  #     when is_function(predicate) do
-  #   target_depth = Context.depth_of_focus(ctx)
+    top = to_root(ctx)
 
-  #   ctx
-  #   |> to_root()
-  #   |> find_extended_cousin_outside_in(0, target_depth, %{
-  #     method: :last,
-  #     predicate: predicate,
-  #     descendant_fn: &rightmost_descendant/1,
-  #     # ancestral_pibling_fn: &last_ancestral_pibling/2,
-  #     sibling_fn: &previous_sibling/1,
-  #     child_fn: &last_child/1
-  #   })
-  # end
+    top_left =
+      case first_sibling(top) do
+        nil ->
+          top
 
-  # defp find_extended_cousin_outside_in(%Context{prev: []} = ctx, target_depth, opts) do
-  #   case opts.descendant_fn.(ctx) do
+        %Context{} = sibling ->
+          sibling
+      end
 
-  #   end
-  # end
+    case find_first_extended_cousin(top_left, target_depth, predicate) do
+      {:ok, first_extended_cousin} ->
+        first_extended_cousin
+
+      {:cont, continue_from} ->
+        continue_from
+        |> find_next_extended_cousin(target_depth, predicate)
+    end
+  end
+
+  @spec find_first_extended_cousin(Context.t(), non_neg_integer(), predicate()) ::
+          {:ok, Context.t()} | {:cont, Context.t()}
+  defp find_first_extended_cousin(%Context{} = ctx, target_depth, predicate) do
+    case leftmost_descendant(ctx, &(Context.depth_of_focus(&1) == target_depth)) do
+      nil ->
+        {:cont, ctx}
+
+      %Context{} = descendant ->
+        new_depth = Context.depth_of_focus(descendant)
+
+        descendant
+        |> find_first_extended_cousin_at_depth(new_depth, target_depth, predicate)
+    end
+  end
+
+  @spec find_first_extended_cousin_at_depth(
+          Context.t(),
+          non_neg_integer(),
+          non_neg_integer(),
+          predicate()
+        ) :: {:ok, Context.t()} | {:cont, Context.t()}
+  defp find_first_extended_cousin_at_depth(
+         %Context{next: []} = ctx,
+         current_depth,
+         target_depth,
+         predicate
+       )
+       when current_depth == target_depth do
+    if predicate.(ctx.focus) do
+      {:ok, ctx}
+    else
+      {:cont, ctx}
+    end
+  end
+
+  defp find_first_extended_cousin_at_depth(
+         %Context{} = ctx,
+         current_depth,
+         target_depth,
+         predicate
+       )
+       when current_depth == target_depth do
+    if predicate.(ctx.focus) do
+      {:ok, ctx}
+    else
+      ctx
+      |> next_sibling()
+      |> find_first_extended_cousin_at_depth(current_depth, target_depth, predicate)
+    end
+  end
+
+  defp find_first_extended_cousin_at_depth(%Context{} = ctx, _, _, _), do: {:cont, ctx}
+
+  @doc """
+  Searches for the last extended cousin or the last first-cousin of the focused node.
+  """
+  @spec last_extended_cousin(Context.t(), keyword()) :: Context.t() | nil
+  def last_extended_cousin(%Context{} = ctx, predicate \\ &Util.always/1)
+      when is_function(predicate) do
+    target_depth = Context.depth_of_focus(ctx)
+
+    top = to_root(ctx)
+
+    top_right =
+      case last_sibling(top) do
+        nil ->
+          top
+
+        %Context{} = sibling ->
+          sibling
+      end
+
+    case find_last_extended_cousin(top_right, target_depth, predicate) do
+      {:ok, last_extended_cousin} ->
+        last_extended_cousin
+
+      {:cont, continue_from} ->
+        continue_from
+        |> find_previous_extended_cousin(target_depth, predicate)
+    end
+  end
+
+  @spec find_last_extended_cousin(Context.t(), non_neg_integer(), predicate()) ::
+          {:ok, Context.t()} | {:cont, Context.t()}
+  defp find_last_extended_cousin(%Context{} = ctx, target_depth, predicate) do
+    case rightmost_descendant(ctx, &(Context.depth_of_focus(&1) == target_depth)) do
+      nil ->
+        {:cont, ctx}
+
+      %Context{} = descendant ->
+        new_depth = Context.depth_of_focus(descendant)
+
+        descendant
+        |> find_last_extended_cousin_at_depth(new_depth, target_depth, predicate)
+    end
+  end
+
+  @spec find_last_extended_cousin_at_depth(
+          Context.t(),
+          non_neg_integer(),
+          non_neg_integer(),
+          predicate()
+        ) :: {:ok, Context.t()} | {:cont, Context.t()}
+  defp find_last_extended_cousin_at_depth(
+         %Context{prev: []} = ctx,
+         current_depth,
+         target_depth,
+         predicate
+       )
+       when current_depth == target_depth do
+    if predicate.(ctx.focus) do
+      {:ok, ctx}
+    else
+      {:cont, ctx}
+    end
+  end
+
+  defp find_last_extended_cousin_at_depth(
+         %Context{} = ctx,
+         current_depth,
+         target_depth,
+         predicate
+       )
+       when current_depth == target_depth do
+    if predicate.(ctx.focus) do
+      {:ok, ctx}
+    else
+      ctx
+      |> previous_sibling()
+      |> find_last_extended_cousin_at_depth(current_depth, target_depth, predicate)
+    end
+  end
+
+  defp find_last_extended_cousin_at_depth(%Context{} = ctx, _, _, _), do: {:cont, ctx}
 
   @doc """
   Searches for the previous extended cousin or the previous first-cousin of the focused node.
@@ -1685,13 +1803,121 @@ defmodule RoseTree.Zipper.Kin do
       when is_function(predicate) do
     target_depth = Context.depth_of_focus(ctx)
 
-    find_extended_cousin_inside_out(ctx, target_depth, %{
-      method: :previous,
-      predicate: predicate,
-      ancestral_pibling_fn: &previous_ancestral_pibling/2,
-      sibling_fn: &previous_sibling/1,
-      child_fn: &last_child/1
-    })
+    ctx
+    |> find_previous_extended_cousin(target_depth, predicate)
+  end
+
+  @spec find_previous_extended_cousin(Context.t(), non_neg_integer(), predicate()) ::
+          Context.t() | nil
+  defp find_previous_extended_cousin(%Context{} = ctx, target_depth, predicate) do
+    case previous_ancestral_pibling(ctx, &TreeNode.parent?/1) do
+      nil ->
+        nil
+
+      %Context{} = ancestral_pibling ->
+        new_depth = Context.depth_of_focus(ancestral_pibling)
+
+        ancestral_pibling
+        |> find_previous_extended_cousin_at_depth(new_depth, target_depth, predicate)
+    end
+  end
+
+  @spec find_previous_extended_cousin_at_depth(
+          Context.t(),
+          non_neg_integer(),
+          non_neg_integer(),
+          predicate()
+        ) ::
+          Context.t() | nil
+  defp find_previous_extended_cousin_at_depth(
+         %Context{path: [], prev: []} = ctx,
+         current_depth,
+         target_depth,
+         predicate
+       )
+       when current_depth == target_depth do
+    if predicate.(ctx.focus) do
+      ctx
+    else
+      nil
+    end
+  end
+
+  defp find_previous_extended_cousin_at_depth(
+         %Context{prev: []} = ctx,
+         current_depth,
+         target_depth,
+         predicate
+       )
+       when current_depth == target_depth do
+    if predicate.(ctx.focus) do
+      ctx
+    else
+      find_previous_extended_cousin(ctx, target_depth, predicate)
+    end
+  end
+
+  defp find_previous_extended_cousin_at_depth(
+         %Context{} = ctx,
+         current_depth,
+         target_depth,
+         predicate
+       )
+       when current_depth == target_depth do
+    if predicate.(ctx.focus) do
+      ctx
+    else
+      ctx
+      |> previous_sibling()
+      |> find_previous_extended_cousin_at_depth(current_depth, target_depth, predicate)
+    end
+  end
+
+  defp find_previous_extended_cousin_at_depth(
+         %Context{path: [], prev: []} = ctx,
+         current_depth,
+         target_depth,
+         predicate
+       ) do
+    case last_child(ctx) do
+      nil ->
+        nil
+
+      %Context{} = child ->
+        find_previous_extended_cousin_at_depth(child, current_depth + 1, target_depth, predicate)
+    end
+  end
+
+  defp find_previous_extended_cousin_at_depth(
+         %Context{prev: []} = ctx,
+         current_depth,
+         target_depth,
+         predicate
+       ) do
+    case last_child(ctx) do
+      nil ->
+        find_previous_extended_cousin(ctx, target_depth, predicate)
+
+      %Context{} = child ->
+        find_previous_extended_cousin_at_depth(child, current_depth + 1, target_depth, predicate)
+    end
+  end
+
+  defp find_previous_extended_cousin_at_depth(
+         %Context{} = ctx,
+         current_depth,
+         target_depth,
+         predicate
+       ) do
+    case last_child(ctx) do
+      nil ->
+        ctx
+        |> previous_sibling()
+        |> find_previous_extended_cousin_at_depth(current_depth, target_depth, predicate)
+
+      %Context{} = child ->
+        find_previous_extended_cousin_at_depth(child, current_depth + 1, target_depth, predicate)
+    end
   end
 
   @doc """
@@ -1702,18 +1928,14 @@ defmodule RoseTree.Zipper.Kin do
       when is_function(predicate) do
     target_depth = Context.depth_of_focus(ctx)
 
-    find_extended_cousin_inside_out(ctx, target_depth, %{
-      method: :next,
-      predicate: predicate,
-      ancestral_pibling_fn: &next_ancestral_pibling/2,
-      sibling_fn: &next_sibling/1,
-      child_fn: &first_child/1
-    })
+    ctx
+    |> find_next_extended_cousin(target_depth, predicate)
   end
 
-  @spec find_extended_cousin_inside_out(Context.t(), non_neg_integer(), map()) :: Context.t() | nil
-  defp find_extended_cousin_inside_out(%Context{} = ctx, target_depth, opts) do
-    case opts.ancestral_pibling_fn.(ctx, &TreeNode.parent?/1) do
+  @spec find_next_extended_cousin(Context.t(), non_neg_integer(), predicate()) ::
+          Context.t() | nil
+  defp find_next_extended_cousin(%Context{} = ctx, target_depth, predicate) do
+    case next_ancestral_pibling(ctx, &TreeNode.parent?/1) do
       nil ->
         nil
 
@@ -1721,130 +1943,105 @@ defmodule RoseTree.Zipper.Kin do
         new_depth = Context.depth_of_focus(ancestral_pibling)
 
         ancestral_pibling
-        |> find_extended_cousin_at_depth_inside_out(new_depth, target_depth, opts)
+        |> find_next_extended_cousin_at_depth(new_depth, target_depth, predicate)
     end
   end
 
-  @spec find_extended_cousin_at_depth_inside_out(Context.t(), non_neg_integer(), non_neg_integer(), map()) ::
+  @spec find_next_extended_cousin_at_depth(
+          Context.t(),
+          non_neg_integer(),
+          non_neg_integer(),
+          predicate()
+        ) ::
           Context.t() | nil
-  defp find_extended_cousin_at_depth_inside_out(
+  defp find_next_extended_cousin_at_depth(
          %Context{path: [], next: []} = ctx,
          current_depth,
          target_depth,
-         opts
+         predicate
        )
-       when current_depth == target_depth and opts.method == :next do
-    if opts.predicate.(ctx.focus) do
-      ctx
-    else
-      nil
-    end
-  end
-
-  defp find_extended_cousin_at_depth_inside_out(
-         %Context{path: [], prev: []} = ctx,
-         current_depth,
-         target_depth,
-         opts
-       )
-       when current_depth == target_depth and opts.method == :previous do
-    if opts.predicate.(ctx.focus) do
-      ctx
-    else
-      nil
-    end
-  end
-
-  defp find_extended_cousin_at_depth_inside_out(%Context{next: []} = ctx, current_depth, target_depth, opts)
-       when current_depth == target_depth and opts.method == :next do
-    if opts.predicate.(ctx.focus) do
-      ctx
-    else
-      find_extended_cousin_inside_out(ctx, target_depth, opts)
-    end
-  end
-
-  defp find_extended_cousin_at_depth_inside_out(%Context{prev: []} = ctx, current_depth, target_depth, opts)
-       when current_depth == target_depth and opts.method == :previous do
-    if opts.predicate.(ctx.focus) do
-      ctx
-    else
-      find_extended_cousin_inside_out(ctx, target_depth, opts)
-    end
-  end
-
-  defp find_extended_cousin_at_depth_inside_out(%Context{} = ctx, current_depth, target_depth, opts)
        when current_depth == target_depth do
-    if opts.predicate.(ctx.focus) do
+    if predicate.(ctx.focus) do
+      ctx
+    else
+      nil
+    end
+  end
+
+  defp find_next_extended_cousin_at_depth(
+         %Context{next: []} = ctx,
+         current_depth,
+         target_depth,
+         predicate
+       )
+       when current_depth == target_depth do
+    if predicate.(ctx.focus) do
+      ctx
+    else
+      find_next_extended_cousin(ctx, target_depth, predicate)
+    end
+  end
+
+  defp find_next_extended_cousin_at_depth(
+         %Context{} = ctx,
+         current_depth,
+         target_depth,
+         predicate
+       )
+       when current_depth == target_depth do
+    if predicate.(ctx.focus) do
       ctx
     else
       ctx
-      |> opts.sibling_fn.()
-      |> find_extended_cousin_at_depth_inside_out(current_depth, target_depth, opts)
+      |> next_sibling()
+      |> find_next_extended_cousin_at_depth(current_depth, target_depth, predicate)
     end
   end
 
-  defp find_extended_cousin_at_depth_inside_out(
+  defp find_next_extended_cousin_at_depth(
          %Context{path: [], next: []} = ctx,
          current_depth,
          target_depth,
-         opts
-       ) when opts.method == :next do
-    case opts.child_fn.(ctx) do
+         predicate
+       ) do
+    case first_child(ctx) do
       nil ->
         nil
 
       %Context{} = child ->
-        find_extended_cousin_at_depth_inside_out(child, current_depth + 1, target_depth, opts)
+        find_next_extended_cousin_at_depth(child, current_depth + 1, target_depth, predicate)
     end
   end
 
-  defp find_extended_cousin_at_depth_inside_out(
-         %Context{path: [], prev: []} = ctx,
+  defp find_next_extended_cousin_at_depth(
+         %Context{next: []} = ctx,
          current_depth,
          target_depth,
-         opts
-       ) when opts.method == :previous do
-    case opts.child_fn.(ctx) do
+         predicate
+       ) do
+    case first_child(ctx) do
       nil ->
-        nil
+        find_next_extended_cousin(ctx, target_depth, predicate)
 
       %Context{} = child ->
-        find_extended_cousin_at_depth_inside_out(child, current_depth + 1, target_depth, opts)
+        find_next_extended_cousin_at_depth(child, current_depth + 1, target_depth, predicate)
     end
   end
 
-  defp find_extended_cousin_at_depth_inside_out(%Context{next: []} = ctx, current_depth, target_depth, opts)
-      when opts.method == :next do
-    case opts.child_fn.(ctx) do
-      nil ->
-        find_extended_cousin_inside_out(ctx, target_depth, opts)
-
-      %Context{} = child ->
-        find_extended_cousin_at_depth_inside_out(child, current_depth + 1, target_depth, opts)
-    end
-  end
-
-  defp find_extended_cousin_at_depth_inside_out(%Context{prev: []} = ctx, current_depth, target_depth, opts)
-      when opts.method == :previous do
-    case opts.child_fn.(ctx) do
-      nil ->
-        find_extended_cousin_inside_out(ctx, target_depth, opts)
-
-      %Context{} = child ->
-        find_extended_cousin_at_depth_inside_out(child, current_depth + 1, target_depth, opts)
-    end
-  end
-
-  defp find_extended_cousin_at_depth_inside_out(%Context{} = ctx, current_depth, target_depth, opts) do
-    case opts.child_fn.(ctx) do
+  defp find_next_extended_cousin_at_depth(
+         %Context{} = ctx,
+         current_depth,
+         target_depth,
+         predicate
+       ) do
+    case first_child(ctx) do
       nil ->
         ctx
-        |> opts.sibling_fn.()
-        |> find_extended_cousin_at_depth_inside_out(current_depth, target_depth, opts)
+        |> next_sibling()
+        |> find_next_extended_cousin_at_depth(current_depth, target_depth, predicate)
 
       %Context{} = child ->
-        find_extended_cousin_at_depth_inside_out(child, current_depth + 1, target_depth, opts)
+        find_next_extended_cousin_at_depth(child, current_depth + 1, target_depth, predicate)
     end
   end
 end

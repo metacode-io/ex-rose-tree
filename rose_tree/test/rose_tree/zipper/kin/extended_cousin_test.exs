@@ -18,165 +18,165 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
     }
   end
 
-  # describe "first_extended_cousin/2" do
-  #   test "should return nil if no parent found", %{simple_ctx: ctx} do
-  #     assert Kin.first_extended_cousin(ctx) == nil
-  #   end
+  describe "first_extended_cousin/2" do
+    test "should return nil if no parent found", %{simple_ctx: ctx} do
+      assert Kin.first_extended_cousin(ctx) == nil
+    end
 
-  #   test "should return nil if no grandparent found", %{ctx_with_parent: ctx} do
-  #     assert Kin.first_extended_cousin(ctx) == nil
-  #   end
+    test "should return nil if no grandparent found", %{ctx_with_parent: ctx} do
+      assert Kin.first_extended_cousin(ctx) == nil
+    end
 
-  #   test "should return nil if grandparent has no siblings", %{ctx_with_grandparent: ctx} do
-  #     assert Kin.first_extended_cousin(ctx) == nil
-  #   end
+    test "should return nil if grandparent has no siblings", %{ctx_with_grandparent: ctx} do
+      assert Kin.first_extended_cousin(ctx) == nil
+    end
 
-  #   test "should return nil if no previous grandpibling has children",
-  #        %{ctx_with_grandpiblings: ctx} do
-  #     assert Kin.first_extended_cousin(ctx) == nil
-  #   end
+    test "should return nil if no previous grandpibling has children",
+         %{ctx_with_grandpiblings: ctx} do
+      assert Kin.first_extended_cousin(ctx) == nil
+    end
 
-  #   test "should return nil if no extended cousin found matching predicate",
-  #        %{
-  #          ctx_with_1st_cousins: ctx_1,
-  #          ctx_with_2nd_cousins: ctx_2,
-  #          ctx_with_extended_cousins: ctx_3
-  #        } do
-  #     predicate = &(&1.term == :not_found)
+    test "should return nil if no extended cousin found matching predicate",
+         %{
+           ctx_with_1st_cousins: ctx_1,
+           ctx_with_2nd_cousins: ctx_2,
+           ctx_with_extended_cousins: ctx_3
+         } do
+      predicate = &(&1.term == :not_found)
 
-  #     for ctx <- [ctx_1, ctx_2, ctx_3] do
-  #       assert Kin.first_extended_cousin(ctx, predicate) == nil
-  #     end
-  #   end
+      for ctx <- [ctx_1, ctx_2, ctx_3] do
+        assert Kin.first_extended_cousin(ctx, predicate) == nil
+      end
+    end
 
-  #   test "should return the same value as Kin.first_first_cousin/2 when no further extended cousins exist",
-  #        %{ctx_with_1st_cousins: ctx} do
-  #     assert %Context{focus: expected} = Kin.first_first_cousin(ctx)
+    test "should return the same value as Kin.first_first_cousin/2 when no further extended cousins exist",
+         %{ctx_with_1st_cousins: ctx} do
+      assert %Context{focus: expected} = Kin.first_first_cousin(ctx)
 
-  #     assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
+      assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
 
-  #     assert actual.term == expected.term
-  #     assert actual.term == 19
-  #   end
+      assert actual.term == expected.term
+      assert actual.term == 19
+    end
 
-  #   test "should return the same value as Kin.first_second_cousin/2 when no further extended cousins exist",
-  #        %{ctx_with_2nd_cousins: ctx} do
-  #     assert %Context{focus: expected} = Kin.first_second_cousin(ctx)
+    test "should return the same value as Kin.first_second_cousin/2 when no further extended cousins exist",
+         %{ctx_with_2nd_cousins: ctx} do
+      assert %Context{focus: expected} = Kin.first_second_cousin(ctx)
 
-  #     assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
+      assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
 
-  #     assert actual.term == expected.term
-  #     assert actual.term == 50
-  #   end
+      assert actual.term == expected.term
+      assert actual.term == 50
+    end
 
-  #   test "should return the next extended cousin found",
-  #        %{ctx_with_extended_cousins: ctx} do
-  #     assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
-  #     assert 103 == actual.term
-  #   end
+    test "should return the next extended cousin found",
+         %{ctx_with_extended_cousins: ctx} do
+      assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
+      assert 103 == actual.term
+    end
 
-  #   test "should return the next extended cousin found matching the predicate",
-  #        %{ctx_with_extended_cousins: ctx} do
-  #     predicate = &(&1.term == 106)
+    test "should return the next extended cousin found matching the predicate",
+         %{ctx_with_extended_cousins: ctx} do
+      predicate = &(&1.term == 106)
 
-  #     actual = Kin.first_extended_cousin(ctx, predicate)
-  #     assert 102 == actual.focus.term
-  #   end
+      actual = Kin.first_extended_cousin(ctx, predicate)
+      assert 102 == actual.focus.term
+    end
 
-  #   test "should return the next extended cousin found in scenario 2",
-  #        %{ctx_with_extended_cousins_2: ctx} do
-  #     assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
-  #     assert -29 == actual.term
-  #   end
+    test "should return the next extended cousin found in scenario 2",
+         %{ctx_with_extended_cousins_2: ctx} do
+      assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
+      assert -29 == actual.term
+    end
 
-  #   test "should return the next extended cousin found matching the predicate in scenario 2",
-  #        %{ctx_with_extended_cousins_2: ctx} do
-  #     predicate = &(&1.term == -31)
+    test "should return the next extended cousin found matching the predicate in scenario 2",
+         %{ctx_with_extended_cousins_2: ctx} do
+      predicate = &(&1.term == -31)
 
-  #     actual = Kin.first_extended_cousin(ctx, predicate)
-  #     assert -31 == actual.focus.term
-  #   end
-  # end
+      actual = Kin.first_extended_cousin(ctx, predicate)
+      assert -31 == actual.focus.term
+    end
+  end
 
-  # describe "last_extended_cousin/2" do
-  #   test "should return nil if no parent found", %{simple_ctx: ctx} do
-  #     assert Kin.last_extended_cousin(ctx) == nil
-  #   end
+  describe "last_extended_cousin/2" do
+    test "should return nil if no parent found", %{simple_ctx: ctx} do
+      assert Kin.last_extended_cousin(ctx) == nil
+    end
 
-  #   test "should return nil if no grandparent found", %{ctx_with_parent: ctx} do
-  #     assert Kin.last_extended_cousin(ctx) == nil
-  #   end
+    test "should return nil if no grandparent found", %{ctx_with_parent: ctx} do
+      assert Kin.last_extended_cousin(ctx) == nil
+    end
 
-  #   test "should return nil if grandparent has no siblings", %{ctx_with_grandparent: ctx} do
-  #     assert Kin.last_extended_cousin(ctx) == nil
-  #   end
+    test "should return nil if grandparent has no siblings", %{ctx_with_grandparent: ctx} do
+      assert Kin.last_extended_cousin(ctx) == nil
+    end
 
-  #   test "should return nil if no previous grandpibling has children",
-  #        %{ctx_with_grandpiblings: ctx} do
-  #     assert Kin.last_extended_cousin(ctx) == nil
-  #   end
+    test "should return nil if no previous grandpibling has children",
+         %{ctx_with_grandpiblings: ctx} do
+      assert Kin.last_extended_cousin(ctx) == nil
+    end
 
-  #   test "should return nil if no extended cousin found matching predicate",
-  #        %{
-  #          ctx_with_1st_cousins: ctx_1,
-  #          ctx_with_2nd_cousins: ctx_2,
-  #          ctx_with_extended_cousins: ctx_3
-  #        } do
-  #     predicate = &(&1.term == :not_found)
+    test "should return nil if no extended cousin found matching predicate",
+         %{
+           ctx_with_1st_cousins: ctx_1,
+           ctx_with_2nd_cousins: ctx_2,
+           ctx_with_extended_cousins: ctx_3
+         } do
+      predicate = &(&1.term == :not_found)
 
-  #     for ctx <- [ctx_1, ctx_2, ctx_3] do
-  #       assert Kin.last_extended_cousin(ctx, predicate) == nil
-  #     end
-  #   end
+      for ctx <- [ctx_1, ctx_2, ctx_3] do
+        assert Kin.last_extended_cousin(ctx, predicate) == nil
+      end
+    end
 
-  #   test "should return the same value as Kin.last_first_cousin/2 when no further extended cousins exist",
-  #        %{ctx_with_1st_cousins: ctx} do
-  #     assert %Context{focus: expected} = Kin.last_first_cousin(ctx)
+    test "should return the same value as Kin.last_first_cousin/2 when no further extended cousins exist",
+         %{ctx_with_1st_cousins: ctx} do
+      assert %Context{focus: expected} = Kin.last_first_cousin(ctx)
 
-  #     assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
+      assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
 
-  #     assert actual.term == expected.term
-  #     assert actual.term == 30
-  #   end
+      assert actual.term == expected.term
+      assert actual.term == 30
+    end
 
-  #   test "should return the same value as Kin.last_second_cousin/2 when no further extended cousins exist",
-  #        %{ctx_with_2nd_cousins: ctx} do
-  #     assert %Context{focus: expected} = Kin.last_second_cousin(ctx)
+    test "should return the same value as Kin.last_second_cousin/2 when no further extended cousins exist",
+         %{ctx_with_2nd_cousins: ctx} do
+      assert %Context{focus: expected} = Kin.last_second_cousin(ctx)
 
-  #     assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
+      assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
 
-  #     assert actual.term == expected.term
-  #     assert actual.term == 58
-  #   end
+      assert actual.term == expected.term
+      assert actual.term == 58
+    end
 
-  #   test "should return the next extended cousin found",
-  #        %{ctx_with_extended_cousins: ctx} do
-  #     assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
-  #     assert 108 == actual.term
-  #   end
+    test "should return the next extended cousin found",
+         %{ctx_with_extended_cousins: ctx} do
+      assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
+      assert 108 == actual.term
+    end
 
-  #   test "should return the next extended cousin found matching the predicate",
-  #        %{ctx_with_extended_cousins: ctx} do
-  #     predicate = &(&1.term == 106)
+    test "should return the next extended cousin found matching the predicate",
+         %{ctx_with_extended_cousins: ctx} do
+      predicate = &(&1.term == 106)
 
-  #     actual = Kin.last_extended_cousin(ctx, predicate)
-  #     assert 106 == actual.focus.term
-  #   end
+      actual = Kin.last_extended_cousin(ctx, predicate)
+      assert 106 == actual.focus.term
+    end
 
-  #   test "should return the next extended cousin found in scenario 2",
-  #        %{ctx_with_extended_cousins_2: ctx} do
-  #     actual = Kin.last_extended_cousin(ctx)
-  #     assert -31 == actual.focus.term
-  #   end
+    test "should return the next extended cousin found in scenario 2",
+         %{ctx_with_extended_cousins_2: ctx} do
+      actual = Kin.last_extended_cousin(ctx)
+      assert -31 == actual.focus.term
+    end
 
-  #   test "should return the next extended cousin found matching the predicate in scenario 2",
-  #        %{ctx_with_extended_cousins_2: ctx} do
-  #     predicate = &(&1.term == -29)
+    test "should return the next extended cousin found matching the predicate in scenario 2",
+         %{ctx_with_extended_cousins_2: ctx} do
+      predicate = &(&1.term == -29)
 
-  #     actual = Kin.last_extended_cousin(ctx, predicate)
-  #     assert -29 == actual.focus.term
-  #   end
-  # end
+      actual = Kin.last_extended_cousin(ctx, predicate)
+      assert -29 == actual.focus.term
+    end
+  end
 
   describe "previous_extended_cousin/2" do
     test "should return nil if no parent found", %{simple_ctx: ctx} do

@@ -617,4 +617,90 @@ defmodule RoseTree.Support.Zippers do
       ]
     }
   end
+
+  def ctx_with_extended_cousins_3() do
+    %Context{
+      focus: -100,
+      prev: [],
+      next: [],
+      path: [
+        Location.new(3,
+          prev: [
+            TreeNode.new(1),
+            TreeNode.new(2)],
+          next: []),
+        Location.new(5,
+          prev: [TreeNode.new(4)],
+          next: [TreeNode.new(6)]),
+        Location.new(8,
+          prev: [TreeNode.new(7)],
+          next: [TreeNode.new(9)]),
+        Location.new(10,
+          prev: [],
+          next: [
+            TreeNode.new(11),
+            TreeNode.new(12, [
+              TreeNode.new(13),
+              TreeNode.new(14)
+            ])
+          ]),
+        Location.new(15,
+          prev: [
+            TreeNode.new(-16, [
+              TreeNode.new(-18, [
+                TreeNode.new(-21),
+                TreeNode.new(-22)
+              ]),
+              TreeNode.new(-19, [
+                TreeNode.new(-23),
+                TreeNode.new(-24, [
+                  TreeNode.new(-26),
+                  TreeNode.new(-27, [
+                    TreeNode.new(-29),
+                    TreeNode.new(-30),
+                    TreeNode.new(-31)
+                  ]),
+                  TreeNode.new(-28)
+                ]),
+                TreeNode.new(-25)
+              ]),
+              TreeNode.new(-20)
+            ]),
+            TreeNode.new(-17, [
+              TreeNode.new(-32),
+              TreeNode.new(-33),
+              TreeNode.new(-34)
+            ])
+          ],
+          next: [
+            TreeNode.new(16, [
+              TreeNode.new(18, [
+                TreeNode.new(21),
+                TreeNode.new(22)
+              ]),
+              TreeNode.new(19, [
+                TreeNode.new(23),
+                TreeNode.new(24, [
+                  TreeNode.new(26),
+                  TreeNode.new(27, [
+                    TreeNode.new(29),
+                    TreeNode.new(30),
+                    TreeNode.new(31)
+                  ]),
+                  TreeNode.new(28)
+                ]),
+                TreeNode.new(25)
+              ]),
+              TreeNode.new(20)
+            ]),
+            TreeNode.new(17, [
+              TreeNode.new(32),
+              TreeNode.new(33),
+              TreeNode.new(34)
+            ])
+          ]),
+        Location.new(35)
+      ]
+    }
+  end
 end
