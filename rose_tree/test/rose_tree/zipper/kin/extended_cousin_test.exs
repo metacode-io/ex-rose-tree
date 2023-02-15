@@ -56,18 +56,18 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
       assert actual.term == 50
     end
 
-    # test "should return nil if no extended cousin found matching predicate",
-    #      %{
-    #        ctx_with_1st_cousins: ctx_1,
-    #        ctx_with_2nd_cousins: ctx_2,
-    #        ctx_with_extended_cousins: ctx_3
-    #      } do
-    #   predicate = &(&1.term == :not_found)
+    test "should return nil if no extended cousin found matching predicate",
+         %{
+           ctx_with_1st_cousins: ctx_1,
+           ctx_with_2nd_cousins: ctx_2,
+           ctx_with_extended_cousins: ctx_3
+         } do
+      predicate = &(&1.focus.term == :not_found)
 
-    #   for ctx <- [ctx_1, ctx_2, ctx_3] do
-    #     assert Kin.first_extended_cousin(ctx, predicate) == nil
-    #   end
-    # end
+      for ctx <- [ctx_1, ctx_2, ctx_3] do
+        assert Kin.first_extended_cousin(ctx, predicate) == nil
+      end
+    end
 
     # test "should return the next extended cousin found",
     #      %{ctx_with_extended_cousins: ctx} do
@@ -136,18 +136,18 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
       assert actual.term == 58
     end
 
-    # test "should return nil if no extended cousin found matching predicate",
-    #      %{
-    #        ctx_with_1st_cousins: ctx_1,
-    #        ctx_with_2nd_cousins: ctx_2,
-    #        ctx_with_extended_cousins: ctx_3
-    #      } do
-    #   predicate = &(&1.term == :not_found)
+    test "should return nil if no extended cousin found matching predicate",
+         %{
+           ctx_with_1st_cousins: ctx_1,
+           ctx_with_2nd_cousins: ctx_2,
+           ctx_with_extended_cousins: ctx_3
+         } do
+      predicate = &(&1.focus.term == :not_found)
 
-    #   for ctx <- [ctx_1, ctx_2, ctx_3] do
-    #     assert Kin.last_extended_cousin(ctx, predicate) == nil
-    #   end
-    # end
+      for ctx <- [ctx_1, ctx_2, ctx_3] do
+        assert Kin.last_extended_cousin(ctx, predicate) == nil
+      end
+    end
 
     # test "should return the next extended cousin found",
     #      %{ctx_with_extended_cousins: ctx} do
