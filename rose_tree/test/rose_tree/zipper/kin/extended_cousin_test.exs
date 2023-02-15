@@ -46,15 +46,15 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
       assert actual.term == 19
     end
 
-    # test "should return the same value as Kin.first_second_cousin/2 when no further extended cousins exist",
-    #      %{ctx_with_2nd_cousins: ctx} do
-    #   assert %Context{focus: expected} = Kin.first_second_cousin(ctx)
+    test "should return the same value as Kin.first_second_cousin/2 when no further extended cousins exist",
+         %{ctx_with_2nd_cousins: ctx} do
+      assert %Context{focus: expected} = Kin.first_second_cousin(ctx)
 
-    #   assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
+      assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
 
-    #   assert actual.term == expected.term
-    #   assert actual.term == 50
-    # end
+      assert actual.term == expected.term
+      assert actual.term == 50
+    end
 
     # test "should return nil if no extended cousin found matching predicate",
     #      %{
@@ -126,15 +126,15 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
       assert actual.term == 30
     end
 
-    # test "should return the same value as Kin.last_second_cousin/2 when no further extended cousins exist",
-    #      %{ctx_with_2nd_cousins: ctx} do
-    #   assert %Context{focus: expected} = Kin.last_second_cousin(ctx)
+    test "should return the same value as Kin.last_second_cousin/2 when no further extended cousins exist",
+         %{ctx_with_2nd_cousins: ctx} do
+      assert %Context{focus: expected} = Kin.last_second_cousin(ctx)
 
-    #   assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
+      assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
 
-    #   assert actual.term == expected.term
-    #   assert actual.term == 58
-    # end
+      assert actual.term == expected.term
+      assert actual.term == 58
+    end
 
     # test "should return nil if no extended cousin found matching predicate",
     #      %{
