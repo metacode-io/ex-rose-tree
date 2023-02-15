@@ -400,7 +400,7 @@ defmodule RoseTree.Support.Zippers do
 
   def ctx_with_2nd_cousins() do
     %Context{
-      focus: TreeNode.new(20),
+      focus: TreeNode.new(200),
       prev: [],
       next: [],
       path: [
@@ -536,7 +536,7 @@ defmodule RoseTree.Support.Zippers do
 
   def ctx_with_extended_cousins_2() do
     %Context{
-      focus: 3,
+      focus: TreeNode.new(3),
       prev: [
         TreeNode.new(1),
         TreeNode.new(2)
@@ -620,7 +620,7 @@ defmodule RoseTree.Support.Zippers do
 
   def ctx_with_extended_cousins_3() do
     %Context{
-      focus: -100,
+      focus: TreeNode.new(-100),
       prev: [],
       next: [],
       path: [
