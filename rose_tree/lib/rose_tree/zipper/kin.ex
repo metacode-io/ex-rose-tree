@@ -1676,22 +1676,28 @@ defmodule RoseTree.Zipper.Kin do
       |> parent()
       |> first_extended_cousin_starting_point()
 
-    starting_sibling =
-      first_sibling(starting_point_on_path)
+    case starting_point_on_path do
+      nil ->
+        nil
 
-    current_details =
-      %{
-        term: starting_sibling.focus.term, # remove
-        index: 0,
-        depth: Context.depth_of_focus(starting_sibling)
-      }
+      %Context{} ->
+        starting_sibling =
+          first_sibling(starting_point_on_path)
 
-    starting_sibling
-    |> do_first_extended_cousin(current_details, path_details, target_depth, predicate)
+        current_details =
+          %{
+            term: starting_sibling.focus.term, # remove
+            index: 0,
+            depth: Context.depth_of_focus(starting_sibling)
+          }
+
+        starting_sibling
+        |> do_first_extended_cousin(current_details, path_details, target_depth, predicate)
+    end
   end
 
   @spec first_extended_cousin_starting_point(Context.t()) :: {Context.t(), non_neg_integer()}
-  defp first_extended_cousin_starting_point(%Context{} = ctx) do
+  def first_extended_cousin_starting_point(%Context{} = ctx) do
     {_root, {candidate_depth, candidate_ctx, path_details}} =
       accumulate_to_root(ctx, {0, nil, []},
       fn
@@ -1984,19 +1990,25 @@ defmodule RoseTree.Zipper.Kin do
       |> parent()
       |> last_extended_cousin_starting_point()
 
-    starting_sibling =
-      last_sibling(starting_point_on_path)
+    case starting_point_on_path do
+      nil ->
+        nil
 
-    current_details =
-      %{
-        term: starting_sibling.focus.term, # remove
-        index: Context.index_of_focus(starting_sibling),
-        num_next: Enum.count(starting_sibling.next),
-        depth: Context.depth_of_focus(starting_sibling)
-      }
+      %Context{} ->
+        starting_sibling =
+          last_sibling(starting_point_on_path)
 
-    starting_sibling
-    |> do_last_extended_cousin(current_details, path_details, target_depth, predicate)
+        current_details =
+          %{
+            term: starting_sibling.focus.term, # remove
+            index: Context.index_of_focus(starting_sibling),
+            num_next: Enum.count(starting_sibling.next),
+            depth: Context.depth_of_focus(starting_sibling)
+          }
+
+        starting_sibling
+        |> do_last_extended_cousin(current_details, path_details, target_depth, predicate)
+    end
   end
 
   @spec last_extended_cousin_starting_point(Context.t()) :: {Context.t(), non_neg_integer()}
