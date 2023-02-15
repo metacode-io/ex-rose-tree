@@ -24,11 +24,11 @@ defmodule RoseTree.Zipper.Traversal do
   @spec forward(Context.t()) :: Context.t() | nil
   def forward(%Context{} = ctx) do
     funs = [
-      &next_sibling/2
-      # &next_extended_cousin/2,
-      # &first_extended_nibling/2,
-      # &first_nibling/2,
-      # &first_child/2
+      &next_sibling/2,
+      &next_extended_cousin/2,
+      &first_extended_nibling/2,
+      &first_nibling/2,
+      &first_child/2
     ]
 
     ctx
@@ -44,6 +44,46 @@ defmodule RoseTree.Zipper.Traversal do
 
   def forward_for(%Context{}, _reps), do: nil
 
+  @doc """
+  Moves forward in the Zipper if the provided predicate function
+  returns true when applied to the next Context. Otherwise,
+  returns nil.
+  """
+  @spec forward_if(Context.t(), predicate()) :: Context.t() | nil
+  def forward_if(%Context{} = ctx, predicate) when is_function(predicate) do
+    case forward(ctx) do
+      nil ->
+        nil
+
+      %Context{} = next_ctx ->
+        if predicate.(next_ctx) do
+          next_ctx
+        else
+          nil
+        end
+    end
+  end
+
+  @doc """
+  Moves forward in the Zipper continuously until the provided predicate
+  function returns true when applied to the Context. Otherwise,
+  returns nil.
+  """
+  @spec forward_until(Context.t(), predicate()) :: Context.t() | nil
+  def forward_until(%Context{} = ctx, predicate) when is_function(predicate) do
+    case forward(ctx) do
+      nil ->
+        nil
+
+      %Context{} = next_ctx ->
+        if predicate.(next_ctx) do
+          next_ctx
+        else
+          forward_until(next_ctx, predicate)
+        end
+    end
+  end
+
   ###
   ### BACKWARD, BREADTH-FIRST TRAVERSAL
   ###
@@ -55,7 +95,15 @@ defmodule RoseTree.Zipper.Traversal do
   def backward(%Context{path: []}), do: nil
 
   def backward(%Context{} = ctx) do
-    raise Error, "not yet implemented"
+    funs = [
+      fn x -> previous_sibling(x) end,
+      fn x -> previous_extended_cousin(x) end,
+      fn x -> last_extended_pibling(x) end,
+      &parent/1
+    ]
+
+    ctx
+    |> first_of(funs)
   end
 
   @doc """
@@ -66,6 +114,46 @@ defmodule RoseTree.Zipper.Traversal do
     do: move_for(ctx, reps, &backward/1)
 
   def backward_for(%Context{}, _reps), do: nil
+
+  @doc """
+  Moves backward in the Zipper if the provided predicate function
+  returns true when applied to the next Context. Otherwise,
+  returns nil.
+  """
+  @spec backward_if(Context.t(), predicate()) :: Context.t() | nil
+  def backward_if(%Context{} = ctx, predicate) when is_function(predicate) do
+    case backward(ctx) do
+      nil ->
+        nil
+
+      %Context{} = next_ctx ->
+        if predicate.(next_ctx) do
+          next_ctx
+        else
+          nil
+        end
+    end
+  end
+
+  @doc """
+  Moves backward in the Zipper continuously until the provided predicate
+  function returns true when applied to the Context. Otherwise,
+  returns nil.
+  """
+  @spec backward_until(Context.t(), predicate()) :: Context.t() | nil
+  def backward_until(%Context{} = ctx, predicate) when is_function(predicate) do
+    case backward(ctx) do
+      nil ->
+        nil
+
+      %Context{} = next_ctx ->
+        if predicate.(next_ctx) do
+          next_ctx
+        else
+          backward_until(next_ctx, predicate)
+        end
+    end
+  end
 
   ###
   ### DESCEND, DEPTH-FIRST TRAVERSAL

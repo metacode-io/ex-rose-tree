@@ -1136,7 +1136,8 @@ defmodule RoseTree.Zipper.Kin do
   """
   @spec first_extended_nibling(Context.t(), predicate()) :: Context.t() | nil
   def first_extended_nibling(%Context{} = ctx, predicate \\ &Util.always/1) do
-    with %Context{} = first_extended_cousin <- first_extended_cousin(ctx),
+    with %Context{} = first_extended_cousin <-
+           first_extended_cousin(ctx, &Context.has_children?/1),
          %Context{} = first_child <- first_child(first_extended_cousin, predicate) do
       first_child
     else
@@ -1150,7 +1151,7 @@ defmodule RoseTree.Zipper.Kin do
   """
   @spec last_extended_nibling(Context.t(), predicate()) :: Context.t() | nil
   def last_extended_nibling(%Context{} = ctx, predicate \\ &Util.always/1) do
-    with %Context{} = last_extended_cousin <- last_extended_cousin(ctx),
+    with %Context{} = last_extended_cousin <- last_extended_cousin(ctx, &Context.has_children?/1),
          %Context{} = last_child <- last_child(last_extended_cousin, predicate) do
       last_child
     else
@@ -1164,7 +1165,8 @@ defmodule RoseTree.Zipper.Kin do
   """
   @spec previous_extended_nibling(Context.t(), predicate()) :: Context.t() | nil
   def previous_extended_nibling(%Context{} = ctx, predicate \\ &Util.always/1) do
-    with %Context{} = prev_extended_cousin <- previous_extended_cousin(ctx),
+    with %Context{} = prev_extended_cousin <-
+           previous_extended_cousin(ctx, &Context.has_children?/1),
          %Context{} = last_child <- last_child(prev_extended_cousin, predicate) do
       last_child
     else
@@ -1178,7 +1180,7 @@ defmodule RoseTree.Zipper.Kin do
   """
   @spec next_extended_nibling(Context.t(), predicate()) :: Context.t() | nil
   def next_extended_nibling(%Context{} = ctx, predicate \\ &Util.always/1) do
-    with %Context{} = next_extended_cousin <- next_extended_cousin(ctx),
+    with %Context{} = next_extended_cousin <- next_extended_cousin(ctx, &Context.has_children?/1),
          %Context{} = first_child <- first_child(next_extended_cousin, predicate) do
       first_child
     else
@@ -1330,13 +1332,73 @@ defmodule RoseTree.Zipper.Kin do
     end
   end
 
-  def first_extended_pibling(), do: raise(Error, "not implemented")
+  @doc """
+  Searches for the first extended cousin of the parent--aka, the
+  first extended pibling--of the focused node.
 
-  def last_extended_pibling(), do: raise(Error, "not implemented")
+  Note: Extended Pibling here really means parent-cousin n-times removed,
+  and is a bit of a neolism, since pibling technically means parent-sibling.
+  """
+  @spec first_extended_pibling(Context.t(), predicate()) :: Context.t() | nil
+  def first_extended_pibling(%Context{} = ctx, predicate \\ &Util.always/1) do
+    with %Context{} = parent <- parent(ctx),
+         %Context{} = first_extended_cousin <- first_extended_cousin(parent, predicate) do
+      first_extended_cousin
+    else
+      nil -> nil
+    end
+  end
 
-  def previous_extended_pibling(), do: raise(Error, "not implemented")
+  @doc """
+  Searches for the last extended cousin of the parent--aka, the
+  last extended pibling--of the focused node.
 
-  def next_extended_pibling(), do: raise(Error, "not implemented")
+  Note: Extended Pibling here really means parent-cousin n-times removed,
+  and is a bit of a neolism, since pibling technically means parent-sibling.
+  """
+  @spec last_extended_pibling(Context.t(), predicate()) :: Context.t() | nil
+  def last_extended_pibling(%Context{} = ctx, predicate \\ &Util.always/1) do
+    with %Context{} = parent <- parent(ctx),
+         %Context{} = last_extended_cousin <- last_extended_cousin(parent, predicate) do
+      last_extended_cousin
+    else
+      nil -> nil
+    end
+  end
+
+  @doc """
+  Searches for the previous extended cousin of the parent--aka, the
+  previous extended pibling--of the focused node.
+
+  Note: Extended Pibling here really means parent-cousin n-times removed,
+  and is a bit of a neolism, since pibling technically means parent-sibling.
+  """
+  @spec previous_extended_pibling(Context.t(), predicate()) :: Context.t() | nil
+  def previous_extended_pibling(%Context{} = ctx, predicate \\ &Util.always/1) do
+    with %Context{} = parent <- parent(ctx),
+         %Context{} = previous_extended_cousin <- previous_extended_cousin(parent, predicate) do
+      previous_extended_cousin
+    else
+      nil -> nil
+    end
+  end
+
+  @doc """
+  Searches for the next extended cousin of the parent--aka, the
+  next extended pibling--of the focused node.
+
+  Note: Extended Pibling here really means parent-cousin n-times removed,
+  and is a bit of a neolism, since pibling technically means parent-sibling.
+  """
+  @spec next_extended_pibling(Context.t(), predicate()) :: Context.t() | nil
+  def next_extended_pibling(%Context{} = ctx, predicate \\ &Util.always/1) do
+    with %Context{} = parent <- parent(ctx),
+         %Context{} = next_extended_cousin <- next_extended_cousin(parent, predicate) do
+      next_extended_cousin
+    else
+      nil -> nil
+    end
+  end
 
   @doc """
   Recursively searches the `path` for the first, first "ancestral" pibling. That is,
