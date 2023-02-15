@@ -83,19 +83,19 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
       assert 102 == actual.term
     end
 
-    test "should return the next extended cousin found in scenario 2",
+    test "should return the first extended cousin found in scenario 2",
          %{ctx_with_extended_cousins_2: ctx} do
       assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
       assert -29 == actual.term
     end
 
-    # test "should return the next extended cousin found matching the predicate in scenario 2",
-    #      %{ctx_with_extended_cousins_2: ctx} do
-    #   predicate = &(&1.term == -31)
+    test "should return the first extended cousin found matching the predicate in scenario 2",
+         %{ctx_with_extended_cousins_2: ctx} do
+      predicate = &(&1.focus.term == -31)
 
-    #   actual = Kin.first_extended_cousin(ctx, predicate)
-    #   assert -31 == actual.focus.term
-    # end
+      assert %Context{focus: actual} = Kin.first_extended_cousin(ctx, predicate)
+      assert -31 == actual.term
+    end
   end
 
   describe "last_extended_cousin/2" do
@@ -163,19 +163,19 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
       assert 106 == actual.term
     end
 
-    test "should return the next extended cousin found in scenario 2",
+    test "should return the last extended cousin found in scenario 2",
          %{ctx_with_extended_cousins_2: ctx} do
       assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
       assert 31 == actual.term
     end
 
-    # test "should return the next extended cousin found matching the predicate in scenario 2",
-    #      %{ctx_with_extended_cousins_2: ctx} do
-    #   predicate = &(&1.term == -29)
+    test "should return the last extended cousin found matching the predicate in scenario 2",
+         %{ctx_with_extended_cousins_2: ctx} do
+      predicate = &(&1.focus.term == 29)
 
-    #   actual = Kin.last_extended_cousin(ctx, predicate)
-    #   assert -29 == actual.focus.term
-    # end
+      assert %Context{focus: actual} = Kin.last_extended_cousin(ctx, predicate)
+      assert 29 == actual.term
+    end
   end
 
   describe "previous_extended_cousin/2" do
