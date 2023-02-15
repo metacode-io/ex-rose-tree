@@ -1669,6 +1669,8 @@ defmodule RoseTree.Zipper.Kin do
   def first_extended_cousin(%Context{} = ctx, predicate) when is_function(predicate) do
     target_depth = Context.depth_of_focus(ctx)
 
+    IO.inspect(target_depth, label: "Target Depth")
+
     {starting_point_on_path, path_details} =
       ctx
       |> parent()
@@ -1719,6 +1721,9 @@ defmodule RoseTree.Zipper.Kin do
       pruned_path_details =
         Enum.drop(path_details, candidate_depth)
 
+      IO.inspect(candidate_ctx.focus.term, label: "Starting Term")
+      IO.inspect(pruned_path_details, label: "Starting Path Details")
+
       {candidate_ctx, pruned_path_details}
   end
 
@@ -1751,37 +1756,217 @@ defmodule RoseTree.Zipper.Kin do
   end
 
 
-  # if there are no nodes left to visit along the path, we won't find a match, so return nil
-  def do_first_extended_cousin(%Context{} = ctx, _current_details, [] = _path_details, _target_depth, _predicate),
-    do: nil
+  # Path Details have been exhausted, thus no match
+  def do_first_extended_cousin(%Context{} = ctx, current_details, [] = _path_details, _target_depth, _predicate) do
+    # IO.inspect(ctx.focus.term, label: "Path Fully Explored - No Match")
+    # IO.inspect(current_details, label: "\tCurrent Details")
+    # IO.inspect(nil, label: "\tLoc Details")
+    nil
+  end
 
-  # if we are focused at a node on the path, we then need to descend the path another level
-  # then find first sibling
+  # Subtrees for all previous siblings have been explored, thus descend path to next location
   def do_first_extended_cousin(%Context{} = ctx, current_details, [loc_details | path_details], target_depth, predicate)
       when current_details.index == loc_details.index and
            current_details.depth == loc_details.depth do
-    {new_path_ctx, new_path_details} = descend_path(ctx, path_details)
+    # IO.inspect(ctx.focus.term, label: "Subtrees Fully Explored for Location, Descend Path")
+    # IO.inspect(current_details, label: "\tCurrent Details")
+    # IO.inspect(loc_details, label: "\tLoc Details")
+    case descend_path(ctx, path_details) do
+      {_, []} ->
+        nil
 
-    new_ctx =
-      first_sibling(new_path_ctx)
+      {new_path_ctx, new_path_details} ->
+        new_ctx =
+          first_sibling(new_path_ctx)
 
-    new_details =
-      %{
-        index: 0,
-        depth: Context.depth_of_focus(new_ctx)
-      }
+        new_details =
+          %{
+            index: 0,
+            depth: Context.depth_of_focus(new_ctx)
+          }
 
-    do_first_extended_cousin(new_ctx, new_details, new_path_details, target_depth, predicate)
+        do_first_extended_cousin(new_ctx, new_details, new_path_details, target_depth, predicate)
+    end
   end
 
-  def do_first_extended_cousin(%Context{} = ctx, current_details, [loc_details | _] = path_details, target_depth, predicate) do
-    IO.inspect(ctx.focus.term, label: "Exploring Subtree Of")
-    IO.inspect(current_details, label: "\tCurrent Details")
-    IO.inspect(loc_details, label: "\tLoc Details")
+  # We've reached the Target Depth and there's no more next siblings. If predicate is true, we've found
+  # our match, otherwise, we need to look for the next ancestral pibling. If there is no next ancestral
+  # pibling, we have no match. If there is one, but it is shallower that our current loc_details depth,
+  # we also have no match. Otherwise, continue the search.
+  def do_first_extended_cousin(%Context{next: []} = ctx, current_details, [loc_details | _] = path_details, target_depth, predicate)
+      when current_details.depth == target_depth do
+    # IO.inspect(ctx.focus.term, label: "Target Depth Reached - Next Empty")
+    # IO.inspect(current_details, label: "\tCurrent Details")
+    # IO.inspect(loc_details, label: "\tLoc Details")
+    if predicate.(ctx) do
+      # IO.puts("\tTarget Found")
+      ctx
+    else
+      # IO.puts("\tTarget Not Found")
+      case next_ancestral_pibling(ctx) do
+        nil ->
+          # IO.puts("\tNo Next Ancestral Pibling Found")
+          nil
+
+        %Context{} = next_ancestral_pibling ->
+          new_depth = Context.depth_of_focus(next_ancestral_pibling)
+
+          if new_depth < loc_details.depth do
+            # IO.puts("\tNext Ancestral Pibling Found Exceeds Boundary")
+            nil
+          else
+            new_details = %{
+              depth: new_depth,
+              index: Context.index_of_focus(next_ancestral_pibling)
+            }
+
+            next_ancestral_pibling
+            |> do_first_extended_cousin(new_details, path_details, target_depth, predicate)
+          end
+      end
+    end
+  end
+
+  # We've reached the Target Depth and there are more next siblings to examine. If predicate is true, however,
+  # we've found our match. Otherwise, search next sibling.
+  def do_first_extended_cousin(%Context{} = ctx, current_details, [loc_details | _] = path_details, target_depth, predicate)
+      when current_details.depth == target_depth do
+    # IO.inspect(ctx.focus.term, label: "Target Depth Reached - Next Remaining")
+    # IO.inspect(current_details, label: "\tCurrent Details")
+    # IO.inspect(loc_details, label: "\tLoc Details")
+    if predicate.(ctx) do
+      # IO.puts("\tTarget Found")
+      ctx
+    else
+      # IO.puts("\tTarget Not Found")
+      new_details = %{current_details | index: current_details.index + 1}
+
+      ctx
+      |> next_sibling()
+      |> do_first_extended_cousin(new_details, path_details, target_depth, predicate)
+    end
+  end
+
+  # We're in the middle of a sub tree search and are focused on a node without children, nor next siblings, thus
+  # we need to look for the next ancestral pibling. If there is no next ancestral
+  # pibling, we have no match. If there is one, but it is shallower that our current loc_details depth,
+  # we also have no match. Otherwise, continue the search.
+  def do_first_extended_cousin(%Context{next: []} = ctx, current_details, [loc_details | _] = path_details, target_depth, predicate)
+      when not TreeNode.parent?(ctx.focus) do
+    # IO.inspect(ctx.focus.term, label: "No Children to Explore - Next Empty")
+    # IO.inspect(current_details, label: "\tCurrent Details")
+    # IO.inspect(loc_details, label: "\tLoc Details")
+    case next_ancestral_pibling(ctx) do
+      nil ->
+        # IO.puts("\tNo Next Ancestral Pibling Found")
+        nil
+
+      %Context{} = next_ancestral_pibling ->
+        new_depth = Context.depth_of_focus(next_ancestral_pibling)
+
+        if new_depth < loc_details.depth do
+          # IO.inspect({new_depth, loc_details.depth}, label: "\tNext Ancestral Pibling Found Exceeds Boundary")
+          nil
+        else
+          new_details = %{
+            depth: new_depth,
+            index: Context.index_of_focus(next_ancestral_pibling)
+          }
+
+          next_ancestral_pibling
+          |> do_first_extended_cousin(new_details, path_details, target_depth, predicate)
+        end
+    end
+  end
+
+  # We're in the middle of a sub tree search and are focused on a node without children but that does have next siblings.
+  # If predicate is true we've found our match. Otherwise, search next sibling.
+  def do_first_extended_cousin(%Context{} = ctx, current_details, [loc_details | _] = path_details, target_depth, predicate)
+      when not TreeNode.parent?(ctx.focus) do
+    # IO.inspect(ctx.focus.term, label: "No Children to Explore - Next Remaining")
+    # IO.inspect(current_details, label: "\tCurrent Details")
+    # IO.inspect(loc_details, label: "\tLoc Details")
+    new_details = %{current_details | index: current_details.index + 1}
+
     ctx
     |> next_sibling()
-    |> do_first_extended_cousin(%{current_details | index: current_details.index + 1}, path_details, target_depth, predicate)
+    |> do_first_extended_cousin(new_details, path_details, target_depth, predicate)
   end
+
+  # We're in the middle of a sub tree search  and are focused on a node with children but without next siblings.
+  # Find it's leftmost descendant next. If none exists, we need to look for the next ancestral pibling. If there
+  # is no next ancestral pibling, we have no match. If there is one, but it is shallower that our current loc_details depth,
+  # we also have no match. Otherwise, continue the search. If there is a leftmost descendant, continue the search from
+  # that node.
+  def do_first_extended_cousin(%Context{next: []} = ctx, current_details, [loc_details | _] = path_details, target_depth, predicate) do
+    # IO.inspect(ctx.focus.term, label: "Exploring Subtree Of - Next Empty")
+    # IO.inspect(current_details, label: "\tCurrent Details")
+    # IO.inspect(loc_details, label: "\tLoc Details")
+    case leftmost_descendant(ctx, &(Context.depth_of_focus(&1) == target_depth)) do
+      nil ->
+        case next_ancestral_pibling(ctx) do
+          nil ->
+            # IO.puts("\tNo Next Ancestral Pibling Found")
+            nil
+
+          %Context{} = next_ancestral_pibling ->
+            new_depth = Context.depth_of_focus(next_ancestral_pibling)
+
+            if new_depth < loc_details.depth do
+              # IO.puts("\tNext Ancestral Pibling Found Exceeds Boundary")
+              nil
+            else
+              new_details = %{
+                depth: new_depth,
+                index: Context.index_of_focus(next_ancestral_pibling)
+              }
+
+              next_ancestral_pibling
+              |> do_first_extended_cousin(new_details, path_details, target_depth, predicate)
+            end
+        end
+
+      %Context{} = descendant ->
+        new_details = %{
+          depth: Context.depth_of_focus(descendant),
+          index: Context.index_of_focus(descendant)
+        }
+
+        descendant
+        |> do_first_extended_cousin(new_details, path_details, target_depth, predicate)
+    end
+
+  end
+
+  # We're in the middle of a sub tree search  and are focused on a node with children and next siblings.
+  # Find it's leftmost descendant next. If none exists, we need to look for the contineu search from next sibling.
+  # If there is a leftmost descendant, continue the search from that node.
+  def do_first_extended_cousin(%Context{} = ctx, current_details, [loc_details | _] = path_details, target_depth, predicate) do
+    # IO.inspect(ctx.focus.term, label: "Exploring Subtree Of - Next Remaining")
+    # IO.inspect(current_details, label: "\tCurrent Details")
+    # IO.inspect(loc_details, label: "\tLoc Details")
+    case leftmost_descendant(ctx, &(Context.depth_of_focus(&1) == target_depth)) do
+      nil ->
+        new_details = %{current_details | index: current_details.index + 1}
+
+        ctx
+        |> next_sibling()
+        |> do_first_extended_cousin(new_details, path_details, target_depth, predicate)
+
+      %Context{} = descendant ->
+        new_details = %{
+          depth: Context.depth_of_focus(descendant),
+          index: Context.index_of_focus(descendant)
+        }
+
+        descendant
+        |> do_first_extended_cousin(new_details, path_details, target_depth, predicate)
+    end
+  end
+
+  # def search_subtree(%Context{} = ctx, current_details, origin_details, target_depth, predicate) do
+
+  # end
 
   @spec find_first_extended_cousin(Context.t(), non_neg_integer(), non_neg_integer(), non_neg_integer(), non_neg_integer(), predicate()) ::
           {:ok, Context.t()} | {:cont, Context.t()}
