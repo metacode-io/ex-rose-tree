@@ -254,6 +254,14 @@ defmodule RoseTree.TreeNode do
   end
 
   @doc """
+  TODO
+  """
+  @spec pop_first_child(t()) :: {t(), t()}
+  def pop_first_child(%__MODULE__{children: children} = tree) do
+
+  end
+
+  @doc """
   Appends the given child to the tree's children.
 
   ## Examples
@@ -280,6 +288,30 @@ defmodule RoseTree.TreeNode do
 
   def append_child(%__MODULE__{children: children} = tree, child) do
     %{tree | children: children ++ [new(child)]}
+  end
+
+  @doc """
+  TODO
+  """
+  @spec pop_last_child(t()) :: {t(), t()}
+  def pop_last_child(%__MODULE__{children: children} = tree) do
+
+  end
+
+  @doc """
+  TODO
+  """
+  @spec insert_child(t(), t() | term(), non_neg_integer()) :: t()
+  def insert_child(%__MODULE__{children: children} = tree, child, index) do
+
+  end
+
+  @doc """
+  TODO
+  """
+  @spec remove_child(t(), non_neg_integer()) :: {t(), t()}
+  def remove_child(%__MODULE__{children: children} = tree, index) do
+
   end
 
   @typep unfold_acc() :: %{
