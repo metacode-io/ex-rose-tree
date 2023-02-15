@@ -69,19 +69,19 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
       end
     end
 
-    test "should return the next extended cousin found",
+    test "should return the first extended cousin found",
          %{ctx_with_extended_cousins: ctx} do
       assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
       assert 103 == actual.term
     end
 
-    # test "should return the next extended cousin found matching the predicate",
-    #      %{ctx_with_extended_cousins: ctx} do
-    #   predicate = &(&1.term == 106)
+    test "should return the first extended cousin found matching the predicate",
+         %{ctx_with_extended_cousins: ctx} do
+      predicate = &(&1.focus.term == 102)
 
-    #   actual = Kin.first_extended_cousin(ctx, predicate)
-    #   assert 102 == actual.focus.term
-    # end
+      assert %Context{focus: actual} = Kin.first_extended_cousin(ctx, predicate)
+      assert 102 == actual.term
+    end
 
     # test "should return the next extended cousin found in scenario 2",
     #      %{ctx_with_extended_cousins_2: ctx} do
@@ -149,19 +149,19 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
       end
     end
 
-    test "should return the next extended cousin found",
+    test "should return the last extended cousin found",
          %{ctx_with_extended_cousins: ctx} do
       assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
       assert 108 == actual.term
     end
 
-    # test "should return the next extended cousin found matching the predicate",
-    #      %{ctx_with_extended_cousins: ctx} do
-    #   predicate = &(&1.term == 106)
+    test "should return the last extended cousin found matching the predicate",
+         %{ctx_with_extended_cousins: ctx} do
+      predicate = &(&1.focus.term == 106)
 
-    #   actual = Kin.last_extended_cousin(ctx, predicate)
-    #   assert 106 == actual.focus.term
-    # end
+      assert %Context{focus: actual} = Kin.last_extended_cousin(ctx, predicate)
+      assert 106 == actual.term
+    end
 
     # test "should return the next extended cousin found in scenario 2",
     #      %{ctx_with_extended_cousins_2: ctx} do
