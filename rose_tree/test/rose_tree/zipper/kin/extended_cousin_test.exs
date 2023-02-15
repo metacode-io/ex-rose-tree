@@ -36,6 +36,26 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
       assert Kin.first_extended_cousin(ctx) == nil
     end
 
+    test "should return the same value as Kin.first_first_cousin/2 when no further extended cousins exist",
+         %{ctx_with_1st_cousins: ctx} do
+      assert %Context{focus: expected} = Kin.first_first_cousin(ctx)
+
+      assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
+
+      assert actual.term == expected.term
+      assert actual.term == 19
+    end
+
+    # test "should return the same value as Kin.first_second_cousin/2 when no further extended cousins exist",
+    #      %{ctx_with_2nd_cousins: ctx} do
+    #   assert %Context{focus: expected} = Kin.first_second_cousin(ctx)
+
+    #   assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
+
+    #   assert actual.term == expected.term
+    #   assert actual.term == 50
+    # end
+
     # test "should return nil if no extended cousin found matching predicate",
     #      %{
     #        ctx_with_1st_cousins: ctx_1,
@@ -47,26 +67,6 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
     #   for ctx <- [ctx_1, ctx_2, ctx_3] do
     #     assert Kin.first_extended_cousin(ctx, predicate) == nil
     #   end
-    # end
-
-    # test "should return the same value as Kin.first_first_cousin/2 when no further extended cousins exist",
-    #      %{ctx_with_1st_cousins: ctx} do
-    #   assert %Context{focus: expected} = Kin.first_first_cousin(ctx)
-
-    #   assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
-
-    #   assert actual.term == expected.term
-    #   assert actual.term == 19
-    # end
-
-    # test "should return the same value as Kin.first_second_cousin/2 when no further extended cousins exist",
-    #      %{ctx_with_2nd_cousins: ctx} do
-    #   assert %Context{focus: expected} = Kin.first_second_cousin(ctx)
-
-    #   assert %Context{focus: actual} = Kin.first_extended_cousin(ctx)
-
-    #   assert actual.term == expected.term
-    #   assert actual.term == 50
     # end
 
     # test "should return the next extended cousin found",
@@ -116,6 +116,26 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
       assert Kin.last_extended_cousin(ctx) == nil
     end
 
+    test "should return the same value as Kin.last_first_cousin/2 when no further extended cousins exist",
+         %{ctx_with_1st_cousins: ctx} do
+      assert %Context{focus: expected} = Kin.last_first_cousin(ctx)
+
+      assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
+
+      assert actual.term == expected.term
+      assert actual.term == 30
+    end
+
+    # test "should return the same value as Kin.last_second_cousin/2 when no further extended cousins exist",
+    #      %{ctx_with_2nd_cousins: ctx} do
+    #   assert %Context{focus: expected} = Kin.last_second_cousin(ctx)
+
+    #   assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
+
+    #   assert actual.term == expected.term
+    #   assert actual.term == 58
+    # end
+
     # test "should return nil if no extended cousin found matching predicate",
     #      %{
     #        ctx_with_1st_cousins: ctx_1,
@@ -127,26 +147,6 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
     #   for ctx <- [ctx_1, ctx_2, ctx_3] do
     #     assert Kin.last_extended_cousin(ctx, predicate) == nil
     #   end
-    # end
-
-    # test "should return the same value as Kin.last_first_cousin/2 when no further extended cousins exist",
-    #      %{ctx_with_1st_cousins: ctx} do
-    #   assert %Context{focus: expected} = Kin.last_first_cousin(ctx)
-
-    #   assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
-
-    #   assert actual.term == expected.term
-    #   assert actual.term == 30
-    # end
-
-    # test "should return the same value as Kin.last_second_cousin/2 when no further extended cousins exist",
-    #      %{ctx_with_2nd_cousins: ctx} do
-    #   assert %Context{focus: expected} = Kin.last_second_cousin(ctx)
-
-    #   assert %Context{focus: actual} = Kin.last_extended_cousin(ctx)
-
-    #   assert actual.term == expected.term
-    #   assert actual.term == 58
     # end
 
     # test "should return the next extended cousin found",
