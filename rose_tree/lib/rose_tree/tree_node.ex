@@ -291,11 +291,28 @@ defmodule RoseTree.TreeNode do
   end
 
   @doc """
-  TODO
+  Removes the last child of the tree's children.
+
+  ## Examples
+
+      iex> node = RoseTree.TreeNode.new(5, [4, 3, 2, 1])
+      ...> RoseTree.TreeNode.pop_last_child(node)
+      {
+        %RoseTree.TreeNode{
+          term: 5,
+          children: [
+            %RoseTree.TreeNode{term: 4, children: []},
+            %RoseTree.TreeNode{term: 3, children: []},
+            %RoseTree.TreeNode{term: 2, children: []}
+          ]
+        }, %RoseTree.TreeNode{term: 1, children: []}
+      }
+
   """
   @spec pop_last_child(t()) :: {t(), t()}
   def pop_last_child(%__MODULE__{children: children} = tree) do
-
+    {new_children, [popped_child | _]} = Enum.split(children, length(children) - 1)
+    {%{tree | children: new_children}, popped_child}
   end
 
   @doc """
