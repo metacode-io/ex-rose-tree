@@ -1,7 +1,8 @@
 defmodule RoseTree.Support.Generators do
   require Logger
 
-  alias RoseTree.{TreeNode, Util}
+  alias RoseTree
+  alias RoseTree.Util
   alias RoseTree.Zipper.{Context, Location}
 
   @typep default_seed() :: %{
@@ -10,11 +11,11 @@ defmodule RoseTree.Support.Generators do
     shares_for_children: non_neg_integer()
   }
 
-  @spec random_tree(keyword()) :: TreeNode.t()
+  @spec random_tree(keyword()) :: RoseTree.t()
   def random_tree(options \\ []) do
     {initial_seed, unfolder_fn} = default_init(options)
 
-    TreeNode.unfold(initial_seed, unfolder_fn)
+    RoseTree.unfold(initial_seed, unfolder_fn)
   end
 
   @spec random_zipper(keyword()) :: Context.t()
@@ -129,7 +130,7 @@ defmodule RoseTree.Support.Generators do
     |> do_allot_remaining_shares(seeds, shares - allotted)
   end
 
-  @spec default_init(keyword()) :: {default_seed(), TreeNode.unfold_fn()}
+  @spec default_init(keyword()) :: {default_seed(), RoseTree.unfold_fn()}
   def default_init(options \\ []) do
     total_nodes = Keyword.get(options, :total_nodes, random_number_of_nodes())
 
