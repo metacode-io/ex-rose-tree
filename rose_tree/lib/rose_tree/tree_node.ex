@@ -254,11 +254,28 @@ defmodule RoseTree.TreeNode do
   end
 
   @doc """
-  TODO
-  """
-  @spec pop_first_child(t()) :: {t(), t()}
-  def pop_first_child(%__MODULE__{children: children} = tree) do
+  Removes the first child of the tree's children.
 
+  ## Examples
+
+      iex> node = RoseTree.TreeNode.new(5, [4, 3, 2, 1])
+      ...> RoseTree.TreeNode.pop_first_child(node)
+      {
+        %RoseTree.TreeNode{
+          term: 5,
+          children: [
+            %RoseTree.TreeNode{term: 3, children: []},
+            %RoseTree.TreeNode{term: 2, children: []},
+            %RoseTree.TreeNode{term: 1, children: []}
+          ]
+        }, %RoseTree.TreeNode{term: 4, children: []}
+      }
+  """
+  @spec pop_first_child(t()) :: {t(), t() | nil}
+  def pop_first_child(%__MODULE__{children: []} = tree), do: {tree, nil}
+
+  def pop_first_child(%__MODULE__{children: [child | children]} = tree) do
+    {%{tree | children: children}, child}
   end
 
   @doc """
@@ -309,7 +326,9 @@ defmodule RoseTree.TreeNode do
       }
 
   """
-  @spec pop_last_child(t()) :: {t(), t()}
+  @spec pop_last_child(t()) :: {t(), t() | nil}
+  def pop_last_child(%__MODULE__{children: []} = tree), do: {tree, nil}
+
   def pop_last_child(%__MODULE__{children: children} = tree) do
     {new_children, [popped_child | _]} = Enum.split(children, length(children) - 1)
     {%{tree | children: new_children}, popped_child}
