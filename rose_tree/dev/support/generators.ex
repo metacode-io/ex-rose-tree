@@ -32,11 +32,11 @@ defmodule RoseTree.Support.Generators do
   end
 
   @spec add_zipper_siblings(Zipper.t(), keyword()) :: Zipper.t()
-  def add_zipper_siblings(%Zipper{} = ctx, options \\ []) do
+  def add_zipper_siblings(%Zipper{} = z, options \\ []) do
     num_siblings = Keyword.get(options, :num_siblings, Enum.random(0..5))
 
     if num_siblings == 0 do
-      ctx
+      z
 
     else
       random_trees = for _ <- 0..num_siblings-1, do: random_tree(options)
@@ -45,25 +45,25 @@ defmodule RoseTree.Support.Generators do
         random_trees
         |> Util.split_at(Enum.random(0..num_siblings-1))
 
-      %Zipper{ctx | prev: prev, next: next}
+      %Zipper{z | prev: prev, next: next}
     end
   end
 
   @spec add_zipper_locations(Zipper.t(), keyword()) :: Zipper.t()
-  def add_zipper_locations(%Zipper{} = ctx, options \\ []) do
+  def add_zipper_locations(%Zipper{} = z, options \\ []) do
     num_locations = Keyword.get(options, :num_locations, Enum.random(0..5))
 
     if num_locations == 0 do
-      ctx
+      z
 
     else
       random_locations =
         for _ <- 0..num_locations-1 do
-           ctx = random_zipper(num_locations: 0)
-           %Location{prev: ctx.prev, term: ctx.focus.term, next: ctx.next}
+           z = random_zipper(num_locations: 0)
+           %Location{prev: z.prev, term: z.focus.term, next: z.next}
         end
 
-      %Zipper{ctx | path: random_locations}
+      %Zipper{z | path: random_locations}
     end
   end
 

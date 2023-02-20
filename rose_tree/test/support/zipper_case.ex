@@ -45,12 +45,12 @@ defmodule RoseTree.ZipperCase do
     tree_x100 = Generators.random_tree(total_nodes: 100)
     tree_x = Generators.random_tree()
 
-    # basic zipper contexts
+    # basic zippers
     empty_z = %Zipper{focus: empty_tree, prev: [], next: [], path: []}
     leaf_z = %Zipper{focus: leaf_tree, prev: [], next: [], path: []}
     simple_z = %Zipper{focus: simple_tree, prev: [], next: [], path: []}
 
-    # random zipper contexts
+    # random zippers
     z_x5 = %Zipper{focus: tree_x5, prev: [], next: [], path: []}
     z_x25 = %Zipper{focus: tree_x25, prev: [], next: [], path: []}
     z_x100 = %Zipper{focus: tree_x100, prev: [], next: [], path: []}

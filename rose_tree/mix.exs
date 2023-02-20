@@ -18,21 +18,19 @@ defmodule RoseTree.MixProject do
         main: "RoseTree",
         groups_for_modules: [
           Tree: [
-            RoseTree,
-            RoseTree.TreeNode
+            RoseTree
           ],
           Zipper: [
             RoseTree.Zipper,
-            RoseTree.Zipper.Context,
-            RoseTree.Zipper.Location,
-            RoseTree.Zipper.Kin,
-            RoseTree.Zipper.Traversal
+            RoseTree.Zipper.Location
           ],
           Util: [
             RoseTree.Util
           ],
           "Dev Support": [
-            RoseTree.Support.Generators
+            RoseTree.Support.Generators,
+            RoseTree.Support.Trees,
+            RoseTree.Support.Zippers
           ]
         ],
         extras: []
