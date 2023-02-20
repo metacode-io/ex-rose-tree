@@ -8,7 +8,7 @@ defmodule RoseTree.ZipperCase do
   use ExUnit.CaseTemplate
 
   alias RoseTree
-  alias RoseTree.Zipper.{Context, Location}
+  alias RoseTree.Zipper.Location
   alias RoseTree.Support.Generators
 
   using do
@@ -16,10 +16,10 @@ defmodule RoseTree.ZipperCase do
       import ExUnit.CaptureLog
 
       require RoseTree
-      require RoseTree.Zipper.Context
+      require RoseTree.Zipper
 
       alias RoseTree.Util
-      alias RoseTree.Zipper.{Context, Location}
+      alias RoseTree.Zipper.Location
       alias RoseTree.Support.Generators
     end
   end
@@ -46,15 +46,15 @@ defmodule RoseTree.ZipperCase do
     tree_x = Generators.random_tree()
 
     # basic zipper contexts
-    empty_ctx = %Context{focus: empty_tree, prev: [], next: [], path: []}
-    leaf_ctx = %Context{focus: leaf_tree, prev: [], next: [], path: []}
-    simple_ctx = %Context{focus: simple_tree, prev: [], next: [], path: []}
+    empty_ctx = %Zipper{focus: empty_tree, prev: [], next: [], path: []}
+    leaf_ctx = %Zipper{focus: leaf_tree, prev: [], next: [], path: []}
+    simple_ctx = %Zipper{focus: simple_tree, prev: [], next: [], path: []}
 
     # random zipper contexts
-    ctx_x5 = %Context{focus: tree_x5, prev: [], next: [], path: []}
-    ctx_x25 = %Context{focus: tree_x25, prev: [], next: [], path: []}
-    ctx_x100 = %Context{focus: tree_x100, prev: [], next: [], path: []}
-    ctx_x = %Context{focus: tree_x, prev: [], next: [], path: []}
+    ctx_x5 = %Zipper{focus: tree_x5, prev: [], next: [], path: []}
+    ctx_x25 = %Zipper{focus: tree_x25, prev: [], next: [], path: []}
+    ctx_x100 = %Zipper{focus: tree_x100, prev: [], next: [], path: []}
+    ctx_x = %Zipper{focus: tree_x, prev: [], next: [], path: []}
 
     all_trees_with_idx =
       [
