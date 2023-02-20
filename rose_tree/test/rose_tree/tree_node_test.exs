@@ -392,6 +392,38 @@ defmodule RoseTree.TreeNodeTest do
     end
   end
 
+  describe "pop_first_child/1" do
+    test "should return a tuple of an unchanged TreeNode and nil if the original has no children" do
+      node = %TreeNode{term: 10, children: []}
+
+      assert {^node, nil} = TreeNode.pop_first_child(node)
+    end
+
+    test "should return a tuple of the new TreeNode without the popped child, and the popped child" do
+      node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 8, children: []},
+          %TreeNode{term: 6, children: []},
+          %TreeNode{term: 4, children: []},
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      assert {
+               %TreeNode{
+                 term: 10,
+                 children: [
+                   %TreeNode{term: 6, children: []},
+                   %TreeNode{term: 4, children: []},
+                   %TreeNode{term: 2, children: []}
+                 ]
+               },
+               %TreeNode{term: 8, children: []}
+             } = TreeNode.pop_first_child(node)
+    end
+  end
+
   describe "append_child/2" do
     test "should create a new child from the given value and append it to the end of the list of children",
          %{simple_tree: tree} do
@@ -426,6 +458,248 @@ defmodule RoseTree.TreeNodeTest do
       [_ | rest] = Enum.reverse(updated_tree.children)
 
       assert Enum.reverse(rest) == tree.children
+    end
+  end
+
+  describe "pop_last_child/1" do
+    test "should return a tuple of an unchanged TreeNode and nil if the original has no children" do
+      node = %TreeNode{term: 10, children: []}
+
+      assert {^node, nil} = TreeNode.pop_last_child(node)
+    end
+
+    test "should return a tuple of the new TreeNode without the popped child, and the popped child" do
+      node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 8, children: []},
+          %TreeNode{term: 6, children: []},
+          %TreeNode{term: 4, children: []},
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      assert {
+               %TreeNode{
+                 term: 10,
+                 children: [
+                   %TreeNode{term: 8, children: []},
+                   %TreeNode{term: 6, children: []},
+                   %TreeNode{term: 4, children: []}
+                 ]
+               },
+               %TreeNode{term: 2, children: []}
+             } = TreeNode.pop_last_child(node)
+    end
+  end
+
+  describe "insert_child/3" do
+    test "should increase the number of children by 1" do
+      node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      new_child = %TreeNode{term: 4, children: []}
+
+      expected_length = 2
+
+      assert %TreeNode{children: children} = TreeNode.insert_child(node, new_child, 1)
+
+      assert length(children) == expected_length
+    end
+
+    test "should accept a TreeNode as input value and insert it unchanged" do
+      node = %TreeNode{term: 10, children: []}
+
+      new_child = %TreeNode{term: 4, children: []}
+
+      assert %TreeNode{children: [^new_child]} = TreeNode.insert_child(node, new_child, 0)
+    end
+
+    test "should accept any other term as input value and insert it, turning it into a TreeNode" do
+      node = %TreeNode{term: 10, children: []}
+
+      new_child = 4
+
+      expected_child = %TreeNode{term: 4, children: []}
+
+      assert %TreeNode{children: [^expected_child]} = TreeNode.insert_child(node, new_child, 0)
+    end
+
+    test "should insert the new child at the correct index when given a positive index" do
+      node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 8, children: []},
+          %TreeNode{term: 6, children: []},
+          %TreeNode{term: 4, children: []},
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      new_child = %TreeNode{term: 5, children: []}
+
+      assert %TreeNode{children: children} = TreeNode.insert_child(node, new_child, 2)
+
+      assert new_child == Enum.at(children, 2)
+    end
+
+    test "should insert the new child at the head when given a negative index that exceeds the count of children" do
+      node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 8, children: []},
+          %TreeNode{term: 6, children: []},
+          %TreeNode{term: 4, children: []},
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      new_child = %TreeNode{term: 5, children: []}
+
+      assert %TreeNode{children: children} = TreeNode.insert_child(node, new_child, -10)
+
+      assert [^new_child | _] = children
+    end
+
+    test "should insert the new child at correct index starting from the back when given a negative index" do
+      node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 8, children: []},
+          %TreeNode{term: 6, children: []},
+          %TreeNode{term: 4, children: []},
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      new_child = %TreeNode{term: 5, children: []}
+
+      assert %TreeNode{children: children} = TreeNode.insert_child(node, new_child, -1)
+
+      assert new_child == Enum.at(children, 3)
+    end
+
+    test "should insert the new child at the end when given an index that exceeds the count of children" do
+      node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 8, children: []},
+          %TreeNode{term: 6, children: []},
+          %TreeNode{term: 4, children: []},
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      new_child = %TreeNode{term: 5, children: []}
+
+      assert %TreeNode{children: children} = TreeNode.insert_child(node, new_child, 10)
+
+      assert [^new_child | _] = Enum.reverse(children)
+    end
+  end
+
+  describe "remove_child/2" do
+    test "should return a tuple of an unchanged TreeNode and nil if the original has no children" do
+      node = %TreeNode{term: 10, children: []}
+
+      assert {^node, nil} = TreeNode.remove_child(node, 5)
+    end
+
+    test "should decrease the number of children by 1" do
+      node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      expected_length = 0
+
+      assert {%TreeNode{children: children}, _} = TreeNode.remove_child(node, 0)
+
+      assert length(children) == expected_length
+    end
+
+    test "should remove the child at the correct index when given a positive index and return updated TreeNode and the removed child as tuple" do
+      node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 8, children: []},
+          %TreeNode{term: 6, children: []},
+          %TreeNode{term: 4, children: []},
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      expected_node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 8, children: []},
+          %TreeNode{term: 6, children: []},
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      expected_child = %TreeNode{term: 4, children: []}
+
+      assert {^expected_node, ^expected_child} = TreeNode.remove_child(node, 2)
+    end
+
+    test "should remove the child at the correct index when given a negative index and return updated TreeNode and the removed child as tuple" do
+      node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 8, children: []},
+          %TreeNode{term: 6, children: []},
+          %TreeNode{term: 4, children: []},
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      expected_node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 8, children: []},
+          %TreeNode{term: 4, children: []},
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      expected_child = %TreeNode{term: 6, children: []}
+
+      assert {^expected_node, ^expected_child} = TreeNode.remove_child(node, -3)
+    end
+
+    test "should not remove any child when given a negative index that is greater than child count and instead return original TreeNode and nil as tuple" do
+      node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 8, children: []},
+          %TreeNode{term: 6, children: []},
+          %TreeNode{term: 4, children: []},
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      assert {^node, nil} = TreeNode.remove_child(node, -10)
+    end
+
+    test "should not remove any child when given a positive index that is greater than child count and instead return original TreeNode and nil as tuple" do
+      node = %TreeNode{
+        term: 10,
+        children: [
+          %TreeNode{term: 8, children: []},
+          %TreeNode{term: 6, children: []},
+          %TreeNode{term: 4, children: []},
+          %TreeNode{term: 2, children: []}
+        ]
+      }
+
+      assert {^node, nil} = TreeNode.remove_child(node, 10)
     end
   end
 

@@ -270,6 +270,7 @@ defmodule RoseTree.TreeNode do
           ]
         }, %RoseTree.TreeNode{term: 4, children: []}
       }
+
   """
   @spec pop_first_child(t()) :: {t(), t() | nil}
   def pop_first_child(%__MODULE__{children: []} = tree), do: {tree, nil}
@@ -360,8 +361,9 @@ defmodule RoseTree.TreeNode do
   def insert_child(%__MODULE__{children: children} = tree, child, index),
     do: do_insert_child(tree, new(child), index)
 
+  @spec do_insert_child(t(), t() | term(), integer()) :: t()
   defp do_insert_child(%__MODULE__{children: children} = tree, child, index)
-      when tree_node?(child) and is_integer(index) do
+       when tree_node?(child) and is_integer(index) do
     {previous_children, next_children} = Enum.split(children, index)
     new_children = previous_children ++ [child | next_children]
     %{tree | children: new_children}
@@ -390,7 +392,20 @@ defmodule RoseTree.TreeNode do
   @spec remove_child(t(), integer()) :: {t(), t() | nil}
   def remove_child(%__MODULE__{children: []} = tree, _index), do: {tree, nil}
 
-  def remove_child(%__MODULE__{children: children} = tree, index) when is_integer(index) do
+  def remove_child(%__MODULE__{children: children} = tree, index)
+      when is_integer(index) and index < 0 do
+    if abs(index) > length(children) do
+      {tree, nil}
+    else
+      do_remove_child(tree, index)
+    end
+  end
+
+  def remove_child(%__MODULE__{children: children} = tree, index) when is_integer(index),
+    do: do_remove_child(tree, index)
+
+  @spec do_remove_child(t(), integer()) :: {t(), t() | nil}
+  defp do_remove_child(%__MODULE__{children: children} = tree, index) when is_integer(index) do
     {new_children, removed_child} =
       case Enum.split(children, index) do
         {previous, []} ->
