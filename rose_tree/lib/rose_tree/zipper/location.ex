@@ -1,28 +1,26 @@
 defmodule RoseTree.Zipper.Location do
   @moduledoc """
-  A Location in the Path from the root of the Rose Tree Zipper to its
-  current Context.
+  A Location in the Path from the root of the RoseTree Zipper to its
+  current context.
   """
 
-  require RoseTree.TreeNode
-
-  alias RoseTree.TreeNode
+  require RoseTree
 
   defstruct ~w(prev term next)a
 
   @typedoc """
   A `Location` is made up of three fields:
-  * `term` is a `TreeNode.term`.
-  * `prev` is a list of `TreeNode`s. They are the siblings that
+  * `term` is a `RoseTree.term`.
+  * `prev` is a list of `RoseTree`s. They are the siblings that
       occur prior the `term`. It is reversed such that the
       head of the list is the nearest previous sibling.
-  * `next` is a list of `TreeNode`s. They are the siblings that
+  * `next` is a list of `RoseTree`s. They are the siblings that
       occur after the `term.
   """
   @type t :: %__MODULE__{
-          prev: [TreeNode.t()],
+          prev: [RoseTree.t()],
           term: term(),
-          next: [TreeNode.t()]
+          next: [RoseTree.t()]
         }
 
   defguard location?(value)
@@ -32,32 +30,32 @@ defmodule RoseTree.Zipper.Location do
                   is_list(value.next)
 
   @doc """
-  Builds a new `Location` given a `term()` or a `TreeNode` as the first
-  argument, and a `prev` and `next` list of `TreeNode`s as the second and
+  Builds a new `Location` given a `term()` or a `RoseTree` as the first
+  argument, and a `prev` and `next` list of `RoseTree`s as the second and
   third argument.
 
-  If the first argument is a `TreeNode`, it will unwrap its `term` element.
+  If the first argument is a `RoseTree`, it will unwrap its `term` element.
 
   ## Examples
 
       iex> RoseTree.Zipper.Location.new(5, prev: [], next: [])
       %RoseTree.Zipper.Location{prev: [], term: 5, next: []}
 
-      iex> tree = RoseTree.TreeNode.new(4)
+      iex> tree = RoseTree.new(4)
       ...> RoseTree.Zipper.Location.new(5, prev: [tree], next: [])
       %RoseTree.Zipper.Location{
         prev: [
-          %RoseTree.TreeNode{term: 4, children: []}
+          %RoseTree{term: 4, children: []}
         ],
         term: 5,
         next: []
       }
 
   """
-  @spec new(TreeNode.t() | term(), keyword()) :: t() | nil
+  @spec new(RoseTree.t() | term(), keyword()) :: t() | nil
   def new(item, opts \\ [])
 
-  def new(item, opts) when TreeNode.tree_node?(item) do
+  def new(item, opts) when RoseTree.rose_tree?(item) do
     new(item.term, opts)
   end
 
@@ -69,9 +67,9 @@ defmodule RoseTree.Zipper.Location do
   end
 
   @doc false
-  @spec do_new(TreeNode.t() | term(), [TreeNode.t()], [TreeNode.t()]) :: t() | nil
+  @spec do_new(RoseTree.t() | term(), [RoseTree.t()], [RoseTree.t()]) :: t() | nil
   defp do_new(item, prev, next) when is_list(prev) and is_list(next) do
-    case {TreeNode.all_tree_nodes?(prev), TreeNode.all_tree_nodes?(next)} do
+    case {RoseTree.all_rose_trees?(prev), RoseTree.all_rose_trees?(next)} do
       {true, true} ->
         %__MODULE__{
           prev: prev,
@@ -123,7 +121,7 @@ defmodule RoseTree.Zipper.Location do
 
   ## Examples
 
-      iex> trees = for t <- [5,4,3,2,1], do: RoseTree.TreeNode.new(t)
+      iex> trees = for t <- [5,4,3,2,1], do: RoseTree.new(t)
       ...> loc = RoseTree.Zipper.Location.new(6, prev: trees, next: [])
       ...> RoseTree.Zipper.Location.index_of_term(loc)
       5

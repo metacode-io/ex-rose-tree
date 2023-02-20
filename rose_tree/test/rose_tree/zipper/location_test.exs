@@ -3,7 +3,7 @@ defmodule RoseTree.Zipper.LocationTest do
 
   require RoseTree.Zipper.Location
   alias RoseTree.Zipper.Location
-  alias RoseTree.TreeNode
+  alias RoseTree
 
   doctest RoseTree.Zipper.Location
 
@@ -46,9 +46,9 @@ defmodule RoseTree.Zipper.LocationTest do
 
     test "should return true when given a valid Location struct" do
       loc = %Location{
-        prev: [TreeNode.new(5)],
+        prev: [RoseTree.new(5)],
         term: 6,
-        next: [TreeNode.new(7)]
+        next: [RoseTree.new(7)]
       }
 
       assert Location.location?(loc) == true
@@ -77,8 +77,8 @@ defmodule RoseTree.Zipper.LocationTest do
   end
 
   describe "new/2 when using the :prev option" do
-    test "should return a new Location with prev field set if valid TreeNodes were passed" do
-      prev = [TreeNode.new(5)]
+    test "should return a new Location with prev field set if valid RoseTrees were passed" do
+      prev = [RoseTree.new(5)]
 
       loc = Location.new(6, prev: prev)
 
@@ -86,8 +86,8 @@ defmodule RoseTree.Zipper.LocationTest do
       assert %Location{prev: ^prev, term: 6, next: []} = loc
     end
 
-    test "should return a new Location with next field set if valid TreeNodes were passed" do
-      next = [TreeNode.new(7)]
+    test "should return a new Location with next field set if valid RoseTrees were passed" do
+      next = [RoseTree.new(7)]
 
       loc = Location.new(6, next: next)
 
@@ -95,9 +95,9 @@ defmodule RoseTree.Zipper.LocationTest do
       assert %Location{prev: [], term: 6, next: ^next} = loc
     end
 
-    test "should return a new Location with both prev and next fields set if valid TreeNodes were passed" do
-      prev = [TreeNode.new(5)]
-      next = [TreeNode.new(7)]
+    test "should return a new Location with both prev and next fields set if valid RoseTrees were passed" do
+      prev = [RoseTree.new(5)]
+      next = [RoseTree.new(7)]
 
       loc = Location.new(6, prev: prev, next: next)
 
@@ -106,13 +106,13 @@ defmodule RoseTree.Zipper.LocationTest do
     end
 
     test "should raise an ArgumentError if prev field set with an invalid element" do
-      prev = [TreeNode.new(5), :bad_element]
+      prev = [RoseTree.new(5), :bad_element]
 
       assert_raise ArgumentError, fn -> Location.new(6, prev: prev) end
     end
 
     test "should raise an ArgumentError if next field set with an invalid element" do
-      next = [TreeNode.new(7), :bad_element]
+      next = [RoseTree.new(7), :bad_element]
 
       assert_raise ArgumentError, fn -> Location.new(6, next: next) end
     end

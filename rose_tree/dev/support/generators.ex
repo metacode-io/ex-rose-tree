@@ -1,8 +1,8 @@
 defmodule RoseTree.Support.Generators do
   require Logger
 
-  alias RoseTree.{TreeNode, Util}
-  alias RoseTree.Zipper.{Context, Location}
+  alias RoseTree.{Util, Zipper}
+  alias RoseTree.Zipper.Location
 
   @typep default_seed() :: %{
     current_depth: non_neg_integer(),
@@ -10,18 +10,18 @@ defmodule RoseTree.Support.Generators do
     shares_for_children: non_neg_integer()
   }
 
-  @spec random_tree(keyword()) :: TreeNode.t()
+  @spec random_tree(keyword()) :: RoseTree.t()
   def random_tree(options \\ []) do
     {initial_seed, unfolder_fn} = default_init(options)
 
-    TreeNode.unfold(initial_seed, unfolder_fn)
+    RoseTree.unfold(initial_seed, unfolder_fn)
   end
 
-  @spec random_zipper(keyword()) :: Context.t()
+  @spec random_zipper(keyword()) :: Zipper.t()
   def random_zipper(options \\ []) do
     focus = random_tree(options)
 
-    %Context{
+    %Zipper{
       focus: focus,
       prev: [],
       next: [],
@@ -31,12 +31,12 @@ defmodule RoseTree.Support.Generators do
     |> add_zipper_locations(options)
   end
 
-  @spec add_zipper_siblings(Context.t(), keyword()) :: Context.t()
-  def add_zipper_siblings(%Context{} = ctx, options \\ []) do
+  @spec add_zipper_siblings(Zipper.t(), keyword()) :: Zipper.t()
+  def add_zipper_siblings(%Zipper{} = z, options \\ []) do
     num_siblings = Keyword.get(options, :num_siblings, Enum.random(0..5))
 
     if num_siblings == 0 do
-      ctx
+      z
 
     else
       random_trees = for _ <- 0..num_siblings-1, do: random_tree(options)
@@ -45,25 +45,25 @@ defmodule RoseTree.Support.Generators do
         random_trees
         |> Util.split_at(Enum.random(0..num_siblings-1))
 
-      %Context{ctx | prev: prev, next: next}
+      %Zipper{z | prev: prev, next: next}
     end
   end
 
-  @spec add_zipper_locations(Context.t(), keyword()) :: Context.t()
-  def add_zipper_locations(%Context{} = ctx, options \\ []) do
+  @spec add_zipper_locations(Zipper.t(), keyword()) :: Zipper.t()
+  def add_zipper_locations(%Zipper{} = z, options \\ []) do
     num_locations = Keyword.get(options, :num_locations, Enum.random(0..5))
 
     if num_locations == 0 do
-      ctx
+      z
 
     else
       random_locations =
         for _ <- 0..num_locations-1 do
-           ctx = random_zipper(num_locations: 0)
-           %Location{prev: ctx.prev, term: ctx.focus.term, next: ctx.next}
+           z = random_zipper(num_locations: 0)
+           %Location{prev: z.prev, term: z.focus.term, next: z.next}
         end
 
-      %Context{ctx | path: random_locations}
+      %Zipper{z | path: random_locations}
     end
   end
 
@@ -129,7 +129,7 @@ defmodule RoseTree.Support.Generators do
     |> do_allot_remaining_shares(seeds, shares - allotted)
   end
 
-  @spec default_init(keyword()) :: {default_seed(), TreeNode.unfold_fn()}
+  @spec default_init(keyword()) :: {default_seed(), RoseTree.unfold_fn()}
   def default_init(options \\ []) do
     total_nodes = Keyword.get(options, :total_nodes, random_number_of_nodes())
 

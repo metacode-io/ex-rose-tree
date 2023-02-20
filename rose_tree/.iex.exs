@@ -1,6 +1,6 @@
-require RoseTree.TreeNode
-require RoseTree.Zipper.Context
+require RoseTree
+require RoseTree.Zipper
 
-alias RoseTree.{TreeNode, Util}
+alias RoseTree.{Util, Zipper}
+alias RoseTree.Zipper.Location
 alias RoseTree.Support.{Generators, Trees, Zippers}
-alias RoseTree.Zipper.{Context, Kin, Location, Traversal}

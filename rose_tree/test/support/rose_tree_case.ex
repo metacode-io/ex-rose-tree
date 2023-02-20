@@ -1,12 +1,12 @@
-defmodule RoseTree.TreeNodeCase do
+defmodule RoseTree.RoseTreeCase do
   @moduledoc """
   This module defines the setup for tests requiring
-  access to pre-polutated `RoseTree.TreeNode` structs.
+  access to pre-polutated `RoseTree` structs.
   """
 
   use ExUnit.CaseTemplate
 
-  alias RoseTree.TreeNode
+  alias RoseTree
   alias RoseTree.Support.Generators
 
   using do
@@ -14,24 +14,24 @@ defmodule RoseTree.TreeNodeCase do
       import ExUnit.CaptureLog
 
       require Logger
-      require RoseTree.TreeNode
+      require RoseTree
 
-      alias RoseTree.TreeNode
+      alias RoseTree
       alias RoseTree.Support.Generators
     end
   end
 
   setup do
-    empty_tree = %TreeNode{term: nil, children: []}
+    empty_tree = %RoseTree{term: nil, children: []}
 
-    leaf_tree = %TreeNode{term: 1, children: []}
+    leaf_tree = %RoseTree{term: 1, children: []}
 
-    simple_tree = %TreeNode{
+    simple_tree = %RoseTree{
       term: 1,
       children: [
-        %TreeNode{term: 2, children: []},
-        %TreeNode{term: 3, children: []},
-        %TreeNode{term: 4, children: []}
+        %RoseTree{term: 2, children: []},
+        %RoseTree{term: 3, children: []},
+        %RoseTree{term: 4, children: []}
       ]
     }
 
