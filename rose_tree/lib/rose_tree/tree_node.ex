@@ -335,17 +335,42 @@ defmodule RoseTree.TreeNode do
   end
 
   @doc """
-  TODO
-  """
-  @spec insert_child(t(), t() | term(), non_neg_integer()) :: t()
-  def insert_child(%__MODULE__{children: children} = tree, child, index) do
+  Inserts a new child into the tree's children at the given index.
 
+  ## Examples
+
+      iex> node = RoseTree.TreeNode.new(5, [4, 3, 2, 1])
+      ...> RoseTree.TreeNode.insert_child(node, 3.5, 2)
+      %RoseTree.TreeNode{
+        term: 5,
+        children: [
+          %RoseTree.TreeNode{term: 4, children: []},
+          %RoseTree.TreeNode{term: 3, children: []},
+          %RoseTree.TreeNode{term: 3.5, children: []},
+          %RoseTree.TreeNode{term: 2, children: []},
+          %RoseTree.TreeNode{term: 1, children: []}
+        ]
+      }
+
+  """
+  @spec insert_child(t(), t() | term(), integer()) :: t()
+  def insert_child(%__MODULE__{} = tree, child, index) when tree_node?(child),
+    do: do_insert_child(tree, child, index)
+
+  def insert_child(%__MODULE__{children: children} = tree, child, index),
+    do: do_insert_child(tree, new(child), index)
+
+  defp do_insert_child(%__MODULE__{children: children} = tree, child, index)
+      when tree_node?(child) and is_integer(index) do
+    {previous_children, next_children} = Enum.split(children, index)
+    new_children = previous_children ++ [child | next_children]
+    %{tree | children: new_children}
   end
 
   @doc """
   TODO
   """
-  @spec remove_child(t(), non_neg_integer()) :: {t(), t()}
+  @spec remove_child(t(), integer()) :: {t(), t()}
   def remove_child(%__MODULE__{children: children} = tree, index) do
 
   end
