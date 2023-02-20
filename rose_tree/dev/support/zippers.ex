@@ -4,24 +4,24 @@ defmodule RoseTree.Support.Zippers do
   """
 
   alias RoseTree.Support.Trees
-  alias RoseTree.TreeNode
-  alias RoseTree.Zipper.{Context, Location}
+  alias RoseTree.Zipper
+  alias RoseTree.Zipper.Location
 
-  def empty_ctx() do
-    %Context{focus: Trees.empty_tree(), prev: [], next: [], path: []}
+  def empty_z() do
+    %Zipper{focus: Trees.empty_tree(), prev: [], next: [], path: []}
   end
 
-  def leaf_ctx() do
-    %Context{focus: Trees.leaf_tree(), prev: [], next: [], path: []}
+  def leaf_z() do
+    %Zipper{focus: Trees.leaf_tree(), prev: [], next: [], path: []}
   end
 
-  def simple_ctx() do
-    %Context{focus: Trees.simple_tree(), prev: [], next: [], path: []}
+  def simple_z() do
+    %Zipper{focus: Trees.simple_tree(), prev: [], next: [], path: []}
   end
 
-  def ctx_with_parent() do
-    %Context{
-      focus: TreeNode.new(20),
+  def z_with_parent() do
+    %Zipper{
+      focus: RoseTree.new(20),
       prev: [],
       next: [],
       path: [
@@ -30,9 +30,9 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
-  def ctx_with_grandparent() do
-    %Context{
-      focus: TreeNode.new(20),
+  def z_with_grandparent() do
+    %Zipper{
+      focus: RoseTree.new(20),
       prev: [],
       next: [],
       path: [
@@ -42,9 +42,9 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
-  def ctx_with_great_grandparent() do
-    %Context{
-      focus: TreeNode.new(20),
+  def z_with_great_grandparent() do
+    %Zipper{
+      focus: RoseTree.new(20),
       prev: [],
       next: [],
       path: [
@@ -55,31 +55,31 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
-  def ctx_with_siblings() do
-    %Context{
-      focus: TreeNode.new(5),
+  def z_with_siblings() do
+    %Zipper{
+      focus: RoseTree.new(5),
       prev: [
-        TreeNode.new(4),
-        TreeNode.new(3),
-        TreeNode.new(2),
-        TreeNode.new(1)
+        RoseTree.new(4),
+        RoseTree.new(3),
+        RoseTree.new(2),
+        RoseTree.new(1)
       ],
       next: [
-        TreeNode.new(6),
-        TreeNode.new(7),
-        TreeNode.new(8),
-        TreeNode.new(9)
+        RoseTree.new(6),
+        RoseTree.new(7),
+        RoseTree.new(8),
+        RoseTree.new(9)
       ]
     }
   end
 
-  def ctx_with_grandchildren() do
-    %Context{
+  def z_with_grandchildren() do
+    %Zipper{
       focus:
-        TreeNode.new(0, [
-          TreeNode.new(1, [4, 5, 6]),
-          TreeNode.new(2, [7, 8, 9]),
-          TreeNode.new(3, [10, 11, 12])
+        RoseTree.new(0, [
+          RoseTree.new(1, [4, 5, 6]),
+          RoseTree.new(2, [7, 8, 9]),
+          RoseTree.new(3, [10, 11, 12])
         ]),
       prev: [],
       next: [],
@@ -87,15 +87,15 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
-  def ctx_with_grandchildren_2() do
-    %Context{
+  def z_with_grandchildren_2() do
+    %Zipper{
       focus:
-        TreeNode.new(0, [
-          TreeNode.new(-100),
-          TreeNode.new(1, [4, 5, 6]),
-          TreeNode.new(2, [7, 8, 9]),
-          TreeNode.new(3, [10, 11, 12]),
-          TreeNode.new(100)
+        RoseTree.new(0, [
+          RoseTree.new(-100),
+          RoseTree.new(1, [4, 5, 6]),
+          RoseTree.new(2, [7, 8, 9]),
+          RoseTree.new(3, [10, 11, 12]),
+          RoseTree.new(100)
         ]),
       prev: [],
       next: [],
@@ -103,17 +103,17 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
-  def ctx_with_great_grandchildren() do
-    %Context{
+  def z_with_great_grandchildren() do
+    %Zipper{
       focus:
-        TreeNode.new(0, [
-          TreeNode.new(1, [4, 5, 6]),
-          TreeNode.new(2, [
-            TreeNode.new(7, [13, 14, 15]),
-            TreeNode.new(8, [16, 17, 18]),
-            TreeNode.new(9, [19, 20, 21])
+        RoseTree.new(0, [
+          RoseTree.new(1, [4, 5, 6]),
+          RoseTree.new(2, [
+            RoseTree.new(7, [13, 14, 15]),
+            RoseTree.new(8, [16, 17, 18]),
+            RoseTree.new(9, [19, 20, 21])
           ]),
-          TreeNode.new(3, [10, 11, 12])
+          RoseTree.new(3, [10, 11, 12])
         ]),
       prev: [],
       next: [],
@@ -121,19 +121,19 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
-  def ctx_with_great_grandchildren_2() do
-    %Context{
+  def z_with_great_grandchildren_2() do
+    %Zipper{
       focus:
-        TreeNode.new(0, [
-          TreeNode.new(1, [4, 5, 6]),
-          TreeNode.new(2, [
-            TreeNode.new(-100),
-            TreeNode.new(7, [13, 14, 15]),
-            TreeNode.new(8, [16, 17, 18]),
-            TreeNode.new(9, [19, 20, 21]),
-            TreeNode.new(100)
+        RoseTree.new(0, [
+          RoseTree.new(1, [4, 5, 6]),
+          RoseTree.new(2, [
+            RoseTree.new(-100),
+            RoseTree.new(7, [13, 14, 15]),
+            RoseTree.new(8, [16, 17, 18]),
+            RoseTree.new(9, [19, 20, 21]),
+            RoseTree.new(100)
           ]),
-          TreeNode.new(3, [10, 11, 12])
+          RoseTree.new(3, [10, 11, 12])
         ]),
       prev: [],
       next: [],
@@ -141,132 +141,132 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
-  def ctx_with_niblings() do
-    %Context{
-      focus: TreeNode.new(5),
+  def z_with_niblings() do
+    %Zipper{
+      focus: RoseTree.new(5),
       prev: [
-        TreeNode.new(4),
-        TreeNode.new(3, [
-          TreeNode.new(10),
-          TreeNode.new(11),
-          TreeNode.new(12)
+        RoseTree.new(4),
+        RoseTree.new(3, [
+          RoseTree.new(10),
+          RoseTree.new(11),
+          RoseTree.new(12)
         ]),
-        TreeNode.new(2),
-        TreeNode.new(1)
+        RoseTree.new(2),
+        RoseTree.new(1)
       ],
       next: [
-        TreeNode.new(6),
-        TreeNode.new(7, [
-          TreeNode.new(13),
-          TreeNode.new(14),
-          TreeNode.new(15)
+        RoseTree.new(6),
+        RoseTree.new(7, [
+          RoseTree.new(13),
+          RoseTree.new(14),
+          RoseTree.new(15)
         ]),
-        TreeNode.new(8),
-        TreeNode.new(9)
+        RoseTree.new(8),
+        RoseTree.new(9)
       ]
     }
   end
 
-  def ctx_with_grand_niblings() do
-    %Context{
-      focus: TreeNode.new(5),
+  def z_with_grand_niblings() do
+    %Zipper{
+      focus: RoseTree.new(5),
       prev: [
-        TreeNode.new(4),
-        TreeNode.new(3, [
-          TreeNode.new(10, [
-            TreeNode.new(18),
-            TreeNode.new(19),
-            TreeNode.new(20)
+        RoseTree.new(4),
+        RoseTree.new(3, [
+          RoseTree.new(10, [
+            RoseTree.new(18),
+            RoseTree.new(19),
+            RoseTree.new(20)
           ]),
-          TreeNode.new(11),
-          TreeNode.new(12)
+          RoseTree.new(11),
+          RoseTree.new(12)
         ]),
-        TreeNode.new(2, [
-          TreeNode.new(16),
-          TreeNode.new(17, [
-            TreeNode.new(21),
-            TreeNode.new(22)
+        RoseTree.new(2, [
+          RoseTree.new(16),
+          RoseTree.new(17, [
+            RoseTree.new(21),
+            RoseTree.new(22)
           ])
         ]),
-        TreeNode.new(1)
+        RoseTree.new(1)
       ],
       next: [
-        TreeNode.new(6),
-        TreeNode.new(7, [
-          TreeNode.new(13),
-          TreeNode.new(14, [
-            TreeNode.new(26),
-            TreeNode.new(27),
-            TreeNode.new(28)
+        RoseTree.new(6),
+        RoseTree.new(7, [
+          RoseTree.new(13),
+          RoseTree.new(14, [
+            RoseTree.new(26),
+            RoseTree.new(27),
+            RoseTree.new(28)
           ]),
-          TreeNode.new(15)
+          RoseTree.new(15)
         ]),
-        TreeNode.new(8, [
-          TreeNode.new(23),
-          TreeNode.new(24),
-          TreeNode.new(25, [
-            TreeNode.new(29),
-            TreeNode.new(30)
+        RoseTree.new(8, [
+          RoseTree.new(23),
+          RoseTree.new(24),
+          RoseTree.new(25, [
+            RoseTree.new(29),
+            RoseTree.new(30)
           ])
         ]),
-        TreeNode.new(9)
+        RoseTree.new(9)
       ]
     }
   end
 
-  def ctx_with_descendant_niblings() do
-    %Context{
-      focus: TreeNode.new(5),
+  def z_with_descendant_niblings() do
+    %Zipper{
+      focus: RoseTree.new(5),
       prev: [
-        TreeNode.new(3, [
-          TreeNode.new(10, [
-            TreeNode.new(18),
-            TreeNode.new(19),
+        RoseTree.new(3, [
+          RoseTree.new(10, [
+            RoseTree.new(18),
+            RoseTree.new(19),
           ]),
-          TreeNode.new(11, [
-            TreeNode.new(20),
-            TreeNode.new(21),
+          RoseTree.new(11, [
+            RoseTree.new(20),
+            RoseTree.new(21),
           ]),
-          TreeNode.new(12, [
-            TreeNode.new(22),
-            TreeNode.new(23, [
-              TreeNode.new(24),
-              TreeNode.new(25)
+          RoseTree.new(12, [
+            RoseTree.new(22),
+            RoseTree.new(23, [
+              RoseTree.new(24),
+              RoseTree.new(25)
             ])
           ])
         ]),
-        TreeNode.new(2, [
-          TreeNode.new(16),
-          TreeNode.new(17)
+        RoseTree.new(2, [
+          RoseTree.new(16),
+          RoseTree.new(17)
         ]),
-        TreeNode.new(1)
+        RoseTree.new(1)
       ],
       next: [
-        TreeNode.new(7, [
-          TreeNode.new(13, [
-            TreeNode.new(29, [
-              TreeNode.new(37),
-              TreeNode.new(38)
+        RoseTree.new(7, [
+          RoseTree.new(13, [
+            RoseTree.new(29, [
+              RoseTree.new(37),
+              RoseTree.new(38)
             ]),
-            TreeNode.new(30),
-            TreeNode.new(31)
+            RoseTree.new(30),
+            RoseTree.new(31)
           ]),
-          TreeNode.new(14, [
-            TreeNode.new(32),
-            TreeNode.new(33),
-            TreeNode.new(34)
+          RoseTree.new(14, [
+            RoseTree.new(32),
+            RoseTree.new(33),
+            RoseTree.new(34)
           ]),
-          TreeNode.new(15)
+          RoseTree.new(15)
         ]),
-        TreeNode.new(8, [
-          TreeNode.new(26),
-          TreeNode.new(27),
-          TreeNode.new(28, [
-            TreeNode.new(35),
-            TreeNode.new(36)
+        RoseTree.new(8, [
+          RoseTree.new(26),
+          RoseTree.new(27),
+          RoseTree.new(28, [
+            RoseTree.new(35),
+            RoseTree.new(36)
           ])
         ]),
-        TreeNode.new(9)
+        RoseTree.new(9)
       ],
       path: [
         Location.new(100)
@@ -274,54 +274,54 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
-  def ctx_with_piblings() do
-    %Context{
-      focus: TreeNode.new(20),
+  def z_with_piblings() do
+    %Zipper{
+      focus: RoseTree.new(20),
       prev: [],
       next: [],
       path: [
         Location.new(10,
           prev: [
-            TreeNode.new(6),
-            TreeNode.new(4),
-            TreeNode.new(2)
+            RoseTree.new(6),
+            RoseTree.new(4),
+            RoseTree.new(2)
           ],
           next: [
-            TreeNode.new(14),
-            TreeNode.new(16),
-            TreeNode.new(18)
+            RoseTree.new(14),
+            RoseTree.new(16),
+            RoseTree.new(18)
           ]
         )
       ]
     }
   end
 
-  def ctx_with_grandpiblings() do
-    %Context{
-      focus: TreeNode.new(20),
+  def z_with_grandpiblings() do
+    %Zipper{
+      focus: RoseTree.new(20),
       prev: [],
       next: [],
       path: [
         Location.new(10),
         Location.new(5,
           prev: [
-            TreeNode.new(4),
-            TreeNode.new(3),
-            TreeNode.new(2)
+            RoseTree.new(4),
+            RoseTree.new(3),
+            RoseTree.new(2)
           ],
           next: [
-            TreeNode.new(6),
-            TreeNode.new(7),
-            TreeNode.new(8)
+            RoseTree.new(6),
+            RoseTree.new(7),
+            RoseTree.new(8)
           ]
         )
       ]
     }
   end
 
-  def ctx_with_ancestral_piblings() do
-    %Context{
-      focus: TreeNode.new(20),
+  def z_with_ancestral_piblings() do
+    %Zipper{
+      focus: RoseTree.new(20),
       prev: [],
       next: [],
       path: [
@@ -331,23 +331,23 @@ defmodule RoseTree.Support.Zippers do
         Location.new(10),
         Location.new(5,
           prev: [
-            TreeNode.new(4),
-            TreeNode.new(3),
-            TreeNode.new(2)
+            RoseTree.new(4),
+            RoseTree.new(3),
+            RoseTree.new(2)
           ],
           next: [
-            TreeNode.new(6),
-            TreeNode.new(7),
-            TreeNode.new(8)
+            RoseTree.new(6),
+            RoseTree.new(7),
+            RoseTree.new(8)
           ]
         )
       ]
     }
   end
 
-  def ctx_with_no_ancestral_piblings() do
-    %Context{
-      focus: TreeNode.new(20),
+  def z_with_no_ancestral_piblings() do
+    %Zipper{
+      focus: RoseTree.new(20),
       prev: [],
       next: [],
       path: [
@@ -359,38 +359,38 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
-  def ctx_with_1st_cousins() do
-    %Context{
-      focus: TreeNode.new(20),
+  def z_with_1st_cousins() do
+    %Zipper{
+      focus: RoseTree.new(20),
       prev: [],
       next: [],
       path: [
         Location.new(10,
           prev: [
-            TreeNode.new(6),
-            TreeNode.new(4, [
-              TreeNode.new(22),
-              TreeNode.new(23),
-              TreeNode.new(24)
+            RoseTree.new(6),
+            RoseTree.new(4, [
+              RoseTree.new(22),
+              RoseTree.new(23),
+              RoseTree.new(24)
             ]),
-            TreeNode.new(2, [
-              TreeNode.new(19),
-              TreeNode.new(20),
-              TreeNode.new(21)
+            RoseTree.new(2, [
+              RoseTree.new(19),
+              RoseTree.new(20),
+              RoseTree.new(21)
             ])
           ],
           next: [
-            TreeNode.new(14),
-            TreeNode.new(16, [
-              TreeNode.new(25),
-              TreeNode.new(26),
-              TreeNode.new(27)
+            RoseTree.new(14),
+            RoseTree.new(16, [
+              RoseTree.new(25),
+              RoseTree.new(26),
+              RoseTree.new(27)
             ]),
-            TreeNode.new(17),
-            TreeNode.new(18, [
-              TreeNode.new(28),
-              TreeNode.new(29),
-              TreeNode.new(30)
+            RoseTree.new(17),
+            RoseTree.new(18, [
+              RoseTree.new(28),
+              RoseTree.new(29),
+              RoseTree.new(30)
             ])
           ]
         )
@@ -398,58 +398,58 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
-  def ctx_with_2nd_cousins() do
-    %Context{
-      focus: TreeNode.new(200),
+  def z_with_2nd_cousins() do
+    %Zipper{
+      focus: RoseTree.new(200),
       prev: [],
       next: [],
       path: [
         Location.new(15),
         Location.new(10,
           prev: [
-            TreeNode.new(6),
-            TreeNode.new(4, [
-              TreeNode.new(22, [
-                TreeNode.new(44),
-                TreeNode.new(45),
-                TreeNode.new(46)
+            RoseTree.new(6),
+            RoseTree.new(4, [
+              RoseTree.new(22, [
+                RoseTree.new(44),
+                RoseTree.new(45),
+                RoseTree.new(46)
               ]),
-              TreeNode.new(23),
-              TreeNode.new(24, [
-                TreeNode.new(47),
-                TreeNode.new(48),
-                TreeNode.new(49)
+              RoseTree.new(23),
+              RoseTree.new(24, [
+                RoseTree.new(47),
+                RoseTree.new(48),
+                RoseTree.new(49)
               ])
             ]),
-            TreeNode.new(2, [
-              TreeNode.new(19),
-              TreeNode.new(20, [
-                TreeNode.new(50),
-                TreeNode.new(51)
+            RoseTree.new(2, [
+              RoseTree.new(19),
+              RoseTree.new(20, [
+                RoseTree.new(50),
+                RoseTree.new(51)
               ]),
-              TreeNode.new(21)
+              RoseTree.new(21)
             ])
           ],
           next: [
-            TreeNode.new(14),
-            TreeNode.new(16, [
-              TreeNode.new(25),
-              TreeNode.new(26, [
-                TreeNode.new(52),
-                TreeNode.new(53)
+            RoseTree.new(14),
+            RoseTree.new(16, [
+              RoseTree.new(25),
+              RoseTree.new(26, [
+                RoseTree.new(52),
+                RoseTree.new(53)
               ]),
-              TreeNode.new(27)
+              RoseTree.new(27)
             ]),
-            TreeNode.new(18, [
-              TreeNode.new(28, [
-                TreeNode.new(54),
-                TreeNode.new(55),
-                TreeNode.new(56)
+            RoseTree.new(18, [
+              RoseTree.new(28, [
+                RoseTree.new(54),
+                RoseTree.new(55),
+                RoseTree.new(56)
               ]),
-              TreeNode.new(29),
-              TreeNode.new(30, [
-                TreeNode.new(57),
-                TreeNode.new(58)
+              RoseTree.new(29),
+              RoseTree.new(30, [
+                RoseTree.new(57),
+                RoseTree.new(58)
               ])
             ])
           ]
@@ -458,9 +458,9 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
-  def ctx_with_extended_cousins() do
-    %Context{
-      focus: TreeNode.new(20),
+  def z_with_extended_cousins() do
+    %Zipper{
+      focus: RoseTree.new(20),
       prev: [],
       next: [],
       path: [
@@ -468,64 +468,64 @@ defmodule RoseTree.Support.Zippers do
         Location.new(15),
         Location.new(10,
           prev: [
-            TreeNode.new(6),
-            TreeNode.new(4, [
-              TreeNode.new(22, [
-                TreeNode.new(44),
-                TreeNode.new(45, [
-                  TreeNode.new(101),
-                  TreeNode.new(102)
+            RoseTree.new(6),
+            RoseTree.new(4, [
+              RoseTree.new(22, [
+                RoseTree.new(44),
+                RoseTree.new(45, [
+                  RoseTree.new(101),
+                  RoseTree.new(102)
                 ]),
-                TreeNode.new(46)
+                RoseTree.new(46)
               ]),
-              TreeNode.new(23),
-              TreeNode.new(24, [
-                TreeNode.new(47),
-                TreeNode.new(48),
-                TreeNode.new(49)
+              RoseTree.new(23),
+              RoseTree.new(24, [
+                RoseTree.new(47),
+                RoseTree.new(48),
+                RoseTree.new(49)
               ])
             ]),
-            TreeNode.new(2, [
-              TreeNode.new(19),
-              TreeNode.new(20, [
-                TreeNode.new(50, [
-                  TreeNode.new(103)
+            RoseTree.new(2, [
+              RoseTree.new(19),
+              RoseTree.new(20, [
+                RoseTree.new(50, [
+                  RoseTree.new(103)
                 ]),
-                TreeNode.new(51, [
-                  TreeNode.new(104)
+                RoseTree.new(51, [
+                  RoseTree.new(104)
                 ])
               ]),
-              TreeNode.new(21)
+              RoseTree.new(21)
             ])
           ],
           next: [
-            TreeNode.new(14),
-            TreeNode.new(16, [
-              TreeNode.new(25),
-              TreeNode.new(26, [
-                TreeNode.new(52, [
-                  TreeNode.new(105),
-                  TreeNode.new(110)
+            RoseTree.new(14),
+            RoseTree.new(16, [
+              RoseTree.new(25),
+              RoseTree.new(26, [
+                RoseTree.new(52, [
+                  RoseTree.new(105),
+                  RoseTree.new(110)
                 ]),
-                TreeNode.new(53, [
-                  TreeNode.new(106)
+                RoseTree.new(53, [
+                  RoseTree.new(106)
                 ])
               ]),
-              TreeNode.new(27)
+              RoseTree.new(27)
             ]),
-            TreeNode.new(18, [
-              TreeNode.new(28, [
-                TreeNode.new(54),
-                TreeNode.new(55, [
-                  TreeNode.new(107),
-                  TreeNode.new(108)
+            RoseTree.new(18, [
+              RoseTree.new(28, [
+                RoseTree.new(54),
+                RoseTree.new(55, [
+                  RoseTree.new(107),
+                  RoseTree.new(108)
                 ]),
-                TreeNode.new(56)
+                RoseTree.new(56)
               ]),
-              TreeNode.new(29),
-              TreeNode.new(30, [
-                TreeNode.new(57),
-                TreeNode.new(58)
+              RoseTree.new(29),
+              RoseTree.new(30, [
+                RoseTree.new(57),
+                RoseTree.new(58)
               ])
             ])
           ]
@@ -534,83 +534,83 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
-  def ctx_with_extended_cousins_2() do
-    %Context{
-      focus: TreeNode.new(3),
+  def z_with_extended_cousins_2() do
+    %Zipper{
+      focus: RoseTree.new(3),
       prev: [
-        TreeNode.new(1),
-        TreeNode.new(2)
+        RoseTree.new(1),
+        RoseTree.new(2)
       ],
       next: [],
       path: [
         Location.new(5,
-          prev: [TreeNode.new(4)],
-          next: [TreeNode.new(6)]),
+          prev: [RoseTree.new(4)],
+          next: [RoseTree.new(6)]),
         Location.new(8,
-          prev: [TreeNode.new(7)],
-          next: [TreeNode.new(9)]),
+          prev: [RoseTree.new(7)],
+          next: [RoseTree.new(9)]),
         Location.new(10,
           prev: [],
           next: [
-            TreeNode.new(11),
-            TreeNode.new(12, [
-              TreeNode.new(13),
-              TreeNode.new(14)
+            RoseTree.new(11),
+            RoseTree.new(12, [
+              RoseTree.new(13),
+              RoseTree.new(14)
             ])
           ]),
         Location.new(15,
           prev: [
-            TreeNode.new(-16, [
-              TreeNode.new(-18, [
-                TreeNode.new(-21),
-                TreeNode.new(-22)
+            RoseTree.new(-16, [
+              RoseTree.new(-18, [
+                RoseTree.new(-21),
+                RoseTree.new(-22)
               ]),
-              TreeNode.new(-19, [
-                TreeNode.new(-23),
-                TreeNode.new(-24, [
-                  TreeNode.new(-26),
-                  TreeNode.new(-27, [
-                    TreeNode.new(-29),
-                    TreeNode.new(-30),
-                    TreeNode.new(-31)
+              RoseTree.new(-19, [
+                RoseTree.new(-23),
+                RoseTree.new(-24, [
+                  RoseTree.new(-26),
+                  RoseTree.new(-27, [
+                    RoseTree.new(-29),
+                    RoseTree.new(-30),
+                    RoseTree.new(-31)
                   ]),
-                  TreeNode.new(-28)
+                  RoseTree.new(-28)
                 ]),
-                TreeNode.new(-25)
+                RoseTree.new(-25)
               ]),
-              TreeNode.new(-20)
+              RoseTree.new(-20)
             ]),
-            TreeNode.new(-17, [
-              TreeNode.new(-32),
-              TreeNode.new(-33),
-              TreeNode.new(-34)
+            RoseTree.new(-17, [
+              RoseTree.new(-32),
+              RoseTree.new(-33),
+              RoseTree.new(-34)
             ])
           ],
           next: [
-            TreeNode.new(16, [
-              TreeNode.new(18, [
-                TreeNode.new(21),
-                TreeNode.new(22)
+            RoseTree.new(16, [
+              RoseTree.new(18, [
+                RoseTree.new(21),
+                RoseTree.new(22)
               ]),
-              TreeNode.new(19, [
-                TreeNode.new(23),
-                TreeNode.new(24, [
-                  TreeNode.new(26),
-                  TreeNode.new(27, [
-                    TreeNode.new(29),
-                    TreeNode.new(30),
-                    TreeNode.new(31)
+              RoseTree.new(19, [
+                RoseTree.new(23),
+                RoseTree.new(24, [
+                  RoseTree.new(26),
+                  RoseTree.new(27, [
+                    RoseTree.new(29),
+                    RoseTree.new(30),
+                    RoseTree.new(31)
                   ]),
-                  TreeNode.new(28)
+                  RoseTree.new(28)
                 ]),
-                TreeNode.new(25)
+                RoseTree.new(25)
               ]),
-              TreeNode.new(20)
+              RoseTree.new(20)
             ]),
-            TreeNode.new(17, [
-              TreeNode.new(32),
-              TreeNode.new(33),
-              TreeNode.new(34)
+            RoseTree.new(17, [
+              RoseTree.new(32),
+              RoseTree.new(33),
+              RoseTree.new(34)
             ])
           ]),
         Location.new(35)

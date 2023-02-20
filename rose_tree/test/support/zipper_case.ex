@@ -7,7 +7,7 @@ defmodule RoseTree.ZipperCase do
 
   use ExUnit.CaseTemplate
 
-  alias RoseTree
+  alias RoseTree.Zipper
   alias RoseTree.Zipper.Location
   alias RoseTree.Support.Generators
 
@@ -18,7 +18,7 @@ defmodule RoseTree.ZipperCase do
       require RoseTree
       require RoseTree.Zipper
 
-      alias RoseTree.Util
+      alias RoseTree.{Util, Zipper}
       alias RoseTree.Zipper.Location
       alias RoseTree.Support.Generators
     end
@@ -46,15 +46,15 @@ defmodule RoseTree.ZipperCase do
     tree_x = Generators.random_tree()
 
     # basic zipper contexts
-    empty_ctx = %Zipper{focus: empty_tree, prev: [], next: [], path: []}
-    leaf_ctx = %Zipper{focus: leaf_tree, prev: [], next: [], path: []}
-    simple_ctx = %Zipper{focus: simple_tree, prev: [], next: [], path: []}
+    empty_z = %Zipper{focus: empty_tree, prev: [], next: [], path: []}
+    leaf_z = %Zipper{focus: leaf_tree, prev: [], next: [], path: []}
+    simple_z = %Zipper{focus: simple_tree, prev: [], next: [], path: []}
 
     # random zipper contexts
-    ctx_x5 = %Zipper{focus: tree_x5, prev: [], next: [], path: []}
-    ctx_x25 = %Zipper{focus: tree_x25, prev: [], next: [], path: []}
-    ctx_x100 = %Zipper{focus: tree_x100, prev: [], next: [], path: []}
-    ctx_x = %Zipper{focus: tree_x, prev: [], next: [], path: []}
+    z_x5 = %Zipper{focus: tree_x5, prev: [], next: [], path: []}
+    z_x25 = %Zipper{focus: tree_x25, prev: [], next: [], path: []}
+    z_x100 = %Zipper{focus: tree_x100, prev: [], next: [], path: []}
+    z_x = %Zipper{focus: tree_x, prev: [], next: [], path: []}
 
     all_trees_with_idx =
       [
@@ -68,15 +68,15 @@ defmodule RoseTree.ZipperCase do
       ]
       |> Enum.with_index()
 
-    all_contexts_with_idx =
+    all_zippers_with_idx =
       [
-        empty_ctx,
-        leaf_ctx,
-        simple_ctx,
-        ctx_x5,
-        ctx_x25,
-        ctx_x100,
-        ctx_x
+        empty_z,
+        leaf_z,
+        simple_z,
+        z_x5,
+        z_x25,
+        z_x100,
+        z_x
       ]
       |> Enum.with_index()
 
@@ -90,15 +90,15 @@ defmodule RoseTree.ZipperCase do
       tree_x5: tree_x5,
       tree_x25: tree_x25,
       tree_x100: tree_x100,
-      # contexts
-      all_contexts_with_idx: all_contexts_with_idx,
-      empty_ctx: empty_ctx,
-      leaf_ctx: leaf_ctx,
-      simple_ctx: simple_ctx,
-      ctx_x5: ctx_x5,
-      ctx_x25: ctx_x25,
-      ctx_x100: ctx_x100,
-      ctx_x: ctx_x
+      # zippers
+      all_zippers_with_idx: all_zippers_with_idx,
+      empty_z: empty_z,
+      leaf_z: leaf_z,
+      simple_z: simple_z,
+      z_x5: z_x5,
+      z_x25: z_x25,
+      z_x100: z_x100,
+      z_x: z_x
     }
   end
 end
