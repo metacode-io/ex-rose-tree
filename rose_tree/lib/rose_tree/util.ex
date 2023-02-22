@@ -35,6 +35,7 @@ defmodule RoseTree.Util do
       {:error, error} -> first_of(term, t)
       :error -> first_of(term, t)
       nil -> first_of(term, t)
+      false -> first_of(term, t)
       result -> result
     end
   end
@@ -70,6 +71,7 @@ defmodule RoseTree.Util do
       {:error, error} -> first_of_with_opts(term, t, opts)
       :error -> first_of_with_opts(term, t, opts)
       nil -> first_of_with_opts(term, t, opts)
+      false -> first_of_with_opts(term, t, opts)
       result -> result
     end
   end
@@ -104,6 +106,7 @@ defmodule RoseTree.Util do
       {:error, error} -> first_of_with_args(term, t, args)
       :error -> first_of_with_args(term, t, args)
       nil -> first_of_with_args(term, t, args)
+      false -> first_of_with_args(term, t, args)
       result -> result
     end
   end
