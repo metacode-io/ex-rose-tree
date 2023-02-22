@@ -7,7 +7,7 @@ defmodule RoseTree do
 
   @type t() :: %__MODULE__{
           term: term(),
-          children: [t() | nil]
+          children: [t()]
         }
 
   ###
