@@ -10,15 +10,27 @@ defmodule RoseTree do
           children: [t() | nil]
         }
 
+  ###
+  ### GUARDS
+  ###
+
+  @doc section: :guards
   defguard rose_tree?(value)
            when is_struct(value) and value.__struct__ == __MODULE__ and is_list(value.children)
 
+  @doc section: :guards
   defguard empty?(value) when rose_tree?(value) and value.term == nil and value.children == []
 
+  @doc section: :guards
   defguard leaf?(value) when rose_tree?(value) and value.children == []
 
+  @doc section: :guards
   defguard parent?(value)
            when rose_tree?(value) and is_list(value.children) and value.children != []
+
+  ###
+  ### BASIC
+  ###
 
   @doc """
   Initializes an empty tree.

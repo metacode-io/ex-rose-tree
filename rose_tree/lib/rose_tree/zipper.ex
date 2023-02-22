@@ -47,6 +47,7 @@ defmodule RoseTree.Zipper do
   ### GUARDS
   ###
 
+  @doc section: :guards
   defguard zipper?(value)
            when is_struct(value) and
                   value.__struct__ == __MODULE__ and
@@ -55,6 +56,7 @@ defmodule RoseTree.Zipper do
                   is_list(value.next) and
                   is_list(value.path)
 
+  @doc section: :guards
   defguard empty?(value)
            when zipper?(value) and
                   RoseTree.empty?(value.focus) and
@@ -62,17 +64,20 @@ defmodule RoseTree.Zipper do
                   value.next == [] and
                   value.path == []
 
+  @doc section: :guards
   defguard at_root?(value)
            when zipper?(value) and value.path == []
 
+  @doc section: :guards
   defguard has_children?(value)
            when zipper?(value) and not RoseTree.leaf?(value.focus)
 
+  @doc section: :guards
   defguard has_siblings?(value)
            when zipper?(value) and (value.prev != [] or value.next != [])
 
   ###
-  ### CORE
+  ### BASIC
   ###
 
   @doc """
@@ -89,6 +94,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :basic
   @spec empty() :: t()
   def empty() do
     %__MODULE__{
@@ -145,6 +151,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :basic
   @spec new(RoseTree.t(), keyword()) :: t()
   def new(focus, opts \\ [])
 
@@ -196,6 +203,7 @@ defmodule RoseTree.Zipper do
       true
 
   """
+  @doc section: :basic
   @spec root?(t()) :: boolean()
   def root?(%__MODULE__{path: []}), do: true
   def root?(_), do: false
@@ -211,6 +219,7 @@ defmodule RoseTree.Zipper do
       %RoseTree{term: 5, children: []}
 
   """
+  @doc section: :basic
   @spec current_focus(t()) :: RoseTree.t()
   def current_focus(%__MODULE__{focus: focus}),
     do: focus
@@ -231,6 +240,7 @@ defmodule RoseTree.Zipper do
       ]
 
   """
+  @doc section: :basic
   @spec focused_children(t()) :: [RoseTree.t()]
   def focused_children(%__MODULE__{focus: focus}),
     do: RoseTree.get_children(focus)
@@ -252,6 +262,7 @@ defmodule RoseTree.Zipper do
       ]
 
   """
+  @doc section: :basic
   @spec prev_siblings(t()) :: [RoseTree.t()]
   def prev_siblings(%__MODULE__{prev: prev}),
     do: Enum.reverse(prev)
@@ -273,6 +284,7 @@ defmodule RoseTree.Zipper do
       ]
 
   """
+  @doc section: :basic
   @spec next_siblings(t()) :: [RoseTree.t()]
   def next_siblings(%__MODULE__{next: next}),
     do: next
@@ -289,6 +301,7 @@ defmodule RoseTree.Zipper do
       4
 
   """
+  @doc section: :basic
   @spec depth_of_focus(t()) :: non_neg_integer()
   def depth_of_focus(%__MODULE__{path: path}),
     do: Enum.count(path)
@@ -306,6 +319,7 @@ defmodule RoseTree.Zipper do
       4
 
   """
+  @doc section: :basic
   @spec index_of_focus(t()) :: non_neg_integer()
   def index_of_focus(%__MODULE__{prev: prev}),
     do: Enum.count(prev)
@@ -325,6 +339,7 @@ defmodule RoseTree.Zipper do
       3
 
   """
+  @doc section: :basic
   @spec index_of_parent(t()) :: non_neg_integer() | nil
   def index_of_parent(%__MODULE__{path: []}), do: nil
 
@@ -347,6 +362,7 @@ defmodule RoseTree.Zipper do
       3
 
   """
+  @doc section: :basic
   @spec index_of_grandparent(t()) :: non_neg_integer() | nil
   def index_of_grandparent(%__MODULE__{path: []}), do: nil
 
@@ -367,6 +383,7 @@ defmodule RoseTree.Zipper do
       %RoseTree.Zipper.Location{prev: [], term: 4, next: []}
 
   """
+  @doc section: :basic
   @spec parent_location(t()) :: Location.t() | nil
   def parent_location(%__MODULE__{path: []}), do: nil
 
@@ -384,6 +401,7 @@ defmodule RoseTree.Zipper do
       4
 
   """
+  @doc section: :basic
   @spec parent_term(t()) :: RoseTree.t() | nil
   def parent_term(%__MODULE__{path: []}), do: nil
 
@@ -405,6 +423,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :basic
   @spec set_focus(t(), RoseTree.t()) :: t()
   def set_focus(z, new_focus)
 
@@ -428,6 +447,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :basic
   @spec map_focus(t(), (RoseTree.t() -> RoseTree.t())) :: t()
   def map_focus(%__MODULE__{focus: focus} = z, map_fn) when is_function(map_fn) do
     case map_fn.(focus) do
@@ -463,6 +483,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :basic
   @spec map_prev_siblings(t(), (RoseTree.t() -> RoseTree.t())) :: t()
   def map_prev_siblings(%__MODULE__{prev: prev} = z, map_fn) when is_function(map_fn) do
     new_siblings =
@@ -500,6 +521,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :basic
   @spec map_next_siblings(t(), (RoseTree.t() -> RoseTree.t())) :: t()
   def map_next_siblings(%__MODULE__{next: next} = z, map_fn) when is_function(map_fn) do
     new_siblings =
@@ -536,6 +558,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :basic
   @spec map_path(t(), (Location.t() -> Location.t())) :: t()
   def map_path(%__MODULE__{path: path} = z, map_fn) when is_function(map_fn) do
     new_locations =
@@ -570,6 +593,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :basic
   @spec new_location(t()) :: Location.t()
   def new_location(%__MODULE__{focus: focus, prev: prev, next: next}) do
     Location.new(focus, prev: prev, next: next)
@@ -601,6 +625,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :basic
   @spec from_locations([Location.t()]) :: t()
   def from_locations([%Location{} = loc | locs]) when Location.location?(loc) do
     loc.term
@@ -639,6 +664,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :ancestors
   @spec parent(t()) :: t() | nil
   def parent(%__MODULE__{path: []}), do: nil
 
@@ -657,6 +683,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the grandparent -- the parent of the parent -- of
   the focus, if possible. If there is no grandparent, returns nil.
   """
+  @doc section: :ancestors
   @spec grandparent(t()) :: t() | nil
   def grandparent(%__MODULE__{} = z) do
     with %__MODULE__{} = parent <- parent(z),
@@ -672,6 +699,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the great-grandparent -- parent of the grand-parent -- of
   the focus, if available. If there is no great-grandparent, returns nil.
   """
+  @doc section: :ancestors
   @spec great_grandparent(t()) :: t() | nil
   def great_grandparent(%__MODULE__{} = z) do
     with %__MODULE__{} = grandparent <- grandparent(z),
@@ -680,25 +708,6 @@ defmodule RoseTree.Zipper do
     else
       nil ->
         nil
-    end
-  end
-
-  @doc """
-  Searches the list of parents comparing at each step to the given predicate,
-  stopping either when the match is successful, or no more parents exist.
-  """
-  @spec find_parent(t(), predicate()) :: t() | nil
-  def find_parent(%__MODULE__{} = z, predicate) when is_function(predicate) do
-    case parent(z) do
-      nil ->
-        nil
-
-      %__MODULE__{} = parent ->
-        if predicate.(parent) do
-          parent
-        else
-          find_parent(parent, predicate)
-        end
     end
   end
 
@@ -741,6 +750,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :descendants
   @spec first_child(t(), predicate()) :: t() | nil
   def first_child(zipper, predicate \\ &Util.always/1)
 
@@ -787,6 +797,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :descendants
   @spec last_child(t(), predicate()) :: t() | nil
   def last_child(zipper, predicate \\ &Util.always/1)
 
@@ -835,6 +846,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :descendants
   @spec child_at(t(), non_neg_integer()) :: t() | nil
   def child_at(%__MODULE__{focus: focus}, _index)
       when RoseTree.empty?(focus) or RoseTree.leaf?(focus),
@@ -864,6 +876,7 @@ defmodule RoseTree.Zipper do
   child. This repeats until the first grandchild is found or it returns
   nil if none are found.
   """
+  @doc section: :descendants
   @spec first_grandchild(t(), predicate()) :: t() | nil
   def first_grandchild(zipper, predicate \\ &Util.always/1)
 
@@ -898,6 +911,7 @@ defmodule RoseTree.Zipper do
   child. This repeats until the first grandchild is found or it returns
   nil if none are found.
   """
+  @doc section: :descendants
   @spec last_grandchild(t(), predicate()) :: t() | nil
   def last_grandchild(zipper, predicate \\ &Util.always/1)
 
@@ -932,6 +946,7 @@ defmodule RoseTree.Zipper do
   child. This repeats until the first great-grandchild is found or it returns
   nil if none are found.
   """
+  @doc section: :descendants
   @spec first_great_grandchild(t(), predicate()) :: t() | nil
   def first_great_grandchild(zipper, predicate \\ &Util.always/1)
 
@@ -967,6 +982,7 @@ defmodule RoseTree.Zipper do
   last child. This repeats until the last great-grandchild is found or it
   returns nil if none are found.
   """
+  @doc section: :descendants
   @spec last_great_grandchild(t(), predicate()) :: t() | nil
   def last_great_grandchild(zipper, predicate \\ &Util.always/1)
 
@@ -997,8 +1013,10 @@ defmodule RoseTree.Zipper do
 
   @doc """
   Descend the right-most edge until it can go no further or until
-  the optional predicate matches.
+  the optional predicate matches. Does not include siblings of
+  starting focus.
   """
+  @doc section: :descendants
   @spec rightmost_descendant(t(), predicate()) :: t() | nil
   def rightmost_descendant(zipper, predicate \\ nil)
 
@@ -1039,8 +1057,10 @@ defmodule RoseTree.Zipper do
 
   @doc """
   Descend the left-most edge until it can go no further or until
-  the optional predicate matches.
+  the optional predicate matches. Does not include siblings of
+  starting focus.
   """
+  @doc section: :descendants
   @spec leftmost_descendant(t(), predicate()) :: t() | nil
   def leftmost_descendant(zipper, predicate \\ nil)
 
@@ -1111,6 +1131,7 @@ defmodule RoseTree.Zipper do
     }
 
   """
+  @doc section: :siblings
   @spec first_sibling(t(), predicate()) :: t() | nil
   def first_sibling(zipper, predicate \\ &Util.always/1)
 
@@ -1163,6 +1184,7 @@ defmodule RoseTree.Zipper do
     }
 
   """
+  @doc section: :siblings
   @spec previous_sibling(t(), predicate()) :: t() | nil
   def previous_sibling(zipper, predicate \\ &Util.always/1)
 
@@ -1212,6 +1234,7 @@ defmodule RoseTree.Zipper do
     }
 
   """
+  @doc section: :siblings
   @spec last_sibling(t(), predicate()) :: t() | nil
   def last_sibling(zipper, predicate \\ &Util.always/1)
 
@@ -1264,6 +1287,7 @@ defmodule RoseTree.Zipper do
     }
 
   """
+  @doc section: :siblings
   @spec next_sibling(t(), predicate()) :: t() | nil
   def next_sibling(zipper, predicate \\ &Util.always/1)
 
@@ -1315,6 +1339,7 @@ defmodule RoseTree.Zipper do
       }
 
   """
+  @doc section: :siblings
   @spec sibling_at(t(), non_neg_integer()) :: t() | nil
   def sibling_at(%__MODULE__{prev: [], next: []} = z, index), do: nil
 
@@ -1350,6 +1375,7 @@ defmodule RoseTree.Zipper do
   first sibling with children -- before the current focus. If not
   found, returns nil.
   """
+  @doc section: :niblings
   @spec first_nibling(t(), predicate()) :: t() | nil
   def first_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate) do
     with %__MODULE__{} = first_sibling <- first_sibling(z, &RoseTree.parent?/1),
@@ -1366,6 +1392,7 @@ defmodule RoseTree.Zipper do
   last sibling  with children -- before the current focus. If not
   found, returns nil.
   """
+  @doc section: :niblings
   @spec last_nibling(t(), predicate()) :: t() | nil
   def last_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate) do
     with %__MODULE__{} = last_sibling <- last_sibling(z, &RoseTree.parent?/1),
@@ -1382,6 +1409,7 @@ defmodule RoseTree.Zipper do
   first previous sibling with children -- before the current focus.
   If not found, returns nil.
   """
+  @doc section: :niblings
   @spec previous_nibling(t(), predicate()) :: t() | nil
   def previous_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1399,6 +1427,7 @@ defmodule RoseTree.Zipper do
   first next sibling with children -- before the current focus.
   If not found, returns nil.
   """
+  @doc section: :niblings
   @spec next_nibling(t(), predicate()) :: t() | nil
   def next_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate) do
     with %__MODULE__{} = next_sibling <- next_sibling(z, &RoseTree.parent?/1),
@@ -1415,6 +1444,7 @@ defmodule RoseTree.Zipper do
   first child of the sibling at the given index -- of the current focus.
   If not found, returns nil.
   """
+  @doc section: :niblings
   @spec first_nibling_at_sibling(t(), non_neg_integer(), predicate()) :: t() | nil
   def first_nibling_at_sibling(%__MODULE__{} = z, index, predicate \\ &Util.always/1)
       when is_integer(index) and is_function(predicate) do
@@ -1432,6 +1462,7 @@ defmodule RoseTree.Zipper do
   last child of the sibling at the given index -- of the current focus.
   If not found, returns nil.
   """
+  @doc section: :niblings
   @spec last_nibling_at_sibling(t(), non_neg_integer(), predicate()) :: t() | nil
   def last_nibling_at_sibling(%__MODULE__{} = z, index, predicate \\ &Util.always/1)
       when is_integer(index) and is_function(predicate) do
@@ -1448,6 +1479,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the previous grand-nibling -- the last grandchild of
   the previous sibling -- of the current focus. If not found, returns nil.
   """
+  @doc section: :niblings
   @spec previous_grandnibling(t(), predicate()) :: t() | nil
   def previous_grandnibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1474,6 +1506,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the next grand-nibling -- the first grandchild of
   the next sibling -- of the current focus. If not found, returns nil.
   """
+  @doc section: :niblings
   @spec next_grandnibling(t(), predicate()) :: t() | nil
   def next_grandnibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1503,6 +1536,7 @@ defmodule RoseTree.Zipper do
   "descendant nibling"). It will repeat the search if one is found, and it will
   continue until no more are found, returning the last one visited.
   """
+  @doc section: :niblings
   @spec first_descendant_nibling(t(), predicate()) :: t() | nil
   def first_descendant_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1539,6 +1573,7 @@ defmodule RoseTree.Zipper do
   "descendant nibling"). It will repeat the search if one is found, and it will
   continue until no more are found, returning the last one visited.
   """
+  @doc section: :niblings
   @spec last_descendant_nibling(t(), predicate()) :: t() | nil
   def last_descendant_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1575,6 +1610,7 @@ defmodule RoseTree.Zipper do
   "descendant nibling"). It will repeat the search if one is found, and it will
   continue until no more are found, returning the last one visited.
   """
+  @doc section: :niblings
   @spec previous_descendant_nibling(t(), predicate()) :: t() | nil
   def previous_descendant_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1611,6 +1647,7 @@ defmodule RoseTree.Zipper do
   "descendant nibling"). It will repeat the search if one is found, and it will
   continue until no more are found, returning the last one visited.
   """
+  @doc section: :niblings
   @spec next_descendant_nibling(t(), predicate()) :: t() | nil
   def next_descendant_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1644,6 +1681,7 @@ defmodule RoseTree.Zipper do
   Searches for the first child of the first extended cousin--aka, the first
   extended nibling--of the focused tree.
   """
+  @doc section: :niblings
   @spec first_extended_nibling(t(), predicate()) :: t() | nil
   def first_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = first_extended_cousin <-
@@ -1659,6 +1697,7 @@ defmodule RoseTree.Zipper do
   Searches for the last child of the last extended cousin--aka, the last
   extended nibling--of the focused tree.
   """
+  @doc section: :niblings
   @spec last_extended_nibling(t(), predicate()) :: t() | nil
   def last_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = last_extended_cousin <- last_extended_cousin(z, &has_children?/1),
@@ -1673,6 +1712,7 @@ defmodule RoseTree.Zipper do
   Searches for the last child of the previous extended cousin--aka, the previous
   extended nibling--of the focused tree.
   """
+  @doc section: :niblings
   @spec previous_extended_nibling(t(), predicate()) :: t() | nil
   def previous_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = prev_extended_cousin <-
@@ -1688,6 +1728,7 @@ defmodule RoseTree.Zipper do
   Searches for the first child of the next extended cousin--aka, the next
   extended nibling--of the focused tree.
   """
+  @doc section: :niblings
   @spec next_extended_nibling(t(), predicate()) :: t() | nil
   def next_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = next_extended_cousin <- next_extended_cousin(z, &has_children?/1),
@@ -1706,6 +1747,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the first pibling -- the first sibling of the parent --
   of the current focus. If not found, returns nil.
   """
+  @doc section: :piblings
   @spec first_pibling(t(), predicate()) :: t() | nil
   def first_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate) do
     with %__MODULE__{} = parent <- parent(z),
@@ -1721,6 +1763,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the last pibling -- the last sibling of the parent --
   of the current focus. If not found, returns nil.
   """
+  @doc section: :piblings
   @spec last_pibling(t(), predicate()) :: t() | nil
   def last_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate) do
     with %__MODULE__{} = parent <- parent(z),
@@ -1736,6 +1779,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the previous pibling -- the previous sibling of the parent --
   of the current focus. If not found, returns nil.
   """
+  @doc section: :piblings
   @spec previous_pibling(t(), predicate()) :: t() | nil
   def previous_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1752,6 +1796,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the next pibling -- the next sibling of the parent --
   of the current focus. If not found, returns nil.
   """
+  @doc section: :piblings
   @spec next_pibling(t(), predicate()) :: t() | nil
   def next_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate) do
     with %__MODULE__{} = parent <- parent(z),
@@ -1767,6 +1812,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the pibling of the current focus at the given index.
   If no pibling is found at that index, returns nil.
   """
+  @doc section: :piblings
   @spec pibling_at(t(), non_neg_integer()) :: t() | nil
   def pibling_at(%__MODULE__{} = z, index) when is_integer(index) do
     with %__MODULE__{} = parent <- parent(z),
@@ -1782,6 +1828,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the first grandpibling -- the first sibling of the grandparent --
   of the current focus. If not found, returns nil.
   """
+  @doc section: :piblings
   @spec first_grandpibling(t(), predicate()) :: t() | nil
   def first_grandpibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1798,6 +1845,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the last grandpibling -- the last sibling of the grandparent --
   of the current focus. If not found, returns nil.
   """
+  @doc section: :piblings
   @spec last_grandpibling(t(), predicate()) :: t() | nil
   def last_grandpibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1814,6 +1862,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the previous grandpibling -- the previous sibling of the grandparent --
   of the current focus. If not found, returns nil.
   """
+  @doc section: :piblings
   @spec previous_grandpibling(t(), predicate()) :: t() | nil
   def previous_grandpibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1830,6 +1879,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the next grandpibling -- the next sibling of the grandparent --
   of the current focus. If not found, returns nil.
   """
+  @doc section: :piblings
   @spec next_grandpibling(t(), predicate()) :: t() | nil
   def next_grandpibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1849,6 +1899,7 @@ defmodule RoseTree.Zipper do
   Note: Extended Pibling here really means parent-cousin n-times removed,
   and is a bit of a neolism, since pibling technically means parent-sibling.
   """
+  @doc section: :piblings
   @spec first_extended_pibling(t(), predicate()) :: t() | nil
   def first_extended_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = parent <- parent(z),
@@ -1866,6 +1917,7 @@ defmodule RoseTree.Zipper do
   Note: Extended Pibling here really means parent-cousin n-times removed,
   and is a bit of a neolism, since pibling technically means parent-sibling.
   """
+  @doc section: :piblings
   @spec last_extended_pibling(t(), predicate()) :: t() | nil
   def last_extended_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = parent <- parent(z),
@@ -1883,6 +1935,7 @@ defmodule RoseTree.Zipper do
   Note: Extended Pibling here really means parent-cousin n-times removed,
   and is a bit of a neolism, since pibling technically means parent-sibling.
   """
+  @doc section: :piblings
   @spec previous_extended_pibling(t(), predicate()) :: t() | nil
   def previous_extended_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = parent <- parent(z),
@@ -1900,6 +1953,7 @@ defmodule RoseTree.Zipper do
   Note: Extended Pibling here really means parent-cousin n-times removed,
   and is a bit of a neolism, since pibling technically means parent-sibling.
   """
+  @doc section: :piblings
   @spec next_extended_pibling(t(), predicate()) :: t() | nil
   def next_extended_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = parent <- parent(z),
@@ -1917,6 +1971,7 @@ defmodule RoseTree.Zipper do
   until it reaches the root. If the root is reached and it does not have a first pibling,
   the function returns nil.
   """
+  @doc section: :piblings
   @spec first_ancestral_pibling(t(), predicate()) :: t() | nil
   def first_ancestral_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1940,6 +1995,7 @@ defmodule RoseTree.Zipper do
   until it reaches the root. If the root is reached and it does not have a previous pibling,
   the function returns nil.
   """
+  @doc section: :piblings
   @spec previous_ancestral_pibling(t(), predicate()) :: t() | nil
   def previous_ancestral_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1963,6 +2019,7 @@ defmodule RoseTree.Zipper do
   until it reaches the root. If the root is reached and it does not have a next pibling,
   the function returns nil.
   """
+  @doc section: :piblings
   @spec next_ancestral_pibling(t(), predicate()) :: t() | nil
   def next_ancestral_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -1986,6 +2043,7 @@ defmodule RoseTree.Zipper do
   until it reaches the root. If the root is reached and it does not have a last pibling,
   the function returns nil.
   """
+  @doc section: :piblings
   @spec last_ancestral_pibling(t(), predicate()) :: t() | nil
   def last_ancestral_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -2010,6 +2068,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the first first-cousin -- the first child of the first
   pibling with children -- of the current focus. If not found, returns nil.
   """
+  @doc section: :first_cousins
   @spec first_first_cousin(t(), predicate()) :: t() | nil
   def first_first_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -2046,6 +2105,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the last first-cousin -- the last child of the last
   pibling with children -- of the current focus. If not found, returns nil.
   """
+  @doc section: :first_cousins
   @spec last_first_cousin(t(), predicate()) :: t() | nil
   def last_first_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -2082,6 +2142,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the previous first-cousin -- the last child of the
   previous pibling with children -- of the current focus. If not found, returns nil.
   """
+  @doc section: :first_cousins
   @spec previous_first_cousin(t(), predicate()) :: t() | nil
   def previous_first_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -2113,6 +2174,7 @@ defmodule RoseTree.Zipper do
   Moves the focus to the next first-cousin -- the first child of the
   next pibling with children -- of the current focus. If not found, returns nil.
   """
+  @doc section: :first_cousins
   @spec next_first_cousin(t(), predicate()) :: t() | nil
   def next_first_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -2149,6 +2211,7 @@ defmodule RoseTree.Zipper do
   the first grandpibling with grandchildren -- of the current focus. If not
   found, returns nil.
   """
+  @doc section: :second_cousins
   @spec first_second_cousin(t(), predicate()) :: t() | nil
   def first_second_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -2181,6 +2244,12 @@ defmodule RoseTree.Zipper do
     end
   end
 
+  @doc """
+  Moves the focus to the last second-cousin -- the last grandchild of
+  the last grandpibling with grandchildren -- of the current focus. If not
+  found, returns nil.
+  """
+  @doc section: :second_cousins
   @spec last_second_cousin(t(), predicate()) :: t() | nil
   def last_second_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -2213,6 +2282,11 @@ defmodule RoseTree.Zipper do
     end
   end
 
+  @doc """
+  Moves the focus to the previous second-cousin -- the last grandchild of the
+  previous grandpibling with grandchildren -- of the current focus. If not found, returns nil.
+  """
+  @doc section: :second_cousins
   @spec previous_second_cousin(t(), predicate()) :: t() | nil
   def previous_second_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -2240,6 +2314,11 @@ defmodule RoseTree.Zipper do
 
   defp do_previous_second_cousin(nil, _predicate), do: nil
 
+  @doc """
+  Moves the focus to the next second-cousin -- the first grandchild of the
+  next grandpibling with grandchildren -- of the current focus. If not found, returns nil.
+  """
+  @doc section: :second_cousins
   @spec next_second_cousin(t(), predicate()) :: t() | nil
   def next_second_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -2285,6 +2364,7 @@ defmodule RoseTree.Zipper do
   4. If you return back to starting Location, and it is also the ending Location,
       and you have not found a suitable note at the right depth, you will not find one.
   """
+  @doc section: :extended_cousins
   @spec first_extended_cousin(t(), keyword()) :: t() | nil
   def first_extended_cousin(z, predicate \\ &Util.always/1)
 
@@ -2320,7 +2400,7 @@ defmodule RoseTree.Zipper do
   end
 
   @spec first_extended_cousin_starting_point(t()) :: {t(), non_neg_integer()}
-  def first_extended_cousin_starting_point(%__MODULE__{} = z) do
+  defp first_extended_cousin_starting_point(%__MODULE__{} = z) do
     {_root, {candidate_depth, candidate_z, path_details}} =
       accumulate_to_root(z, {0, nil, []}, fn
         %__MODULE__{prev: []} = next_z, {candidate_depth, candidate_z, details} ->
@@ -2652,6 +2732,7 @@ defmodule RoseTree.Zipper do
   @doc """
   Searches for the last extended cousin or the last first-cousin of the focused tree.
   """
+  @doc section: :extended_cousins
   @spec last_extended_cousin(t(), keyword()) :: t() | nil
   def last_extended_cousin(z, predicate \\ &Util.always/1)
 
@@ -2689,7 +2770,7 @@ defmodule RoseTree.Zipper do
   end
 
   @spec last_extended_cousin_starting_point(t()) :: {t(), non_neg_integer()}
-  def last_extended_cousin_starting_point(%__MODULE__{} = z) do
+  defp last_extended_cousin_starting_point(%__MODULE__{} = z) do
     {_root, {candidate_depth, candidate_z, path_details}} =
       accumulate_to_root(z, {0, nil, []}, fn
         %__MODULE__{next: []} = next_z, {candidate_depth, candidate_z, details} ->
@@ -3023,6 +3104,7 @@ defmodule RoseTree.Zipper do
   @doc """
   Searches for the previous extended cousin or the previous first-cousin of the focused tree.
   """
+  @doc section: :extended_cousins
   @spec previous_extended_cousin(t(), keyword()) :: t() | nil
   def previous_extended_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -3148,6 +3230,7 @@ defmodule RoseTree.Zipper do
   @doc """
   Searches for the next extended cousin or the next first-cousin of the focused tree.
   """
+  @doc section: :extended_cousins
   @spec next_extended_cousin(t(), keyword()) :: t() | nil
   def next_extended_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
@@ -3159,7 +3242,7 @@ defmodule RoseTree.Zipper do
 
   @spec find_next_extended_cousin(t(), non_neg_integer(), predicate()) ::
           t() | nil
-  def find_next_extended_cousin(%__MODULE__{} = z, target_depth, predicate) do
+  defp find_next_extended_cousin(%__MODULE__{} = z, target_depth, predicate) do
     case next_ancestral_pibling(z, &RoseTree.parent?/1) do
       nil ->
         nil
@@ -3288,6 +3371,7 @@ defmodule RoseTree.Zipper do
       true
 
   """
+  @doc section: :traversal
   @spec to_root(t()) :: t()
   def to_root(%__MODULE__{} = z) do
     case parent(z) do
@@ -3304,6 +3388,7 @@ defmodule RoseTree.Zipper do
   provided `acc_fn`. Returns a tuple including the root Zipper and the accumulated
   value.
   """
+  @doc section: :traversal
   @spec accumulate_to_root(t(), term(), (t(), term() -> term())) ::
           {t(), term()}
   def accumulate_to_root(%__MODULE__{} = z, acc, acc_fn) do
@@ -3332,6 +3417,7 @@ defmodule RoseTree.Zipper do
       3
 
   """
+  @doc section: :traversal
   @spec move_for(
           t(),
           pos_integer(),
@@ -3361,6 +3447,7 @@ defmodule RoseTree.Zipper do
   @doc """
   Traverses forward through the zipper in a breadth-first manner.
   """
+  @doc section: :breadth_first
   @spec forward(t()) :: t() | nil
   def forward(%__MODULE__{} = z) do
     funs = [
@@ -3378,6 +3465,7 @@ defmodule RoseTree.Zipper do
   @doc """
   Repeats a call to `forward/1` by the given number of `reps`.
   """
+  @doc section: :breadth_first
   @spec forward_for(t(), pos_integer()) :: t() | nil
   def forward_for(%__MODULE__{} = z, reps) when reps > 0,
     do: move_for(z, reps, &forward/1)
@@ -3389,6 +3477,7 @@ defmodule RoseTree.Zipper do
   returns true when applied to the next  Otherwise,
   returns nil.
   """
+  @doc section: :breadth_first
   @spec forward_if(t(), predicate()) :: t() | nil
   def forward_if(%__MODULE__{} = z, predicate) when is_function(predicate) do
     case forward(z) do
@@ -3409,6 +3498,7 @@ defmodule RoseTree.Zipper do
   function returns true when applied to the  Otherwise,
   returns nil.
   """
+  @doc section: :breadth_first
   @spec forward_until(t(), predicate()) :: t() | nil
   def forward_until(%__MODULE__{} = z, predicate) when is_function(predicate) do
     case forward(z) do
@@ -3431,6 +3521,7 @@ defmodule RoseTree.Zipper do
   @doc """
   Traverses backward through the zipper in a breadth-first manner.
   """
+  @doc section: :breadth_first
   @spec backward(t()) :: t()
   def backward(%__MODULE__{path: []}), do: nil
 
@@ -3449,6 +3540,7 @@ defmodule RoseTree.Zipper do
   @doc """
   Repeats a call to `backward/1` by the given number of `reps`.
   """
+  @doc section: :breadth_first
   @spec backward_for(t(), pos_integer()) :: t() | nil
   def backward_for(%__MODULE__{} = z, reps) when reps > 0,
     do: move_for(z, reps, &backward/1)
@@ -3460,6 +3552,7 @@ defmodule RoseTree.Zipper do
   returns true when applied to the next  Otherwise,
   returns nil.
   """
+  @doc section: :breadth_first
   @spec backward_if(t(), predicate()) :: t() | nil
   def backward_if(%__MODULE__{} = z, predicate) when is_function(predicate) do
     case backward(z) do
@@ -3480,6 +3573,7 @@ defmodule RoseTree.Zipper do
   function returns true when applied to the  Otherwise,
   returns nil.
   """
+  @doc section: :breadth_first
   @spec backward_until(t(), predicate()) :: t() | nil
   def backward_until(%__MODULE__{} = z, predicate) when is_function(predicate) do
     case backward(z) do
@@ -3502,6 +3596,7 @@ defmodule RoseTree.Zipper do
   @doc """
   Traverses forward through the zipper in a depth-first manner.
   """
+  @doc section: :depth_first
   @spec descend(t()) :: t() | nil
   def descend(%__MODULE__{} = z) do
     funs = [
@@ -3517,6 +3612,7 @@ defmodule RoseTree.Zipper do
   @doc """
   Repeats a call to `descend/1` by the given number of `reps`.
   """
+  @doc section: :depth_first
   @spec descend_for(t(), pos_integer()) :: t() | nil
   def descend_for(%__MODULE__{} = z, reps) when reps > 0,
     do: move_for(z, reps, &descend/1)
@@ -3528,6 +3624,7 @@ defmodule RoseTree.Zipper do
   returns true when applied to the next  Otherwise,
   returns nil.
   """
+  @doc section: :depth_first
   @spec descend_if(t(), predicate()) :: t() | nil
   def descend_if(%__MODULE__{} = z, predicate) when is_function(predicate) do
     case descend(z) do
@@ -3548,6 +3645,7 @@ defmodule RoseTree.Zipper do
   function returns true when applied to the  Otherwise,
   returns nil.
   """
+  @doc section: :depth_first
   @spec descend_until(t(), predicate()) :: t() | nil
   def descend_until(%__MODULE__{} = z, predicate) when is_function(predicate) do
     case descend(z) do
@@ -3570,6 +3668,7 @@ defmodule RoseTree.Zipper do
   @doc """
   Traverses back through the zipper in a depth-first manner.
   """
+  @doc section: :depth_first
   @spec ascend(t()) :: t()
   def ascend(%__MODULE__{} = z) do
     funs = [
@@ -3585,6 +3684,7 @@ defmodule RoseTree.Zipper do
   @doc """
   Repeats a call to `ascend/1` by the given number of `reps`.
   """
+  @doc section: :depth_first
   @spec ascend_for(t(), pos_integer()) :: t() | nil
   def ascend_for(%__MODULE__{} = z, reps) when reps > 0,
     do: move_for(z, reps, &ascend/1)
@@ -3596,6 +3696,7 @@ defmodule RoseTree.Zipper do
   returns true when applied to the next  Otherwise,
   returns nil.
   """
+  @doc section: :depth_first
   @spec ascend_if(t(), predicate()) :: t() | nil
   def ascend_if(%__MODULE__{} = z, predicate) when is_function(predicate) do
     case ascend(z) do
@@ -3616,6 +3717,7 @@ defmodule RoseTree.Zipper do
   function returns true when applied to the  Otherwise,
   returns nil.
   """
+  @doc section: :depth_first
   @spec ascend_until(t(), predicate()) :: t() | nil
   def ascend_until(%__MODULE__{} = z, predicate) when is_function(predicate) do
     case ascend(z) do
@@ -3639,6 +3741,7 @@ defmodule RoseTree.Zipper do
   Using the designated move function, `move_fn`, searches for the first
   tree that satisfies the given `predicate` function.
   """
+  @doc section: :searching
   @spec find(
           t(),
           (t() -> boolean()),
@@ -3660,4 +3763,25 @@ defmodule RoseTree.Zipper do
   end
 
   def find(%__MODULE__{}, _predicate, _move_fn), do: nil
+
+
+  @doc """
+  Searches the list of parents comparing at each step to the given predicate,
+  stopping either when the match is successful, or no more parents exist.
+  """
+  @doc section: :searching
+  @spec find_parent(t(), predicate()) :: t() | nil
+  def find_parent(%__MODULE__{} = z, predicate) when is_function(predicate) do
+    case parent(z) do
+      nil ->
+        nil
+
+      %__MODULE__{} = parent ->
+        if predicate.(parent) do
+          parent
+        else
+          find_parent(parent, predicate)
+        end
+    end
+  end
 end
