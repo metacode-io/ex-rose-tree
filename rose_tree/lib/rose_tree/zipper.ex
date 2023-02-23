@@ -21,8 +21,9 @@ defmodule RoseTree.Zipper do
   ]
 
   @typedoc """
-  The Zipper struct represents a contextual position within a RoseTree. It
-  includes the following important pieces:
+  The Zipper struct represents a contextual position within a `RoseTree`.
+
+  It includes the following important pieces:
   * `focus` - the current _focus_ or _context_ within the `RoseTree.Zipper`. Its
     type is that of a `RoseTree`.
   * `prev` - all siblings occurring before the current `focus`. It's type is a list of
