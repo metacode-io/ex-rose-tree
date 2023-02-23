@@ -226,71 +226,6 @@ defmodule RoseTree.Zipper do
     do: focus
 
   @doc """
-  Returns the children of the Zipper's current focus.
-
-  ## Examples
-
-      iex> tree = RoseTree.new(5, [4,3,2,1])
-      ...> z = RoseTree.Zipper.new(tree)
-      ...> RoseTree.Zipper.focused_children(z)
-      [
-        %RoseTree{term: 4, children: []},
-        %RoseTree{term: 3, children: []},
-        %RoseTree{term: 2, children: []},
-        %RoseTree{term: 1, children: []}
-      ]
-
-  """
-  @doc section: :basic
-  @spec focused_children(t()) :: [RoseTree.t()]
-  def focused_children(%__MODULE__{focus: focus}),
-    do: RoseTree.get_children(focus)
-
-  @doc """
-  Returns the siblings that come before the current focus.
-
-  ## Examples
-
-      iex> prev = for t <- [1,2,3,4], do: RoseTree.new(t)
-      ...> tree = RoseTree.new(5)
-      ...> z = RoseTree.Zipper.new(tree, prev: prev)
-      ...> RoseTree.Zipper.prev_siblings(z)
-      [
-        %RoseTree{term: 4, children: []},
-        %RoseTree{term: 3, children: []},
-        %RoseTree{term: 2, children: []},
-        %RoseTree{term: 1, children: []}
-      ]
-
-  """
-  @doc section: :basic
-  @spec prev_siblings(t()) :: [RoseTree.t()]
-  def prev_siblings(%__MODULE__{prev: prev}),
-    do: Enum.reverse(prev)
-
-  @doc """
-  Returns the siblings that come after the current focus.
-
-  ## Examples
-
-      iex> next = for t <- [6,7,8,9], do: RoseTree.new(t)
-      ...> tree = RoseTree.new(5)
-      ...> z = RoseTree.Zipper.new(tree, next: next)
-      ...> RoseTree.Zipper.next_siblings(z)
-      [
-        %RoseTree{term: 6, children: []},
-        %RoseTree{term: 7, children: []},
-        %RoseTree{term: 8, children: []},
-        %RoseTree{term: 9, children: []}
-      ]
-
-  """
-  @doc section: :basic
-  @spec next_siblings(t()) :: [RoseTree.t()]
-  def next_siblings(%__MODULE__{next: next}),
-    do: next
-
-  @doc """
   Returns the depth (as zero-based index) of the current focus.
 
   ## Examples
@@ -324,89 +259,6 @@ defmodule RoseTree.Zipper do
   @spec index_of_focus(t()) :: non_neg_integer()
   def index_of_focus(%__MODULE__{prev: prev}),
     do: Enum.count(prev)
-
-  @doc """
-  Returns the index (zero-based) of the current focus' parent with
-  respect to any potentital siblings it may have. If the current
-  focus has no parent, returns nil.
-
-  ## Examples
-
-      iex> parent_siblings = for n <- [3,2,1], do: RoseTree.new(n)
-      ...> parent_loc = RoseTree.Zipper.Location.new(4, prev: parent_siblings)
-      ...> tree = RoseTree.new(5)
-      ...> z = RoseTree.Zipper.new(tree, path: [parent_loc])
-      ...> RoseTree.Zipper.index_of_parent(z)
-      3
-
-  """
-  @doc section: :basic
-  @spec index_of_parent(t()) :: non_neg_integer() | nil
-  def index_of_parent(%__MODULE__{path: []}), do: nil
-
-  def index_of_parent(%__MODULE__{path: [parent | _]}),
-    do: Location.index_of_term(parent)
-
-  @doc """
-  Returns the index (zero-based) of the current focus' grandparent with
-  respect to any potentital siblings it may have. If the current
-  focus has no grandparent, returns nil.
-
-  ## Examples
-
-      iex> grandparent_siblings = for n <- [3,2,1], do: RoseTree.new(n)
-      ...> grandparent_loc = RoseTree.Zipper.Location.new(4, prev: grandparent_siblings)
-      ...> parent_loc = RoseTree.Zipper.Location.new(5)
-      ...> tree = RoseTree.new(6)
-      ...> z = RoseTree.Zipper.new(tree, path: [parent_loc, grandparent_loc])
-      ...> RoseTree.Zipper.index_of_grandparent(z)
-      3
-
-  """
-  @doc section: :basic
-  @spec index_of_grandparent(t()) :: non_neg_integer() | nil
-  def index_of_grandparent(%__MODULE__{path: []}), do: nil
-
-  def index_of_grandparent(%__MODULE__{path: [_parent | []]}), do: nil
-
-  def index_of_grandparent(%__MODULE__{path: [_parent | [grandparent | _]]}),
-    do: Location.index_of_term(grandparent)
-
-  @doc """
-  Returns the current zipper's parent location.
-
-  ## Examples
-      iex> loc_trees = for n <- [4,3,2,1], do: RoseTree.new(n)
-      ...> locs = for n <- loc_trees, do: RoseTree.Zipper.Location.new(n)
-      ...> tree = RoseTree.new(5)
-      ...> z = RoseTree.Zipper.new(tree, path: locs)
-      ...> RoseTree.Zipper.parent_location(z)
-      %RoseTree.Zipper.Location{prev: [], term: 4, next: []}
-
-  """
-  @doc section: :basic
-  @spec parent_location(t()) :: Location.t() | nil
-  def parent_location(%__MODULE__{path: []}), do: nil
-
-  def parent_location(%__MODULE__{path: [parent | _]}), do: parent
-
-  @doc """
-  Returns the term in the current zipper's parent location.
-
-  ## Examples
-      iex> loc_trees = for n <- [4,3,2,1], do: RoseTree.new(n)
-      ...> locs = for n <- loc_trees, do: RoseTree.Zipper.Location.new(n)
-      ...> tree = RoseTree.new(5)
-      ...> z = RoseTree.Zipper.new(tree, path: locs)
-      ...> RoseTree.Zipper.parent_term(z)
-      4
-
-  """
-  @doc section: :basic
-  @spec parent_term(t()) :: RoseTree.t() | nil
-  def parent_term(%__MODULE__{path: []}), do: nil
-
-  def parent_term(%__MODULE__{path: [parent | _]}), do: parent.term
 
   @doc """
   Sets the current focus of the zipper to the given RoseTree.
@@ -457,82 +309,6 @@ defmodule RoseTree.Zipper do
 
       _ ->
         raise ArgumentError, "map_fn must return a valid RoseTree struct"
-    end
-  end
-
-  @doc """
-  Applies the given function to all previous siblings of the current focus without
-  moving the zipper.
-
-  ## Examples
-
-      iex> prev = for n <- [4,3,2,1], do: RoseTree.new(n)
-      ...> tree = RoseTree.new(5)
-      ...> z = RoseTree.Zipper.new(tree, prev: prev)
-      ...> map_fn = &RoseTree.map_term(&1, fn term -> term * 2 end)
-      ...> RoseTree.Zipper.map_prev_siblings(z, &map_fn.(&1))
-      %RoseTree.Zipper{
-        focus: %RoseTree{term: 5, children: []},
-        prev: [
-          %RoseTree{term: 8, children: []},
-          %RoseTree{term: 6, children: []},
-          %RoseTree{term: 4, children: []},
-          %RoseTree{term: 2, children: []}
-        ],
-        next: [],
-        path: []
-      }
-
-  """
-  @doc section: :basic
-  @spec map_prev_siblings(t(), (RoseTree.t() -> RoseTree.t())) :: t()
-  def map_prev_siblings(%__MODULE__{prev: prev} = z, map_fn) when is_function(map_fn) do
-    new_siblings =
-      prev
-      |> Enum.map(fn sibling -> map_fn.(sibling) end)
-
-    if RoseTree.all_rose_trees?(new_siblings) do
-      %{z | prev: new_siblings}
-    else
-      raise ArgumentError, "map_fn must return a valid RoseTree struct"
-    end
-  end
-
-  @doc """
-  Applies the given function to all next siblings of the current focus without
-  moving the zipper.
-
-  ## Examples
-
-      iex> next = for n <- [6,7,8,9], do: RoseTree.new(n)
-      ...> tree = RoseTree.new(5)
-      ...> z = RoseTree.Zipper.new(tree, next: next)
-      ...> map_fn = &RoseTree.map_term(&1, fn term -> term * 2 end)
-      ...> RoseTree.Zipper.map_next_siblings(z, &map_fn.(&1))
-      %RoseTree.Zipper{
-        focus: %RoseTree{term: 5, children: []},
-        prev: [],
-        next: [
-          %RoseTree{term: 12, children: []},
-          %RoseTree{term: 14, children: []},
-          %RoseTree{term: 16, children: []},
-          %RoseTree{term: 18, children: []}
-        ],
-        path: []
-      }
-
-  """
-  @doc section: :basic
-  @spec map_next_siblings(t(), (RoseTree.t() -> RoseTree.t())) :: t()
-  def map_next_siblings(%__MODULE__{next: next} = z, map_fn) when is_function(map_fn) do
-    new_siblings =
-      next
-      |> Enum.map(fn sibling -> map_fn.(sibling) end)
-
-    if RoseTree.all_rose_trees?(new_siblings) do
-      %{z | next: new_siblings}
-    else
-      raise ArgumentError, "map_fn must return a valid RoseTree struct"
     end
   end
 
@@ -638,6 +414,90 @@ defmodule RoseTree.Zipper do
   ### DIRECT ANCESTORS (PARENTS, GRANDPARENTS, ETC)
   ###
 
+
+  @doc """
+  Returns the index (zero-based) of the current focus' parent with
+  respect to any potentital siblings it may have. If the current
+  focus has no parent, returns nil.
+
+  ## Examples
+
+      iex> parent_siblings = for n <- [3,2,1], do: RoseTree.new(n)
+      ...> parent_loc = RoseTree.Zipper.Location.new(4, prev: parent_siblings)
+      ...> tree = RoseTree.new(5)
+      ...> z = RoseTree.Zipper.new(tree, path: [parent_loc])
+      ...> RoseTree.Zipper.index_of_parent(z)
+      3
+
+  """
+  @doc section: :ancestors
+  @spec index_of_parent(t()) :: non_neg_integer() | nil
+  def index_of_parent(%__MODULE__{path: []}), do: nil
+
+  def index_of_parent(%__MODULE__{path: [parent | _]}),
+    do: Location.index_of_term(parent)
+
+  @doc """
+  Returns the index (zero-based) of the current focus' grandparent with
+  respect to any potentital siblings it may have. If the current
+  focus has no grandparent, returns nil.
+
+  ## Examples
+
+      iex> grandparent_siblings = for n <- [3,2,1], do: RoseTree.new(n)
+      ...> grandparent_loc = RoseTree.Zipper.Location.new(4, prev: grandparent_siblings)
+      ...> parent_loc = RoseTree.Zipper.Location.new(5)
+      ...> tree = RoseTree.new(6)
+      ...> z = RoseTree.Zipper.new(tree, path: [parent_loc, grandparent_loc])
+      ...> RoseTree.Zipper.index_of_grandparent(z)
+      3
+
+  """
+  @doc section: :ancestors
+  @spec index_of_grandparent(t()) :: non_neg_integer() | nil
+  def index_of_grandparent(%__MODULE__{path: []}), do: nil
+
+  def index_of_grandparent(%__MODULE__{path: [_parent | []]}), do: nil
+
+  def index_of_grandparent(%__MODULE__{path: [_parent | [grandparent | _]]}),
+    do: Location.index_of_term(grandparent)
+
+  @doc """
+  Returns the current zipper's parent location.
+
+  ## Examples
+      iex> loc_trees = for n <- [4,3,2,1], do: RoseTree.new(n)
+      ...> locs = for n <- loc_trees, do: RoseTree.Zipper.Location.new(n)
+      ...> tree = RoseTree.new(5)
+      ...> z = RoseTree.Zipper.new(tree, path: locs)
+      ...> RoseTree.Zipper.parent_location(z)
+      %RoseTree.Zipper.Location{prev: [], term: 4, next: []}
+
+  """
+  @doc section: :ancestors
+  @spec parent_location(t()) :: Location.t() | nil
+  def parent_location(%__MODULE__{path: []}), do: nil
+
+  def parent_location(%__MODULE__{path: [parent | _]}), do: parent
+
+  @doc """
+  Returns the term in the current zipper's parent location.
+
+  ## Examples
+      iex> loc_trees = for n <- [4,3,2,1], do: RoseTree.new(n)
+      ...> locs = for n <- loc_trees, do: RoseTree.Zipper.Location.new(n)
+      ...> tree = RoseTree.new(5)
+      ...> z = RoseTree.Zipper.new(tree, path: locs)
+      ...> RoseTree.Zipper.parent_term(z)
+      4
+
+  """
+  @doc section: :ancestors
+  @spec parent_term(t()) :: RoseTree.t() | nil
+  def parent_term(%__MODULE__{path: []}), do: nil
+
+  def parent_term(%__MODULE__{path: [parent | _]}), do: parent.term
+
   @doc """
   Moves the focus to the parent Location. If at the root, thus no
   parent, returns nil.
@@ -717,6 +577,27 @@ defmodule RoseTree.Zipper do
   ###
 
   @doc """
+  Returns the children of the Zipper's current focus.
+
+  ## Examples
+
+      iex> tree = RoseTree.new(5, [4,3,2,1])
+      ...> z = RoseTree.Zipper.new(tree)
+      ...> RoseTree.Zipper.children(z)
+      [
+        %RoseTree{term: 4, children: []},
+        %RoseTree{term: 3, children: []},
+        %RoseTree{term: 2, children: []},
+        %RoseTree{term: 1, children: []}
+      ]
+
+  """
+  @doc section: :descendants
+  @spec children(t()) :: [RoseTree.t()]
+  def children(%__MODULE__{focus: focus}),
+    do: RoseTree.get_children(focus)
+
+  @doc """
   Moves focus to the first child. If there are no children, and this is
   a leaf, returns nil.
 
@@ -760,7 +641,7 @@ defmodule RoseTree.Zipper do
       do: nil
 
   def first_child(%__MODULE__{} = z, predicate) when is_function(predicate) do
-    children = focused_children(z)
+    children = children(z)
 
     case Util.split_when(children, predicate) do
       {[], []} ->
@@ -809,7 +690,7 @@ defmodule RoseTree.Zipper do
   def last_child(%__MODULE__{} = z, predicate) when is_function(predicate) do
     children =
       z
-      |> focused_children()
+      |> children()
       |> Enum.reverse()
 
     case Util.split_when(children, predicate) do
@@ -854,7 +735,7 @@ defmodule RoseTree.Zipper do
       do: nil
 
   def child_at(%__MODULE__{} = z, index) when is_integer(index) do
-    children = focused_children(z)
+    children = children(z)
 
     case Util.split_at(children, index) do
       {[], []} ->
@@ -1103,6 +984,126 @@ defmodule RoseTree.Zipper do
   ###
   ### SIBLINGS
   ###
+
+  @doc """
+  Returns the siblings that come before the current focus.
+
+  ## Examples
+
+      iex> prev = for t <- [1,2,3,4], do: RoseTree.new(t)
+      ...> tree = RoseTree.new(5)
+      ...> z = RoseTree.Zipper.new(tree, prev: prev)
+      ...> RoseTree.Zipper.prev_siblings(z)
+      [
+        %RoseTree{term: 4, children: []},
+        %RoseTree{term: 3, children: []},
+        %RoseTree{term: 2, children: []},
+        %RoseTree{term: 1, children: []}
+      ]
+
+  """
+  @doc section: :siblings
+  @spec prev_siblings(t()) :: [RoseTree.t()]
+  def prev_siblings(%__MODULE__{prev: prev}),
+    do: Enum.reverse(prev)
+
+  @doc """
+  Returns the siblings that come after the current focus.
+
+  ## Examples
+
+      iex> next = for t <- [6,7,8,9], do: RoseTree.new(t)
+      ...> tree = RoseTree.new(5)
+      ...> z = RoseTree.Zipper.new(tree, next: next)
+      ...> RoseTree.Zipper.next_siblings(z)
+      [
+        %RoseTree{term: 6, children: []},
+        %RoseTree{term: 7, children: []},
+        %RoseTree{term: 8, children: []},
+        %RoseTree{term: 9, children: []}
+      ]
+
+  """
+  @doc section: :siblings
+  @spec next_siblings(t()) :: [RoseTree.t()]
+  def next_siblings(%__MODULE__{next: next}),
+    do: next
+
+  @doc """
+  Applies the given function to all previous siblings of the current focus without
+  moving the zipper.
+
+  ## Examples
+
+      iex> prev = for n <- [4,3,2,1], do: RoseTree.new(n)
+      ...> tree = RoseTree.new(5)
+      ...> z = RoseTree.Zipper.new(tree, prev: prev)
+      ...> map_fn = &RoseTree.map_term(&1, fn term -> term * 2 end)
+      ...> RoseTree.Zipper.map_prev_siblings(z, &map_fn.(&1))
+      %RoseTree.Zipper{
+        focus: %RoseTree{term: 5, children: []},
+        prev: [
+          %RoseTree{term: 8, children: []},
+          %RoseTree{term: 6, children: []},
+          %RoseTree{term: 4, children: []},
+          %RoseTree{term: 2, children: []}
+        ],
+        next: [],
+        path: []
+      }
+
+  """
+  @doc section: :siblings
+  @spec map_prev_siblings(t(), (RoseTree.t() -> RoseTree.t())) :: t()
+  def map_prev_siblings(%__MODULE__{prev: prev} = z, map_fn) when is_function(map_fn) do
+    new_siblings =
+      prev
+      |> Enum.map(fn sibling -> map_fn.(sibling) end)
+
+    if RoseTree.all_rose_trees?(new_siblings) do
+      %{z | prev: new_siblings}
+    else
+      raise ArgumentError, "map_fn must return a valid RoseTree struct"
+    end
+  end
+
+  @doc """
+  Applies the given function to all next siblings of the current focus without
+  moving the zipper.
+
+  ## Examples
+
+      iex> next = for n <- [6,7,8,9], do: RoseTree.new(n)
+      ...> tree = RoseTree.new(5)
+      ...> z = RoseTree.Zipper.new(tree, next: next)
+      ...> map_fn = &RoseTree.map_term(&1, fn term -> term * 2 end)
+      ...> RoseTree.Zipper.map_next_siblings(z, &map_fn.(&1))
+      %RoseTree.Zipper{
+        focus: %RoseTree{term: 5, children: []},
+        prev: [],
+        next: [
+          %RoseTree{term: 12, children: []},
+          %RoseTree{term: 14, children: []},
+          %RoseTree{term: 16, children: []},
+          %RoseTree{term: 18, children: []}
+        ],
+        path: []
+      }
+
+  """
+  @doc section: :siblings
+  @spec map_next_siblings(t(), (RoseTree.t() -> RoseTree.t())) :: t()
+  def map_next_siblings(%__MODULE__{next: next} = z, map_fn) when is_function(map_fn) do
+    new_siblings =
+      next
+      |> Enum.map(fn sibling -> map_fn.(sibling) end)
+
+    if RoseTree.all_rose_trees?(new_siblings) do
+      %{z | next: new_siblings}
+    else
+      raise ArgumentError, "map_fn must return a valid RoseTree struct"
+    end
+  end
 
   @doc """
   Moves focus to the first sibling from the current focus. If there are
