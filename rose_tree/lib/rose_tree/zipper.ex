@@ -313,6 +313,72 @@ defmodule RoseTree.Zipper do
   end
 
   @doc """
+  Removes the current focus and then moves the focus to one of three places:
+  1. the next sibling, if one exists,
+  2. else the previous sibling, if one exists,
+  3. else the parent, if one exists
+
+  If none of those conditions exist, it will return an empty zipper. In any case,
+  the new zipper will be returned as the first item in a tuple, while the removed
+  focus will be returned as the second item.
+
+  ## Examples
+
+      iex> tree = RoseTree.new(5)
+      ...> prev_siblings = for n <- [4,3], do: RoseTree.new(n)
+      ...> next_siblings = for n <- [6,7], do: RoseTree.new(n)
+      ...> z = RoseTree.Zipper.new(tree, prev: prev_siblings, next: next_siblings)
+      ...> RoseTree.Zipper.remove_focus(z)
+      {%RoseTree.Zipper{
+        focus: %RoseTree{term: 6, children: []},
+        prev: [
+          %RoseTree{term: 4, children: []},
+          %RoseTree{term: 3, children: []}
+        ],
+        next: [
+          %RoseTree{term: 7, children: []}
+        ],
+        path: []
+      },
+      %RoseTree{term: 5, children: []}}
+
+
+  """
+  @doc section: :basic
+  @spec remove_focus(t()) :: {t(), RoseTree.t() | nil}
+  def remove_focus(%__MODULE__{} = z) when empty?(z), do: {z, nil}
+
+  def remove_focus(%__MODULE__{prev: [], next: [], path: []} = z), do: {empty(), nil}
+
+  def remove_focus(%__MODULE__{prev: [], next: []} = z),
+    do: {do_parental_shift(z, []), z.focus}
+
+  def remove_focus(%__MODULE__{prev: [new_focus | new_prev], next: []} = z) do
+    shift_previous = %{
+      z
+      | focus: new_focus,
+        prev: new_prev,
+        next: [],
+        path: z.path
+    }
+
+    {shift_previous, z.focus}
+  end
+
+  def remove_focus(%__MODULE__{next: [new_focus | new_next]} = z) do
+    shift_next = %{
+      z
+      | focus: new_focus,
+        prev: z.prev,
+        next: new_next,
+        path: z.path
+    }
+
+    {shift_next, z.focus}
+  end
+
+
+  @doc """
   Applies the given function to path of locations from the current focus back to the root
   without moving the zipper.
 
@@ -530,11 +596,19 @@ defmodule RoseTree.Zipper do
   def parent(%__MODULE__{path: []}), do: nil
 
   def parent(%__MODULE__{path: [parent | g_parents]} = z) do
-    combined_z = Enum.reverse(z.prev) ++ [z.focus | z.next]
+    combined_siblings = Enum.reverse(z.prev) ++ [z.focus | z.next]
 
+    z
+    |> do_parental_shift(combined_siblings)
+  end
+
+  @spec do_parental_shift(t(), [RoseTree.t()]) :: t()
+  defp do_parental_shift(%__MODULE__{path: []}), do: nil
+
+  defp do_parental_shift(%__MODULE__{path: [parent | g_parents]} = z, combined_siblings) when is_list(combined_siblings) do
     focused_parent =
       parent.term
-      |> RoseTree.new(combined_z)
+      |> RoseTree.new(combined_siblings)
 
     %{z | prev: parent.prev, next: parent.next, path: g_parents}
     |> set_focus(focused_parent)

@@ -25,7 +25,7 @@ defmodule RoseTree.Zipper.DirectAncestorTest do
     end
 
     test "should move focus to parent if one is found", %{z_with_parent: z} do
-      %Zipper{focus: focus} = Zipper.parent(z)
+      assert %Zipper{focus: focus} = Zipper.parent(z)
       assert focus.term == 10
     end
   end
