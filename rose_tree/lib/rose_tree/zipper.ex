@@ -1177,6 +1177,91 @@ defmodule RoseTree.Zipper do
     end
   end
 
+  @spec prepend_first_sibling(t(), term()) :: t()
+  def prepend_first_sibling(%__MODULE__{} = z, %RoseTree{} = sibling) do
+
+  end
+
+  def prepend_first_sibling(%__MODULE__{} = z, sibling) do
+
+  end
+
+  @spec append_last_sibling(t(), term()) :: t()
+  def append_last_sibling(%__MODULE__{} = z, %RoseTree{} = sibling) do
+
+  end
+
+  def append_last_sibling(%__MODULE__{} = z, sibling) do
+
+  end
+
+  @spec append_previous_sibling(t(), term()) :: t()
+  def append_previous_sibling(%__MODULE__{} = z, %RoseTree{} = sibling) do
+
+  end
+
+  def append_previous_sibling(%__MODULE__{} = z, sibling) do
+
+  end
+
+  @spec prepend_next_sibling(t(), term()) :: t()
+  def prepend_next_sibling(%__MODULE__{} = z, %RoseTree{} = sibling) do
+
+  end
+
+  def prepend_next_sibling(%__MODULE__{} = z, sibling) do
+
+  end
+
+  @spec insert_previous_sibling_at(t(), term(), integer()) :: t()
+  def insert_previous_sibling_at(%__MODULE__{} = z, %RoseTree{} = sibling, index) when is_integer(index) do
+
+  end
+
+  def insert_previous_sibling_at(%__MODULE__{} = z, sibling, index) when is_integer(index) do
+
+  end
+
+  @spec insert_next_sibling_at(t(), term(), integer()) :: t()
+  def insert_next_sibling_at(%__MODULE__{} = z, %RoseTree{} = sibling, index) when is_integer(index) do
+
+  end
+
+  def insert_next_sibling_at(%__MODULE__{} = z, sibling, index) when is_integer(index) do
+
+  end
+
+  @spec pop_first_sibling(t()) :: {t(), RoseTree.t() | nil}
+  def pop_first_sibling(%__MODULE__{} = z) do
+
+  end
+
+  @spec pop_previous_sibling(t()) :: {t(), RoseTree.t() | nil}
+  def pop_previous_sibling(%__MODULE__{} = z) do
+
+  end
+
+  @spec pop_last_sibling(t()) :: {t(), RoseTree.t() | nil}
+  def pop_last_sibling(%__MODULE__{} = z) do
+
+  end
+
+  @spec pop_next_sibling(t()) :: {t(), RoseTree.t() | nil}
+  def pop_next_sibling(%__MODULE__{} = z) do
+
+  end
+
+  @spec pop_previous_sibling_at(t(), integer()) :: {t(), RoseTree.t() | nil}
+  def pop_previous_sibling_at(%__MODULE__{} = z, index) when is_integer(index) do
+
+  end
+
+  @spec pop_next_sibling_at(t(), integer()) :: {t(), RoseTree.t() | nil}
+  def pop_next_sibling_at(%__MODULE__{} = z, index) when is_integer(index) do
+
+  end
+
+
   @doc """
   Moves focus to the first sibling from the current focus. If there are
   no more siblings before the current focus, returns nil.
