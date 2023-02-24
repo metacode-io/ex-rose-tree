@@ -1177,42 +1177,39 @@ defmodule RoseTree.Zipper do
     end
   end
 
+  @doc section: :siblings
   @spec prepend_first_sibling(t(), term()) :: t()
-  def prepend_first_sibling(%__MODULE__{} = z, %RoseTree{} = sibling) do
+  def prepend_first_sibling(%__MODULE__{} = z, %RoseTree{} = sibling),
+    do: %{z | prev: z.prev ++ [sibling]}
 
-  end
+  def prepend_first_sibling(%__MODULE__{} = z, sibling),
+    do: %{z | prev: z.prev ++ [RoseTree.new(sibling)]}
 
-  def prepend_first_sibling(%__MODULE__{} = z, sibling) do
-
-  end
-
+  @doc section: :siblings
   @spec append_last_sibling(t(), term()) :: t()
-  def append_last_sibling(%__MODULE__{} = z, %RoseTree{} = sibling) do
+  def append_last_sibling(%__MODULE__{} = z, %RoseTree{} = sibling),
+    do: %{z | next: z.next ++ [sibling]}
 
-  end
+  def append_last_sibling(%__MODULE__{} = z, sibling),
+    do: %{z | next: z.next ++ [RoseTree.new(sibling)]}
 
-  def append_last_sibling(%__MODULE__{} = z, sibling) do
-
-  end
-
+  @doc section: :siblings
   @spec append_previous_sibling(t(), term()) :: t()
-  def append_previous_sibling(%__MODULE__{} = z, %RoseTree{} = sibling) do
+  def append_previous_sibling(%__MODULE__{} = z, %RoseTree{} = sibling),
+    do: %{z | prev: [sibling | z.prev]}
 
-  end
+  def append_previous_sibling(%__MODULE__{} = z, sibling),
+    do: %{z | prev: [RoseTree.new(sibling) | z.prev]}
 
-  def append_previous_sibling(%__MODULE__{} = z, sibling) do
-
-  end
-
+  @doc section: :siblings
   @spec prepend_next_sibling(t(), term()) :: t()
-  def prepend_next_sibling(%__MODULE__{} = z, %RoseTree{} = sibling) do
+  def prepend_next_sibling(%__MODULE__{} = z, %RoseTree{} = sibling),
+    do: %{z | next: [sibling | z.next]}
 
-  end
+  def prepend_next_sibling(%__MODULE__{} = z, sibling),
+    do: %{z | next: [RoseTree.new(sibling) | z.next]}
 
-  def prepend_next_sibling(%__MODULE__{} = z, sibling) do
-
-  end
-
+  @doc section: :siblings
   @spec insert_previous_sibling_at(t(), term(), integer()) :: t()
   def insert_previous_sibling_at(%__MODULE__{} = z, %RoseTree{} = sibling, index) when is_integer(index) do
 
@@ -1222,6 +1219,7 @@ defmodule RoseTree.Zipper do
 
   end
 
+  @doc section: :siblings
   @spec insert_next_sibling_at(t(), term(), integer()) :: t()
   def insert_next_sibling_at(%__MODULE__{} = z, %RoseTree{} = sibling, index) when is_integer(index) do
 
@@ -1231,31 +1229,37 @@ defmodule RoseTree.Zipper do
 
   end
 
+  @doc section: :siblings
   @spec pop_first_sibling(t()) :: {t(), RoseTree.t() | nil}
   def pop_first_sibling(%__MODULE__{} = z) do
 
   end
 
+  @doc section: :siblings
   @spec pop_previous_sibling(t()) :: {t(), RoseTree.t() | nil}
   def pop_previous_sibling(%__MODULE__{} = z) do
 
   end
 
+  @doc section: :siblings
   @spec pop_last_sibling(t()) :: {t(), RoseTree.t() | nil}
   def pop_last_sibling(%__MODULE__{} = z) do
 
   end
 
+  @doc section: :siblings
   @spec pop_next_sibling(t()) :: {t(), RoseTree.t() | nil}
   def pop_next_sibling(%__MODULE__{} = z) do
 
   end
 
+  @doc section: :siblings
   @spec pop_previous_sibling_at(t(), integer()) :: {t(), RoseTree.t() | nil}
   def pop_previous_sibling_at(%__MODULE__{} = z, index) when is_integer(index) do
 
   end
 
+  @doc section: :siblings
   @spec pop_next_sibling_at(t(), integer()) :: {t(), RoseTree.t() | nil}
   def pop_next_sibling_at(%__MODULE__{} = z, index) when is_integer(index) do
 

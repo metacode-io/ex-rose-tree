@@ -11,6 +11,152 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
     }
   end
 
+  describe "prepend_first_sibling/2" do
+    test "should increase the number of previous siblings by 1", %{z_with_siblings: z} do
+      new_term = :anything
+      new_tree = RoseTree.new(new_term)
+
+      for _ <- [new_term, new_tree] do
+        assert %Zipper{prev: actual} = Zipper.prepend_first_sibling(z, new_tree)
+        assert Enum.count(actual) == Enum.count(z.prev) + 1
+      end
+    end
+
+    test "should add the new RoseTree to the head of the previous siblings", %{z_with_siblings: z} do
+      new_tree = RoseTree.new(:anything)
+
+      assert %Zipper{prev: actual} = Zipper.prepend_first_sibling(z, new_tree)
+      assert [^new_tree | _] = Enum.reverse(actual)
+    end
+
+    test "should add the term as a new RoseTree to the head of the previous siblings", %{z_with_siblings: z} do
+      new_term = :anything
+
+      expected_tree = RoseTree.new(new_term)
+
+      assert %Zipper{prev: actual} = Zipper.prepend_first_sibling(z, new_term)
+      assert [^expected_tree | _] = Enum.reverse(actual)
+    end
+  end
+
+  describe "append_last_sibling/2" do
+    test "should increase the number of next siblings by 1", %{z_with_siblings: z} do
+      new_term = :anything
+      new_tree = RoseTree.new(new_term)
+
+      for _ <- [new_term, new_tree] do
+        assert %Zipper{next: actual} = Zipper.append_last_sibling(z, new_tree)
+        assert Enum.count(actual) == Enum.count(z.next) + 1
+      end
+    end
+
+    test "should add the new RoseTree to the end of the next siblings", %{z_with_siblings: z} do
+      new_tree = RoseTree.new(:anything)
+
+      assert %Zipper{next: actual} = Zipper.append_last_sibling(z, new_tree)
+      assert [^new_tree | _] = Enum.reverse(actual)
+    end
+
+    test "should add the term as a new RoseTree to the end of the next siblings", %{z_with_siblings: z} do
+      new_term = :anything
+
+      expected_tree = RoseTree.new(new_term)
+
+      assert %Zipper{next: actual} = Zipper.append_last_sibling(z, new_term)
+      assert [^expected_tree | _] = Enum.reverse(actual)
+    end
+  end
+
+  describe "append_previous_sibling/2" do
+    test "should increase the number of previous siblings by 1", %{z_with_siblings: z} do
+      new_term = :anything
+      new_tree = RoseTree.new(new_term)
+
+      for _ <- [new_term, new_tree] do
+        assert %Zipper{prev: actual} = Zipper.append_previous_sibling(z, new_tree)
+        assert Enum.count(actual) == Enum.count(z.prev) + 1
+      end
+    end
+
+    test "should add the new RoseTree to the end of the previous siblings", %{z_with_siblings: z} do
+      new_tree = RoseTree.new(:anything)
+
+      assert %Zipper{prev: actual} = Zipper.append_previous_sibling(z, new_tree)
+      assert [^new_tree | _] = actual
+    end
+
+    test "should add the term as a new RoseTree to the end of the previous siblings", %{z_with_siblings: z} do
+      new_term = :anything
+
+      expected_tree = RoseTree.new(new_term)
+
+      assert %Zipper{prev: actual} = Zipper.append_previous_sibling(z, new_term)
+      assert [^expected_tree | _] = actual
+    end
+  end
+
+  describe "prepend_next_sibling/2" do
+    test "should increase the number of next siblings by 1", %{z_with_siblings: z} do
+      new_term = :anything
+      new_tree = RoseTree.new(new_term)
+
+      for _ <- [new_term, new_tree] do
+        assert %Zipper{next: actual} = Zipper.prepend_next_sibling(z, new_tree)
+        assert Enum.count(actual) == Enum.count(z.next) + 1
+      end
+    end
+
+    test "should add the new RoseTree to the head of the next siblings", %{z_with_siblings: z} do
+      new_tree = RoseTree.new(:anything)
+
+      assert %Zipper{next: actual} = Zipper.prepend_next_sibling(z, new_tree)
+      assert [^new_tree | _] = actual
+    end
+
+    test "should add the term as a new RoseTree to the next of the next siblings", %{z_with_siblings: z} do
+      new_term = :anything
+
+      expected_tree = RoseTree.new(new_term)
+
+      assert %Zipper{next: actual} = Zipper.prepend_next_sibling(z, new_term)
+      assert [^expected_tree | _] = actual
+    end
+  end
+
+  # describe "insert_previous_sibling_at/3" do
+  #   test "should increase the number of previous siblings by 1", %{z_with_siblings: z} do
+  #     new_term = :anything
+  #     new_tree = RoseTree.new(new_term)
+
+  #     for _ <- [new_term, new_tree] do
+  #       assert %Zipper{prev: actual} = Zipper.insert_previous_sibling_at(z, new_tree, 0)
+  #       assert Enum.count(actual) == Enum.count(z.prev) + 1
+  #     end
+  #   end
+
+  #   test "should insert a new RoseTree to previous siblings", %{z_with_siblings: z} do
+  #     new_tree = RoseTree.new(:anything)
+
+  #     actual = Zipper.insert_previous_sibling_at(z, new_tree, 0)
+
+  #     assert %Zipper{} = actual
+  #     assert [^new_tree | _] = actual.next
+  #     assert Enum.count(actual.next) == Enum.count(z.next) + 1
+  #   end
+
+  #   test "should insert a term as a new RoseTree to previous siblings", %{z_with_siblings: z} do
+  #     new_term = :anything
+
+  #     expected_tree = RoseTree.new(new_term)
+
+  #     actual = Zipper.insert_previous_sibling_at(z, new_term)
+
+  #     assert %Zipper{} = actual
+  #     assert [^expected_tree | _] = actual.next
+  #     assert Enum.count(actual.next) == Enum.count(z.next) + 1
+  #   end
+  # end
+
   describe "first_sibling/2" do
     test "should return nil if Zipper has no previous siblings", %{simple_z: z} do
       assert Zipper.first_sibling(z) == nil
