@@ -1,6 +1,10 @@
 defmodule RoseTree.Support.Zippers do
   @moduledoc """
   Sample Zippers for use in development and testing.
+
+  WARNING :: Do not make modifications to the values or structures
+  of these samples without being prepared to rewrite any unit test
+  that relies on them!
   """
 
   alias RoseTree.Support.Trees
