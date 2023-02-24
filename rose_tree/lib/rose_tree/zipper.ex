@@ -376,7 +376,6 @@ defmodule RoseTree.Zipper do
     {shift_next, z.focus}
   end
 
-
   @doc """
   Applies the given function to path of locations from the current focus back to the root
   without moving the zipper.
@@ -478,7 +477,6 @@ defmodule RoseTree.Zipper do
   ###
   ### DIRECT ANCESTORS (PARENTS, GRANDPARENTS, ETC)
   ###
-
 
   @doc """
   Returns the index (zero-based) of the current focus' parent with
@@ -604,7 +602,8 @@ defmodule RoseTree.Zipper do
   @spec do_parental_shift(t(), [RoseTree.t()]) :: t()
   defp do_parental_shift(%__MODULE__{path: []}), do: nil
 
-  defp do_parental_shift(%__MODULE__{path: [parent | g_parents]} = z, combined_siblings) when is_list(combined_siblings) do
+  defp do_parental_shift(%__MODULE__{path: [parent | g_parents]} = z, combined_siblings)
+       when is_list(combined_siblings) do
     focused_parent =
       parent.term
       |> RoseTree.new(combined_siblings)
@@ -3838,7 +3837,6 @@ defmodule RoseTree.Zipper do
   end
 
   def find(%__MODULE__{}, _predicate, _move_fn), do: nil
-
 
   @doc """
   Searches the list of parents comparing at each step to the given predicate,

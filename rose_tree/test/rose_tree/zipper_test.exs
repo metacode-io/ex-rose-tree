@@ -17,12 +17,9 @@ defmodule RoseTree.ZipperTest do
     {[1, 2, 3], 7},
     {{1, 2}, 8},
     {%Zipper{focus: :not_a_node, prev: [], next: [], path: []}, 9},
-    {%Zipper{focus: %RoseTree{term: 1, children: []}, prev: :not_a_list, next: [], path: []},
-     10},
-    {%Zipper{focus: %RoseTree{term: 1, children: []}, prev: [], next: :not_a_list, path: []},
-     11},
-    {%Zipper{focus: %RoseTree{term: 1, children: []}, prev: [], next: [], path: :not_a_list},
-     12},
+    {%Zipper{focus: %RoseTree{term: 1, children: []}, prev: :not_a_list, next: [], path: []}, 10},
+    {%Zipper{focus: %RoseTree{term: 1, children: []}, prev: [], next: :not_a_list, path: []}, 11},
+    {%Zipper{focus: %RoseTree{term: 1, children: []}, prev: [], next: [], path: :not_a_list}, 12},
     {nil, 13}
   ]
 
@@ -240,11 +237,15 @@ defmodule RoseTree.ZipperTest do
       assert {^z, nil} = Zipper.remove_focus(z)
     end
 
-    test "should return an empty zipper and nil when given a root leaf zipper", %{empty_z: empty_z, leaf_z: z} do
+    test "should return an empty zipper and nil when given a root leaf zipper", %{
+      empty_z: empty_z,
+      leaf_z: z
+    } do
       assert {^empty_z, nil} = Zipper.remove_focus(z)
     end
 
-    test "should return a zipper focused on the parent with no children and the removed focus when given a zipper with parent and no siblings", %{z_with_parent: z} do
+    test "should return a zipper focused on the parent with no children and the removed focus when given a zipper with parent and no siblings",
+         %{z_with_parent: z} do
       expected_removal = z.focus
 
       assert {%Zipper{focus: focus}, ^expected_removal} = Zipper.remove_focus(z)
@@ -252,7 +253,8 @@ defmodule RoseTree.ZipperTest do
       assert focus.children == []
     end
 
-    test "should return a zipper focused on the previous sibling and the removed focus when given a zipper with prev siblings but no next siblings", %{z_with_siblings: z} do
+    test "should return a zipper focused on the previous sibling and the removed focus when given a zipper with prev siblings but no next siblings",
+         %{z_with_siblings: z} do
       z_with_removed_next = %{z | next: []}
 
       expected_removal = z.focus
@@ -264,7 +266,8 @@ defmodule RoseTree.ZipperTest do
       assert actual_z.next == []
     end
 
-    test "should return a zipper focused on the next sibling and the removed focus when given a zipper with nex siblings", %{z_with_siblings: z} do
+    test "should return a zipper focused on the next sibling and the removed focus when given a zipper with nex siblings",
+         %{z_with_siblings: z} do
       expected_removal = z.focus
       [expected_focus | expected_next] = z.next
 

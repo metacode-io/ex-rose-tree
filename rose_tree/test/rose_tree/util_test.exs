@@ -93,7 +93,9 @@ defmodule RoseTree.UtilTest do
       assert nil == Util.first_of(:anything, [])
     end
 
-    test "should return nil if single function provided and returns {:error, error}", %{error_tuple_fn: function} do
+    test "should return nil if single function provided and returns {:error, error}", %{
+      error_tuple_fn: function
+    } do
       assert nil == Util.first_of(:anything, [function])
     end
 
@@ -113,20 +115,27 @@ defmodule RoseTree.UtilTest do
       assert nil == Util.first_of(:anything, functions)
     end
 
-    test "should return successful result if single function provided that returns {:ok, value}", %{ok_tuple_fn: function} do
+    test "should return successful result if single function provided that returns {:ok, value}",
+         %{ok_tuple_fn: function} do
       assert :success_1 == Util.first_of(:anything, [function])
     end
 
-    test "should return successful result if single function provided that returns a truthy result", %{result_fn: function} do
+    test "should return successful result if single function provided that returns a truthy result",
+         %{result_fn: function} do
       assert :success_2 == Util.first_of(:anything, [function])
     end
 
-    test "should return a successful result for a randomly mixed list of functions as long as at least one passes", %{all_fns: functions} do
+    test "should return a successful result for a randomly mixed list of functions as long as at least one passes",
+         %{all_fns: functions} do
       result = Util.first_of(:anything, Enum.shuffle(functions))
       assert result in [:success_1, :success_2]
     end
 
-    test "should return the first successful result", %{ok_tuple_fn: fn_1, result_fn: fn_2, error_fn: fn_3} do
+    test "should return the first successful result", %{
+      ok_tuple_fn: fn_1,
+      result_fn: fn_2,
+      error_fn: fn_3
+    } do
       functions_1 = [fn_3, fn_1, fn_2]
       functions_2 = [fn_3, fn_2, fn_1]
 
@@ -142,11 +151,15 @@ defmodule RoseTree.UtilTest do
       assert nil == Util.first_of_with_opts(:anything, [], @options)
     end
 
-    test "should return nil if single function provided and returns {:error, error}", %{error_tuple_opts_fn: function} do
+    test "should return nil if single function provided and returns {:error, error}", %{
+      error_tuple_opts_fn: function
+    } do
       assert nil == Util.first_of_with_opts(:anything, [function], @options)
     end
 
-    test "should return nil if single function provided and returns :error", %{error_opts_fn: function} do
+    test "should return nil if single function provided and returns :error", %{
+      error_opts_fn: function
+    } do
       assert nil == Util.first_of_with_opts(:anything, [function], @options)
     end
 
@@ -154,7 +167,9 @@ defmodule RoseTree.UtilTest do
       assert nil == Util.first_of_with_opts(:anything, [function], @options)
     end
 
-    test "should return nil if single function provided and returns false", %{false_opts_fn: function} do
+    test "should return nil if single function provided and returns false", %{
+      false_opts_fn: function
+    } do
       assert nil == Util.first_of_with_opts(:anything, [function], @options)
     end
 
@@ -162,20 +177,29 @@ defmodule RoseTree.UtilTest do
       assert nil == Util.first_of_with_opts(:anything, functions, @options)
     end
 
-    test "should return successful result if single function provided that returns {:ok, value}", %{ok_tuple_opts_fn: function} do
+    test "should return successful result if single function provided that returns {:ok, value}",
+         %{ok_tuple_opts_fn: function} do
       assert {:success_1, @options} == Util.first_of_with_opts(:anything, [function], @options)
     end
 
-    test "should return successful result if single function provided that returns a truthy result", %{result_opts_fn: function} do
+    test "should return successful result if single function provided that returns a truthy result",
+         %{result_opts_fn: function} do
       assert {:success_2, @options} == Util.first_of_with_opts(:anything, [function], @options)
     end
 
-    test "should return a successful result for a randomly mixed list of functions as long as at least one passes", %{all_opts_fns: functions} do
-      assert {result, @options} = Util.first_of_with_opts(:anything, Enum.shuffle(functions), @options)
+    test "should return a successful result for a randomly mixed list of functions as long as at least one passes",
+         %{all_opts_fns: functions} do
+      assert {result, @options} =
+               Util.first_of_with_opts(:anything, Enum.shuffle(functions), @options)
+
       assert result in [:success_1, :success_2]
     end
 
-    test "should return the first successful result", %{ok_tuple_opts_fn: fn_1, result_opts_fn: fn_2, error_opts_fn: fn_3} do
+    test "should return the first successful result", %{
+      ok_tuple_opts_fn: fn_1,
+      result_opts_fn: fn_2,
+      error_opts_fn: fn_3
+    } do
       functions_1 = [fn_3, fn_1, fn_2]
       functions_2 = [fn_3, fn_2, fn_1]
 
@@ -193,11 +217,15 @@ defmodule RoseTree.UtilTest do
       assert nil == Util.first_of_with_args(:anything, [], @args)
     end
 
-    test "should return nil if single function provided and returns {:error, error}", %{error_tuple_args_fn: function} do
+    test "should return nil if single function provided and returns {:error, error}", %{
+      error_tuple_args_fn: function
+    } do
       assert nil == Util.first_of_with_args(:anything, [function], @args)
     end
 
-    test "should return nil if single function provided and returns :error", %{error_args_fn: function} do
+    test "should return nil if single function provided and returns :error", %{
+      error_args_fn: function
+    } do
       assert nil == Util.first_of_with_args(:anything, [function], @args)
     end
 
@@ -205,7 +233,9 @@ defmodule RoseTree.UtilTest do
       assert nil == Util.first_of_with_args(:anything, [function], @args)
     end
 
-    test "should return nil if single function provided and returns false", %{false_args_fn: function} do
+    test "should return nil if single function provided and returns false", %{
+      false_args_fn: function
+    } do
       assert nil == Util.first_of_with_args(:anything, [function], @args)
     end
 
@@ -213,20 +243,29 @@ defmodule RoseTree.UtilTest do
       assert nil == Util.first_of_with_args(:anything, functions, @args)
     end
 
-    test "should return successful result if single function provided that returns {:ok, value}", %{ok_tuple_args_fn: function} do
+    test "should return successful result if single function provided that returns {:ok, value}",
+         %{ok_tuple_args_fn: function} do
       assert {:success_1, @arg1, @arg2} == Util.first_of_with_args(:anything, [function], @args)
     end
 
-    test "should return successful result if single function provided that returns a truthy result", %{result_args_fn: function} do
+    test "should return successful result if single function provided that returns a truthy result",
+         %{result_args_fn: function} do
       assert {:success_2, @arg1, @arg2} == Util.first_of_with_args(:anything, [function], @args)
     end
 
-    test "should return a successful result for a randomly mixed list of functions as long as at least one passes", %{all_args_fns: functions} do
-      assert {result, @arg1, @arg2} = Util.first_of_with_args(:anything, Enum.shuffle(functions), @args)
+    test "should return a successful result for a randomly mixed list of functions as long as at least one passes",
+         %{all_args_fns: functions} do
+      assert {result, @arg1, @arg2} =
+               Util.first_of_with_args(:anything, Enum.shuffle(functions), @args)
+
       assert result in [:success_1, :success_2]
     end
 
-    test "should return the first successful result", %{ok_tuple_args_fn: fn_1, result_args_fn: fn_2, error_args_fn: fn_3} do
+    test "should return the first successful result", %{
+      ok_tuple_args_fn: fn_1,
+      result_args_fn: fn_2,
+      error_args_fn: fn_3
+    } do
       functions_1 = [fn_3, fn_1, fn_2]
       functions_2 = [fn_3, fn_2, fn_1]
 
