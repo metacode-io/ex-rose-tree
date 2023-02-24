@@ -342,7 +342,6 @@ defmodule RoseTree.Zipper do
       },
       %RoseTree{term: 5, children: []}}
 
-
   """
   @doc section: :basic
   @spec remove_focus(t()) :: {t(), RoseTree.t() | nil}

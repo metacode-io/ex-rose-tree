@@ -29,7 +29,8 @@ defmodule RoseTree.ZipperTest do
   setup do
     %{
       z_with_parent: Zippers.z_with_parent(),
-      z_with_grandparent: Zippers.z_with_grandparent()
+      z_with_grandparent: Zippers.z_with_grandparent(),
+      z_with_siblings: Zippers.z_with_siblings()
     }
   end
 
@@ -231,6 +232,46 @@ defmodule RoseTree.ZipperTest do
       map_fn = fn tree_node -> tree_node.term * 2 end
 
       assert_raise(ArgumentError, fn -> Zipper.map_focus(z, map_fn) end)
+    end
+  end
+
+  describe "remove_focus/1" do
+    test "should return an empty zipper and nil when given an empty zipper", %{empty_z: z} do
+      assert {^z, nil} = Zipper.remove_focus(z)
+    end
+
+    test "should return an empty zipper and nil when given a root leaf zipper", %{empty_z: empty_z, leaf_z: z} do
+      assert {^empty_z, nil} = Zipper.remove_focus(z)
+    end
+
+    test "should return a zipper focused on the parent with no children and the removed focus when given a zipper with parent and no siblings", %{z_with_parent: z} do
+      expected_removal = z.focus
+
+      assert {%Zipper{focus: focus}, ^expected_removal} = Zipper.remove_focus(z)
+      assert focus.term == 10
+      assert focus.children == []
+    end
+
+    test "should return a zipper focused on the previous sibling and the removed focus when given a zipper with prev siblings but no next siblings", %{z_with_siblings: z} do
+      z_with_removed_next = %{z | next: []}
+
+      expected_removal = z.focus
+      [expected_focus | expected_prev] = z.prev
+
+      assert {%Zipper{} = actual_z, ^expected_removal} = Zipper.remove_focus(z_with_removed_next)
+      assert actual_z.focus.term == expected_focus.term
+      assert actual_z.prev == expected_prev
+      assert actual_z.next == []
+    end
+
+    test "should return a zipper focused on the next sibling and the removed focus when given a zipper with nex siblings", %{z_with_siblings: z} do
+      expected_removal = z.focus
+      [expected_focus | expected_next] = z.next
+
+      assert {%Zipper{} = actual_z, ^expected_removal} = Zipper.remove_focus(z)
+      assert actual_z.focus.term == expected_focus.term
+      assert actual_z.next == expected_next
+      assert actual_z.prev == z.prev
     end
   end
 
