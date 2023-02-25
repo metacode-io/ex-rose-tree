@@ -1254,9 +1254,10 @@ defmodule RoseTree.Zipper do
 
   @doc section: :siblings
   @spec pop_previous_sibling(t()) :: {t(), RoseTree.t() | nil}
-  def pop_previous_sibling(%__MODULE__{} = z) do
+  def pop_previous_sibling(%__MODULE__{prev: []} = z), do: {z, nil}
 
-  end
+  def pop_previous_sibling(%__MODULE__{prev: [previous | siblings]} = z),
+    do: {%{z | prev: siblings}, previous}
 
   @doc section: :siblings
   @spec pop_last_sibling(t()) :: {t(), RoseTree.t() | nil}
