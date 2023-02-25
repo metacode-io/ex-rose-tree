@@ -1245,8 +1245,11 @@ defmodule RoseTree.Zipper do
 
   @doc section: :siblings
   @spec pop_first_sibling(t()) :: {t(), RoseTree.t() | nil}
-  def pop_first_sibling(%__MODULE__{} = z) do
+  def pop_first_sibling(%__MODULE__{prev: []} = z), do: {z, nil}
 
+  def pop_first_sibling(%__MODULE__{} = z) do
+    {new_siblings, [first_sibling | []]} = Enum.split(z.prev, -1)
+    {%{z | prev: new_siblings}, first_sibling}
   end
 
   @doc section: :siblings
