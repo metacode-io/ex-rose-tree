@@ -179,6 +179,59 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
     end
   end
 
+  describe "insert_next_sibling_at/3" do
+    test "should increase the number of next siblings by 1", %{z_with_siblings: z} do
+      new_term = :anything
+      new_tree = RoseTree.new(new_term)
+
+      for _ <- [new_term, new_tree] do
+        assert %Zipper{next: actual} = Zipper.insert_next_sibling_at(z, new_tree, 0)
+        assert Enum.count(actual) == Enum.count(z.prev) + 1
+      end
+    end
+
+    test "should insert a new RoseTree to next siblings", %{z_with_siblings: z} do
+      new_tree = RoseTree.new(:anything)
+
+      assert %Zipper{next: [^new_tree | _]} = Zipper.insert_next_sibling_at(z, new_tree, 0)
+    end
+
+    test "should insert a term as a new RoseTree to next siblings", %{z_with_siblings: z} do
+      new_term = :anything
+
+      expected_tree = RoseTree.new(new_term)
+
+      assert %Zipper{next: [^expected_tree | _]} = Zipper.insert_next_sibling_at(z, expected_tree, 0)
+    end
+
+    test "should insert a new RoseTree at the correct index when given a positive index", %{z_with_siblings: z} do
+      new_tree = RoseTree.new(:anything)
+
+      assert %Zipper{next: actual} = Zipper.insert_next_sibling_at(z, new_tree, 3)
+      assert new_tree == Enum.at(actual, 3)
+    end
+
+    test "should insert a new RoseTree at the end when given a positive index greater than count of next siblings", %{z_with_siblings: z} do
+      new_tree = RoseTree.new(:anything)
+
+      assert %Zipper{next: actual} = Zipper.insert_next_sibling_at(z, new_tree, 10)
+      assert [^new_tree | _] = Enum.reverse(actual)
+    end
+
+    test "should insert a new RoseTree at the correct index, starting from the back, when given a negative index", %{z_with_siblings: z} do
+      new_tree = RoseTree.new(:anything)
+
+      assert %Zipper{next: actual} = Zipper.insert_next_sibling_at(z, new_tree, -2)
+      assert new_tree == Enum.at(actual, 2)
+    end
+
+    test "should insert a new RoseTree at the head when given a negative index greater than count of next siblings", %{z_with_siblings: z} do
+      new_tree = RoseTree.new(:anything)
+
+      assert %Zipper{next: [^new_tree | _]} = Zipper.insert_next_sibling_at(z, new_tree, -10)
+    end
+  end
+
   describe "first_sibling/2" do
     test "should return nil if Zipper has no previous siblings", %{simple_z: z} do
       assert Zipper.first_sibling(z) == nil

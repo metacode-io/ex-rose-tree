@@ -1211,29 +1211,36 @@ defmodule RoseTree.Zipper do
 
   @doc section: :siblings
   @spec insert_previous_sibling_at(t(), term(), integer()) :: t()
-  def insert_previous_sibling_at(%__MODULE__{} = z, sibling, index),
+  def insert_previous_sibling_at(%__MODULE__{} = z, sibling, index) when RoseTree.rose_tree?(sibling),
     do: do_insert_previous_sibling_at(z, sibling, index)
 
   def insert_previous_sibling_at(%__MODULE__{} = z, sibling, index),
-  do: do_insert_previous_sibling_at(z, RoseTree.new(sibling), index)
+    do: do_insert_previous_sibling_at(z, RoseTree.new(sibling), index)
 
   @spec do_insert_previous_sibling_at(t(), RoseTree.t(), integer()) :: t()
   def do_insert_previous_sibling_at(%__MODULE__{} = z, sibling, index)
       when RoseTree.rose_tree?(sibling) and is_integer(index) do
-    previous_siblings = Enum.reverse(z.prev)
-    {prev_siblings, next_siblings} = Enum.split(previous_siblings, index)
-    new_siblings = prev_siblings ++ [sibling | next_siblings]
+    {siblings_before, siblings_after} =
+      z.prev
+      |> Enum.reverse()
+      |> Enum.split(index)
+    new_siblings = siblings_before ++ [sibling | siblings_after]
     %{z | prev: Enum.reverse(new_siblings)}
   end
 
   @doc section: :siblings
   @spec insert_next_sibling_at(t(), term(), integer()) :: t()
-  def insert_next_sibling_at(%__MODULE__{} = z, sibling, index) when RoseTree.rose_tree?(sibling) and is_integer(index) do
+  def insert_next_sibling_at(%__MODULE__{} = z, sibling, index) when RoseTree.rose_tree?(sibling),
+    do: do_insert_next_sibling_at(z, sibling, index)
 
-  end
+  def insert_next_sibling_at(%__MODULE__{} = z, sibling, index),
+    do: do_insert_next_sibling_at(z, RoseTree.new(sibling), index)
 
-  def insert_next_sibling_at(%__MODULE__{} = z, sibling, index) when is_integer(index) do
-
+  def do_insert_next_sibling_at(%__MODULE__{} = z, sibling, index)
+      when RoseTree.rose_tree?(sibling) and is_integer(index) do
+    {siblings_before, siblings_after} = Enum.split(z.next, index)
+    new_siblings = siblings_before ++ [sibling | siblings_after]
+    %{z | next: new_siblings}
   end
 
   @doc section: :siblings
