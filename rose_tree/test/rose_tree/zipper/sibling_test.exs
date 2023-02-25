@@ -286,6 +286,24 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
     end
   end
 
+  describe "pop_next_sibling/1" do
+    test "should return unchanged Zipper and nil when no next siblings exist", %{simple_z: z} do
+      assert {^z, nil} = Zipper.pop_next_sibling(z)
+    end
+
+    test "should return Zipper with one less next sibling", %{z_with_siblings: z} do
+      assert {%Zipper{next: actual}, %RoseTree{} = _removed} = Zipper.pop_next_sibling(z)
+      assert Enum.count(actual) == Enum.count(z.next) - 1
+    end
+
+    test "should return Zipper with next sibling removed", %{z_with_siblings: z} do
+      [expected_removal | expected_remainder] = z.next
+
+      assert {%Zipper{next: ^expected_remainder}, ^expected_removal} =
+        Zipper.pop_next_sibling(z)
+    end
+  end
+
   describe "first_sibling/2" do
     test "should return nil if Zipper has no previous siblings", %{simple_z: z} do
       assert Zipper.first_sibling(z) == nil

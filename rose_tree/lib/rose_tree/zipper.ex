@@ -1256,8 +1256,8 @@ defmodule RoseTree.Zipper do
   @spec pop_previous_sibling(t()) :: {t(), RoseTree.t() | nil}
   def pop_previous_sibling(%__MODULE__{prev: []} = z), do: {z, nil}
 
-  def pop_previous_sibling(%__MODULE__{prev: [previous | siblings]} = z),
-    do: {%{z | prev: siblings}, previous}
+  def pop_previous_sibling(%__MODULE__{prev: [previous | new_siblings]} = z),
+    do: {%{z | prev: new_siblings}, previous}
 
   @doc section: :siblings
   @spec pop_last_sibling(t()) :: {t(), RoseTree.t() | nil}
@@ -1270,9 +1270,10 @@ defmodule RoseTree.Zipper do
 
   @doc section: :siblings
   @spec pop_next_sibling(t()) :: {t(), RoseTree.t() | nil}
-  def pop_next_sibling(%__MODULE__{} = z) do
+  def pop_next_sibling(%__MODULE__{next: []} = z), do: {z, nil}
 
-  end
+  def pop_next_sibling(%__MODULE__{next: [next | new_siblings]} = z),
+    do: {%{z | next: new_siblings}, next}
 
   @doc section: :siblings
   @spec pop_previous_sibling_at(t(), integer()) :: {t(), RoseTree.t() | nil}
