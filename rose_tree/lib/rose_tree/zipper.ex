@@ -1262,7 +1262,8 @@ defmodule RoseTree.Zipper do
   end
 
   @doc """
-  Removes the first sibling from the Zipper."""
+  Removes the first sibling from the Zipper.
+  """
   @doc section: :siblings
   @spec pop_first_sibling(t()) :: {t(), RoseTree.t() | nil}
   def pop_first_sibling(%__MODULE__{prev: []} = z), do: {z, nil}
