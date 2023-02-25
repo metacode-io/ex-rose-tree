@@ -335,6 +335,37 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
     end
   end
 
+  describe "pop_next_sibling_at/3" do
+    test "should return unchanged Zipper and nil when no next siblings exist", %{simple_z: z} do
+      assert {^z, nil} = Zipper.pop_next_sibling_at(z, 0)
+    end
+
+    test "should decrease the number of next siblings by 1", %{z_with_siblings: z} do
+      assert {%Zipper{next: actual}, %RoseTree{} = _removed} = Zipper.pop_next_sibling_at(z, 0)
+      assert Enum.count(actual) == Enum.count(z.next) - 1
+    end
+
+    test "should remove the sibling at the correct index when given a positive index", %{z_with_siblings: z} do
+      assert {%Zipper{next: actual}, removed} = Zipper.pop_next_sibling_at(z, 1)
+      assert removed == Enum.at(z.next, 1)
+      assert [6,8,9] = Enum.map(actual, &(&1.term))
+    end
+
+    test "should not remove any sibling when given a positive index greater than count of next siblings", %{z_with_siblings: z} do
+      assert {^z, nil} = Zipper.pop_next_sibling_at(z, 10)
+    end
+
+    test "should remove the sibling at the correct index, starting from from the back, when given a negative index", %{z_with_siblings: z} do
+      assert {%Zipper{next: actual}, removed} = Zipper.pop_next_sibling_at(z, -3)
+      assert removed == Enum.at(z.next, 1)
+      assert [6,8,9] = Enum.map(actual, &(&1.term))
+    end
+
+    test "should not remove any sibling when given a negative index greater than count of next siblings", %{z_with_siblings: z} do
+      assert {^z, nil} = Zipper.pop_next_sibling_at(z, -10)
+    end
+  end
+
   describe "first_sibling/2" do
     test "should return nil if Zipper has no previous siblings", %{simple_z: z} do
       assert Zipper.first_sibling(z) == nil
