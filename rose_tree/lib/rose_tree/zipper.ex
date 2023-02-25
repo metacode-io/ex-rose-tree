@@ -1277,8 +1277,30 @@ defmodule RoseTree.Zipper do
 
   @doc section: :siblings
   @spec pop_previous_sibling_at(t(), integer()) :: {t(), RoseTree.t() | nil}
-  def pop_previous_sibling_at(%__MODULE__{} = z, index) when is_integer(index) do
+  def pop_previous_sibling_at(%__MODULE__{prev: []} = z, _index), do: {z, nil}
 
+  def pop_previous_sibling_at(%__MODULE__{} = z, index) when is_integer(index) and index < 0 do
+    if abs(index) > length(z.prev) do
+      {z, nil}
+    else
+      do_pop_previous_sibling_at(z, index)
+    end
+  end
+
+  def pop_previous_sibling_at(%__MODULE__{} = z, index) when is_integer(index),
+    do: do_pop_previous_sibling_at(z, index)
+
+  defp do_pop_previous_sibling_at(%__MODULE__{} = z, index) when is_integer(index) do
+    {new_siblings, removed_sibling} =
+      case Enum.split(Enum.reverse(z.prev), index) do
+        {previous, []} ->
+          {Enum.reverse(previous), nil}
+
+        {previous, [removed | next]} ->
+          {Enum.reverse(previous ++ next), removed}
+      end
+
+    {%{z | prev: new_siblings}, removed_sibling}
   end
 
   @doc section: :siblings
