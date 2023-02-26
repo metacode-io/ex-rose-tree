@@ -22,14 +22,16 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
       end
     end
 
-    test "should add the new RoseTree to the end of the previous siblings since they are reversed", %{z_with_siblings: z} do
+    test "should add the new RoseTree to the end of the previous siblings since they are reversed",
+         %{z_with_siblings: z} do
       new_tree = RoseTree.new(:anything)
 
       assert %Zipper{prev: actual} = Zipper.prepend_first_sibling(z, new_tree)
       assert [^new_tree | _] = Enum.reverse(actual)
     end
 
-    test "should add the term as a new RoseTree to the end of the previous siblings since they are reversed", %{z_with_siblings: z} do
+    test "should add the term as a new RoseTree to the end of the previous siblings since they are reversed",
+         %{z_with_siblings: z} do
       new_term = :anything
 
       expected_tree = RoseTree.new(new_term)
@@ -57,7 +59,9 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
       assert [^new_tree | _] = Enum.reverse(actual)
     end
 
-    test "should add the term as a new RoseTree to the end of the next siblings", %{z_with_siblings: z} do
+    test "should add the term as a new RoseTree to the end of the next siblings", %{
+      z_with_siblings: z
+    } do
       new_term = :anything
 
       expected_tree = RoseTree.new(new_term)
@@ -78,14 +82,16 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
       end
     end
 
-    test "should add the new RoseTree to the head of the previous siblings since they are reversed", %{z_with_siblings: z} do
+    test "should add the new RoseTree to the head of the previous siblings since they are reversed",
+         %{z_with_siblings: z} do
       new_tree = RoseTree.new(:anything)
 
       assert %Zipper{prev: actual} = Zipper.append_previous_sibling(z, new_tree)
       assert [^new_tree | _] = actual
     end
 
-    test "should add the term as a new RoseTree to the head of the previous siblings since they are reversed", %{z_with_siblings: z} do
+    test "should add the term as a new RoseTree to the head of the previous siblings since they are reversed",
+         %{z_with_siblings: z} do
       new_term = :anything
 
       expected_tree = RoseTree.new(new_term)
@@ -113,7 +119,9 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
       assert [^new_tree | _] = actual
     end
 
-    test "should add the term as a new RoseTree to the next of the next siblings", %{z_with_siblings: z} do
+    test "should add the term as a new RoseTree to the next of the next siblings", %{
+      z_with_siblings: z
+    } do
       new_term = :anything
 
       expected_tree = RoseTree.new(new_term)
@@ -150,28 +158,32 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
       assert [^expected_tree | _] = Enum.reverse(actual)
     end
 
-    test "should insert a new RoseTree at the correct index, starting from the back since its reversed, when given a positive index", %{z_with_siblings: z} do
+    test "should insert a new RoseTree at the correct index, starting from the back since its reversed, when given a positive index",
+         %{z_with_siblings: z} do
       new_tree = RoseTree.new(:anything)
 
       assert %Zipper{prev: actual} = Zipper.insert_previous_sibling_at(z, new_tree, 3)
       assert new_tree == Enum.at(Enum.reverse(actual), 3)
     end
 
-    test "should insert a new RoseTree at the head when given a positive index greater than count of previous siblings since they are reversed", %{z_with_siblings: z} do
+    test "should insert a new RoseTree at the head when given a positive index greater than count of previous siblings since they are reversed",
+         %{z_with_siblings: z} do
       new_tree = RoseTree.new(:anything)
 
       assert %Zipper{prev: actual} = Zipper.insert_previous_sibling_at(z, new_tree, 10)
       assert [^new_tree | _] = actual
     end
 
-    test "should insert a new RoseTree at the correct index, starting from from the front esince its reversed, when given a negative index", %{z_with_siblings: z} do
+    test "should insert a new RoseTree at the correct index, starting from from the front esince its reversed, when given a negative index",
+         %{z_with_siblings: z} do
       new_tree = RoseTree.new(:anything)
 
       assert %Zipper{prev: actual} = Zipper.insert_previous_sibling_at(z, new_tree, -2)
       assert new_tree == Enum.at(actual, 2)
     end
 
-    test "should insert a new RoseTree at the end when given a negatve index greater than count of previous siblings since they are reversed", %{z_with_siblings: z} do
+    test "should insert a new RoseTree at the end when given a negatve index greater than count of previous siblings since they are reversed",
+         %{z_with_siblings: z} do
       new_tree = RoseTree.new(:anything)
 
       assert %Zipper{prev: actual} = Zipper.insert_previous_sibling_at(z, new_tree, -10)
@@ -201,31 +213,37 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
 
       expected_tree = RoseTree.new(new_term)
 
-      assert %Zipper{next: [^expected_tree | _]} = Zipper.insert_next_sibling_at(z, expected_tree, 0)
+      assert %Zipper{next: [^expected_tree | _]} =
+               Zipper.insert_next_sibling_at(z, expected_tree, 0)
     end
 
-    test "should insert a new RoseTree at the correct index when given a positive index", %{z_with_siblings: z} do
+    test "should insert a new RoseTree at the correct index when given a positive index", %{
+      z_with_siblings: z
+    } do
       new_tree = RoseTree.new(:anything)
 
       assert %Zipper{next: actual} = Zipper.insert_next_sibling_at(z, new_tree, 3)
       assert new_tree == Enum.at(actual, 3)
     end
 
-    test "should insert a new RoseTree at the end when given a positive index greater than count of next siblings", %{z_with_siblings: z} do
+    test "should insert a new RoseTree at the end when given a positive index greater than count of next siblings",
+         %{z_with_siblings: z} do
       new_tree = RoseTree.new(:anything)
 
       assert %Zipper{next: actual} = Zipper.insert_next_sibling_at(z, new_tree, 10)
       assert [^new_tree | _] = Enum.reverse(actual)
     end
 
-    test "should insert a new RoseTree at the correct index, starting from the back, when given a negative index", %{z_with_siblings: z} do
+    test "should insert a new RoseTree at the correct index, starting from the back, when given a negative index",
+         %{z_with_siblings: z} do
       new_tree = RoseTree.new(:anything)
 
       assert %Zipper{next: actual} = Zipper.insert_next_sibling_at(z, new_tree, -2)
       assert new_tree == Enum.at(actual, 2)
     end
 
-    test "should insert a new RoseTree at the head when given a negative index greater than count of next siblings", %{z_with_siblings: z} do
+    test "should insert a new RoseTree at the head when given a negative index greater than count of next siblings",
+         %{z_with_siblings: z} do
       new_tree = RoseTree.new(:anything)
 
       assert %Zipper{next: [^new_tree | _]} = Zipper.insert_next_sibling_at(z, new_tree, -10)
@@ -245,8 +263,7 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
     test "should return Zipper with first sibling removed", %{z_with_siblings: z} do
       {expected_remainder, [expected_removal | []]} = Enum.split(z.prev, -1)
 
-      assert {%Zipper{prev: ^expected_remainder}, ^expected_removal} =
-        Zipper.pop_first_sibling(z)
+      assert {%Zipper{prev: ^expected_remainder}, ^expected_removal} = Zipper.pop_first_sibling(z)
     end
   end
 
@@ -264,7 +281,7 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
       [expected_removal | expected_remainder] = z.prev
 
       assert {%Zipper{prev: ^expected_remainder}, ^expected_removal} =
-        Zipper.pop_previous_sibling(z)
+               Zipper.pop_previous_sibling(z)
     end
   end
 
@@ -281,8 +298,7 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
     test "should return Zipper with last sibling removed", %{z_with_siblings: z} do
       {expected_remainder, [expected_removal | []]} = Enum.split(z.next, -1)
 
-      assert {%Zipper{next: ^expected_remainder}, ^expected_removal} =
-        Zipper.pop_last_sibling(z)
+      assert {%Zipper{next: ^expected_remainder}, ^expected_removal} = Zipper.pop_last_sibling(z)
     end
   end
 
@@ -299,8 +315,7 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
     test "should return Zipper with next sibling removed", %{z_with_siblings: z} do
       [expected_removal | expected_remainder] = z.next
 
-      assert {%Zipper{next: ^expected_remainder}, ^expected_removal} =
-        Zipper.pop_next_sibling(z)
+      assert {%Zipper{next: ^expected_remainder}, ^expected_removal} = Zipper.pop_next_sibling(z)
     end
   end
 
@@ -310,27 +325,33 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
     end
 
     test "should decrease the number of previous siblings by 1", %{z_with_siblings: z} do
-      assert {%Zipper{prev: actual}, %RoseTree{} = _removed} = Zipper.pop_previous_sibling_at(z, 0)
+      assert {%Zipper{prev: actual}, %RoseTree{} = _removed} =
+               Zipper.pop_previous_sibling_at(z, 0)
+
       assert Enum.count(actual) == Enum.count(z.prev) - 1
     end
 
-    test "should remove the sibling at the correct index, starting from the back since its reversed, when given a positive index", %{z_with_siblings: z} do
+    test "should remove the sibling at the correct index, starting from the back since its reversed, when given a positive index",
+         %{z_with_siblings: z} do
       assert {%Zipper{prev: actual}, removed} = Zipper.pop_previous_sibling_at(z, 1)
       assert removed == Enum.at(z.prev, 2)
-      assert [4,3,1] = Enum.map(actual, &(&1.term))
+      assert [4, 3, 1] = Enum.map(actual, & &1.term)
     end
 
-    test "should not remove any sibling when given a positive index greater than count of previous siblings", %{z_with_siblings: z} do
+    test "should not remove any sibling when given a positive index greater than count of previous siblings",
+         %{z_with_siblings: z} do
       assert {^z, nil} = Zipper.pop_previous_sibling_at(z, 10)
     end
 
-    test "should remove the sibling at the correct index, starting from from the front since its reversed, when given a negative index", %{z_with_siblings: z} do
+    test "should remove the sibling at the correct index, starting from from the front since its reversed, when given a negative index",
+         %{z_with_siblings: z} do
       assert {%Zipper{prev: actual}, removed} = Zipper.pop_previous_sibling_at(z, -3)
       assert removed == Enum.at(z.prev, 2)
-      assert [4,3,1] = Enum.map(actual, &(&1.term))
+      assert [4, 3, 1] = Enum.map(actual, & &1.term)
     end
 
-    test "should not remove any sibling when given a negative index greater than count of previous siblings", %{z_with_siblings: z} do
+    test "should not remove any sibling when given a negative index greater than count of previous siblings",
+         %{z_with_siblings: z} do
       assert {^z, nil} = Zipper.pop_previous_sibling_at(z, -10)
     end
   end
@@ -345,23 +366,28 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
       assert Enum.count(actual) == Enum.count(z.next) - 1
     end
 
-    test "should remove the sibling at the correct index when given a positive index", %{z_with_siblings: z} do
+    test "should remove the sibling at the correct index when given a positive index", %{
+      z_with_siblings: z
+    } do
       assert {%Zipper{next: actual}, removed} = Zipper.pop_next_sibling_at(z, 1)
       assert removed == Enum.at(z.next, 1)
-      assert [6,8,9] = Enum.map(actual, &(&1.term))
+      assert [6, 8, 9] = Enum.map(actual, & &1.term)
     end
 
-    test "should not remove any sibling when given a positive index greater than count of next siblings", %{z_with_siblings: z} do
+    test "should not remove any sibling when given a positive index greater than count of next siblings",
+         %{z_with_siblings: z} do
       assert {^z, nil} = Zipper.pop_next_sibling_at(z, 10)
     end
 
-    test "should remove the sibling at the correct index, starting from from the back, when given a negative index", %{z_with_siblings: z} do
+    test "should remove the sibling at the correct index, starting from from the back, when given a negative index",
+         %{z_with_siblings: z} do
       assert {%Zipper{next: actual}, removed} = Zipper.pop_next_sibling_at(z, -3)
       assert removed == Enum.at(z.next, 1)
-      assert [6,8,9] = Enum.map(actual, &(&1.term))
+      assert [6, 8, 9] = Enum.map(actual, & &1.term)
     end
 
-    test "should not remove any sibling when given a negative index greater than count of next siblings", %{z_with_siblings: z} do
+    test "should not remove any sibling when given a negative index greater than count of next siblings",
+         %{z_with_siblings: z} do
       assert {^z, nil} = Zipper.pop_next_sibling_at(z, -10)
     end
   end

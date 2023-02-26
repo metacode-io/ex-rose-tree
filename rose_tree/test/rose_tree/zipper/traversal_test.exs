@@ -132,7 +132,6 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert %Zipper{focus: focus} = Zipper.descend_until(z, &(&1.focus.term == 12))
       assert focus.term == 12
     end
-
   end
 
   describe "ascend/1" do

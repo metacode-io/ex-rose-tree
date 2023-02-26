@@ -1228,8 +1228,9 @@ defmodule RoseTree.Zipper do
   """
   @doc section: :siblings
   @spec insert_previous_sibling_at(t(), term(), integer()) :: t()
-  def insert_previous_sibling_at(%__MODULE__{} = z, sibling, index) when RoseTree.rose_tree?(sibling),
-    do: do_insert_previous_sibling_at(z, sibling, index)
+  def insert_previous_sibling_at(%__MODULE__{} = z, sibling, index)
+      when RoseTree.rose_tree?(sibling),
+      do: do_insert_previous_sibling_at(z, sibling, index)
 
   def insert_previous_sibling_at(%__MODULE__{} = z, sibling, index),
     do: do_insert_previous_sibling_at(z, RoseTree.new(sibling), index)
@@ -1241,6 +1242,7 @@ defmodule RoseTree.Zipper do
       z.prev
       |> Enum.reverse()
       |> Enum.split(index)
+
     new_siblings = siblings_before ++ [sibling | siblings_after]
     %{z | prev: Enum.reverse(new_siblings)}
   end
@@ -1370,7 +1372,6 @@ defmodule RoseTree.Zipper do
 
     {%{z | next: new_siblings}, removed_sibling}
   end
-
 
   @doc """
   Moves focus to the first sibling from the current focus. If there are
@@ -3715,7 +3716,7 @@ defmodule RoseTree.Zipper do
   to the next node. Otherwise, returns nil.
   """
   @doc section: :traversal
-  @spec move_if(t(), predicate(), move_fn()) :: t() |nil
+  @spec move_if(t(), predicate(), move_fn()) :: t() | nil
   def move_if(%__MODULE__{} = z, predicate, move_fn)
       when is_function(move_fn) and is_function(predicate) do
     case move_fn.(z) do
@@ -3727,6 +3728,28 @@ defmodule RoseTree.Zipper do
           next_z
         else
           nil
+        end
+    end
+  end
+
+  @doc """
+  Continuously moves a direction in the Zipper, determined by the `move_fn()`,
+  until the provided predicate function returns true when applied to the next
+  node. Otherwise, returns nil.
+  """
+  @doc section: :traversal
+  @spec move_until(t(), predicate(), move_fn()) :: t() | nil
+  def move_until(%__MODULE__{} = z, predicate, move_fn)
+      when is_function(move_fn) and is_function(predicate) do
+    case move_fn.(z) do
+      nil ->
+        nil
+
+      %__MODULE__{} = next_z ->
+        if predicate.(next_z) do
+          next_z
+        else
+          move_until(next_z, predicate, move_fn)
         end
     end
   end
@@ -3765,8 +3788,7 @@ defmodule RoseTree.Zipper do
 
   @doc """
   Moves forward in the Zipper if the provided predicate function
-  returns true when applied to the next  Otherwise,
-  returns nil.
+  returns true when applied to the next node. Otherwise, returns nil.
   """
   @doc section: :breadth_first
   @spec forward_if(t(), predicate()) :: t() | nil
@@ -3775,24 +3797,12 @@ defmodule RoseTree.Zipper do
 
   @doc """
   Moves forward in the Zipper continuously until the provided predicate
-  function returns true when applied to the  Otherwise,
-  returns nil.
+  function returns true when applied to the next node. Otherwise, returns nil.
   """
   @doc section: :breadth_first
   @spec forward_until(t(), predicate()) :: t() | nil
-  def forward_until(%__MODULE__{} = z, predicate) when is_function(predicate) do
-    case forward(z) do
-      nil ->
-        nil
-
-      %__MODULE__{} = next_z ->
-        if predicate.(next_z) do
-          next_z
-        else
-          forward_until(next_z, predicate)
-        end
-    end
-  end
+  def forward_until(%__MODULE__{} = z, predicate) when is_function(predicate),
+    do: move_until(z, predicate, &forward/1)
 
   @doc """
   Moves forward through the Zipper until the last node of the tree
@@ -3845,8 +3855,7 @@ defmodule RoseTree.Zipper do
 
   @doc """
   Moves backward in the Zipper if the provided predicate function
-  returns true when applied to the next  Otherwise,
-  returns nil.
+  returns true when applied to the next node. Otherwise, returns nil.
   """
   @doc section: :breadth_first
   @spec backward_if(t(), predicate()) :: t() | nil
@@ -3855,24 +3864,12 @@ defmodule RoseTree.Zipper do
 
   @doc """
   Moves backward in the Zipper continuously until the provided predicate
-  function returns true when applied to the  Otherwise,
-  returns nil.
+  function returns true when applied to the next node. Otherwise, returns nil.
   """
   @doc section: :breadth_first
   @spec backward_until(t(), predicate()) :: t() | nil
-  def backward_until(%__MODULE__{} = z, predicate) when is_function(predicate) do
-    case backward(z) do
-      nil ->
-        nil
-
-      %__MODULE__{} = next_z ->
-        if predicate.(next_z) do
-          next_z
-        else
-          backward_until(next_z, predicate)
-        end
-    end
-  end
+  def backward_until(%__MODULE__{} = z, predicate) when is_function(predicate),
+    do: move_until(z, predicate, &backward/1)
 
   @doc """
   Moves backward through the Zipper until the root is reached.
@@ -3921,8 +3918,7 @@ defmodule RoseTree.Zipper do
 
   @doc """
   Descends into the Zipper if the provided predicate function
-  returns true when applied to the next focus. Otherwise,
-  returns nil.
+  returns true when applied to the next focus. Otherwise, returns nil.
   """
   @doc section: :depth_first
   @spec descend_if(t(), predicate()) :: t() | nil
@@ -3936,19 +3932,8 @@ defmodule RoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec descend_until(t(), predicate()) :: t() | nil
-  def descend_until(%__MODULE__{} = z, predicate) when is_function(predicate) do
-    case descend(z) do
-      nil ->
-        nil
-
-      %__MODULE__{} = next_z ->
-        if predicate.(next_z) do
-          next_z
-        else
-          descend_until(next_z, predicate)
-        end
-    end
-  end
+  def descend_until(%__MODULE__{} = z, predicate) when is_function(predicate),
+    do: move_until(z, predicate, &descend/1)
 
   @doc """
   Descends through the Zipper in a depth-first manner until the last
@@ -3997,9 +3982,8 @@ defmodule RoseTree.Zipper do
   def ascend_for(%__MODULE__{}, _reps), do: nil
 
   @doc """
-  Ascends the Zipper if the provided predicate function
-  returns true when applied to the next  Otherwise,
-  returns nil.
+  Ascends the Zipper if the provided predicate function returns true
+  when applied to the next focus. Otherwise, returns nil.
   """
   @doc section: :depth_first
   @spec ascend_if(t(), predicate()) :: t() | nil
@@ -4007,25 +3991,13 @@ defmodule RoseTree.Zipper do
     do: move_if(z, predicate, &ascend/1)
 
   @doc """
-  Ascends the Zipper continuously until the provided predicate
-  function returns true when applied to the  Otherwise,
-  returns nil.
+  Ascends the Zipper continuously until the provided predicate function
+  returns true when applied to the next focus. Otherwise, returns nil.
   """
   @doc section: :depth_first
   @spec ascend_until(t(), predicate()) :: t() | nil
-  def ascend_until(%__MODULE__{} = z, predicate) when is_function(predicate) do
-    case ascend(z) do
-      nil ->
-        nil
-
-      %__MODULE__{} = next_z ->
-        if predicate.(next_z) do
-          next_z
-        else
-          ascend_until(next_z, predicate)
-        end
-    end
-  end
+  def ascend_until(%__MODULE__{} = z, predicate) when is_function(predicate),
+    do: move_until(z, predicate, &ascend/1)
 
   @doc """
   Ascends through the Zipper in a depth-first manner until the
