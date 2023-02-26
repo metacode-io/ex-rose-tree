@@ -134,6 +134,22 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "descend_while/2" do
+    test "should descend the Zipper depth-first until the last node is reached when the default predicate is used", %{
+      z_depth_first: z
+    } do
+      assert %Zipper{focus: actual} = Zipper.descend_while(z)
+      assert actual.term == 40
+    end
+
+    test "should descend the Zipper depth-first until the predicate returns false", %{
+      z_depth_first: z
+    } do
+      assert %Zipper{focus: actual} = Zipper.descend_while(z, &(&1.focus.term < 20))
+      assert actual.term == 20
+    end
+  end
+
   describe "ascend/1" do
     test "should return nil if given a Zipper with no parents or siblings", %{simple_z: z} do
       assert Zipper.ascend(z) == nil
@@ -234,6 +250,28 @@ defmodule RoseTree.Zipper.ZipperTest do
     } do
       assert %Zipper{focus: focus} = Zipper.ascend_until(z, &(&1.focus.term == 12))
       assert focus.term == 12
+    end
+  end
+
+  describe "ascend_while/2" do
+    setup ctx do
+      %{
+        z_at_last_depth_first: Zipper.descend_to_last(ctx.z_depth_first)
+      }
+    end
+
+    test "should ascend the Zipper depth-first until the root node is reached when the default predicate is used", %{
+      z_at_last_depth_first: z
+    } do
+      assert %Zipper{focus: actual} = Zipper.ascend_while(z)
+      assert actual.term == 0
+    end
+
+    test "should ascend the Zipper depth-first until the predicate returns false", %{
+      z_at_last_depth_first: z
+    } do
+      assert %Zipper{focus: actual} = Zipper.ascend_while(z, &(&1.focus.term > 20))
+      assert actual.term == 20
     end
   end
 end
