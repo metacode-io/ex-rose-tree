@@ -364,6 +364,84 @@ defmodule RoseTree.Zipper.PiblingTest do
     end
   end
 
+  describe "first_ancestral_pibling/2" do
+    test "should return nil if no parent found", %{simple_z: z} do
+      assert Zipper.first_ancestral_pibling(z) == nil
+    end
+
+    test "should return nil if no ancestors have siblings", %{z_with_no_ancestral_piblings: z} do
+      assert Zipper.first_ancestral_pibling(z) == nil
+    end
+
+    test "should return nil if no previous pibling for any ancestor found matching the predicate",
+         %{
+           z_with_piblings: z_1,
+           z_with_grandpiblings: z_2,
+           z_with_ancestral_piblings: z_3
+         } do
+      predicate = &(&1.term == :not_found)
+
+      for z <- [z_1, z_2, z_3] do
+        assert Zipper.first_ancestral_pibling(z, predicate) == nil
+      end
+    end
+
+    test "should return the first previous ancestral pibling found", %{
+      z_with_grandpiblings: z
+    } do
+      actual = Zipper.first_ancestral_pibling(z)
+      assert 2 == actual.focus.term
+    end
+
+    test "should return the first previous pibling matching the predicate", %{
+      z_with_grandpiblings: z
+    } do
+      predicate = &(&1.term == 3)
+
+      actual = Zipper.first_ancestral_pibling(z, predicate)
+      assert 3 == actual.focus.term
+    end
+  end
+
+  describe "last_ancestral_pibling/2" do
+    test "should return nil if no parent found", %{simple_z: z} do
+      assert Zipper.last_ancestral_pibling(z) == nil
+    end
+
+    test "should return nil if no ancestors have siblings", %{z_with_no_ancestral_piblings: z} do
+      assert Zipper.last_ancestral_pibling(z) == nil
+    end
+
+    test "should return nil if no next pibling for any ancestor found matching the predicate",
+         %{
+           z_with_piblings: z_1,
+           z_with_grandpiblings: z_2,
+           z_with_ancestral_piblings: z_3
+         } do
+      predicate = &(&1.term == :not_found)
+
+      for z <- [z_1, z_2, z_3] do
+        assert Zipper.last_ancestral_pibling(z, predicate) == nil
+      end
+    end
+
+    test "should return the first next ancestral pibling found", %{
+      z_with_grandpiblings: z
+    } do
+      actual = Zipper.last_ancestral_pibling(z)
+      assert 8 == actual.focus.term
+    end
+
+    test "should return the first next ancestral pibling matching the predicate", %{
+      z_with_grandpiblings: z
+    } do
+      predicate = &(&1.term == 7)
+
+      actual = Zipper.last_ancestral_pibling(z, predicate)
+      assert 7 == actual.focus.term
+    end
+  end
+
   describe "previous_ancestral_pibling/2" do
     test "should return nil if no parent found", %{simple_z: z} do
       assert Zipper.previous_ancestral_pibling(z) == nil
