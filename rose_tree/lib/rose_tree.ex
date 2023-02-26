@@ -503,7 +503,7 @@ defmodule RoseTree do
   @typedoc """
   A function that takes a seed value and returns a new RoseTree and a
   list of new seeds to use for children. Care must be taken that you
-  don't create an function that inifinitely creates new seeds, in
+  don't create an function that infinitely creates new seeds, in
   other words, the function should have a terminating base case.
   """
   @type unfold_fn() :: (seed :: term() -> {term(), [seed :: term()]})

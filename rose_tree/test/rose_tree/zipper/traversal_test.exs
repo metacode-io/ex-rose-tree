@@ -14,15 +14,16 @@ defmodule RoseTree.Zipper.ZipperTest do
       z_with_grandchildren: Zippers.z_with_grandchildren(),
       z_with_siblings: Zippers.z_with_siblings(),
       z_with_ancestral_piblings: Zippers.z_with_ancestral_piblings(),
-      z_with_descendant_niblings: Zippers.z_with_descendant_niblings()
+      z_with_descendant_niblings: Zippers.z_with_descendant_niblings(),
+      z_depth_first: Zippers.z_depth_first()
     }
   end
 
-  describe "to_root/1" do
+  describe "rewind/1" do
     test "should return the current Zipper if already at the root" do
       root = %Zipper{focus: "root"}
 
-      actual = Zipper.to_root(root)
+      actual = Zipper.rewind(root)
 
       assert root == actual
     end
@@ -37,7 +38,7 @@ defmodule RoseTree.Zipper.ZipperTest do
 
         [root_location | _] = Enum.reverse(some_zipper.path)
 
-        assert %Zipper{focus: focus, path: []} = Zipper.to_root(some_zipper)
+        assert %Zipper{focus: focus, path: []} = Zipper.rewind(some_zipper)
         assert focus.term == root_location.term
       end
     end
@@ -131,6 +132,7 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert %Zipper{focus: focus} = Zipper.descend_until(z, &(&1.focus.term == 12))
       assert focus.term == 12
     end
+
   end
 
   describe "ascend/1" do
