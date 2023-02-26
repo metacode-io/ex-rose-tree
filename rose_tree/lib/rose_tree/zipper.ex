@@ -3754,6 +3754,28 @@ defmodule RoseTree.Zipper do
     end
   end
 
+  @doc """
+  Repeats the given `move_fn()` while the given predicate remains true.
+  If no custom predicate is given, the `move_fn()` will repeat until it no
+  longer can.
+  """
+  @doc section: :traversal
+  @spec move_while(t(), move_fn(), predicate()) :: t()
+  def move_while(%__MODULE__{} = z, move_fn, predicate \\ &Util.always/1)
+      when is_function(move_fn) and is_function(predicate) do
+    if predicate.(z) do
+      case move_fn.(z) do
+        nil ->
+          z
+
+        %__MODULE__{} = next_z ->
+          move_while(z, move_fn, predicate)
+      end
+    else
+      z
+    end
+  end
+
   ###
   ### FORWARD, BREADTH-FIRST TRAVERSAL
   ###
@@ -3805,20 +3827,23 @@ defmodule RoseTree.Zipper do
     do: move_until(z, predicate, &forward/1)
 
   @doc """
+  Moves forward in the Zipper while the given predicate remains true.
+  If no custom predicate is given, `forward/1` will repeat until it no
+  longer can.
+  """
+  @doc section: :breadth_first
+  @spec forward_while(t(), predicate()) :: t()
+  def forward_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
+    do: move_while(z, predicate, &forward/1)
+
+  @doc """
   Moves forward through the Zipper until the last node of the tree
   has been reached.
   """
   @doc section: :breadth_first
   @spec forward_to_last(t()) :: t()
-  def forward_to_last(%__MODULE__{} = z) do
-    case forward(z) do
-      nil ->
-        z
-
-      %__MODULE__{} = next_z ->
-        forward_to_last(next_z)
-    end
-  end
+  def forward_to_last(%__MODULE__{} = z),
+    do: forward_while(z)
 
   ###
   ### BACKWARD, BREADTH-FIRST TRAVERSAL
@@ -3872,19 +3897,23 @@ defmodule RoseTree.Zipper do
     do: move_until(z, predicate, &backward/1)
 
   @doc """
-  Moves backward through the Zipper until the root is reached.
+  Moves backward in the Zipper while the given predicate remains true.
+  If no custom predicate is given, `backward/1` will repeat until it no
+  longer can.
   """
   @doc section: :breadth_first
-  @spec backward_to_root(t()) :: t()
-  def backward_to_root(%__MODULE__{} = z) do
-    case backward(z) do
-      nil ->
-        z
+  @spec backward_while(t(), predicate()) :: t()
+  def backward_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
+    do: move_while(z, predicate, &backward/1)
 
-      %__MODULE__{} = next_z ->
-        backward_to_root(z)
-    end
-  end
+  @doc """
+  Moves backward through the Zipper until the root has been reached. If the
+  root has previous siblings, will move the the first sibling of the root.
+  """
+  @doc section: :breadth_first
+  @spec backward_to_last(t()) :: t()
+  def backward_to_last(%__MODULE__{} = z),
+    do: backward_while(z)
 
   ###
   ### DESCEND, DEPTH-FIRST TRAVERSAL
@@ -3936,20 +3965,21 @@ defmodule RoseTree.Zipper do
     do: move_until(z, predicate, &descend/1)
 
   @doc """
-  Descends through the Zipper in a depth-first manner until the last
-  node of the tree is reached.
+  Descends the Zipper while the given predicate remains true. If no custom
+  predicate is given, `descend/1` will repeat until it no longer can.
+  """
+  @doc section: :depth_first
+  @spec descend_while(t(), predicate()) :: t()
+  def descend_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
+    do: move_while(z, predicate, &descend/1)
+
+  @doc """
+  Descends the Zipper until the last node of the tree has been reached.
   """
   @doc section: :depth_first
   @spec descend_to_last(t()) :: t()
-  def descend_to_last(%__MODULE__{} = z) do
-    case descend(z) do
-      nil ->
-        z
-
-      %__MODULE__{} = next_z ->
-        descend_to_last(next_z)
-    end
-  end
+  def descend_to_last(%__MODULE__{} = z),
+    do: descend_while(z)
 
   ###
   ### ASCEND, DEPTH-FIRST TRAVERSAL
@@ -4000,20 +4030,22 @@ defmodule RoseTree.Zipper do
     do: move_until(z, predicate, &ascend/1)
 
   @doc """
-  Ascends through the Zipper in a depth-first manner until the
-  root of the tree is reached.
+  Ascends the Zipper while the given predicate remains true. If no custom
+  predicate is given, `descend/1` will repeat until it no longer can.
   """
   @doc section: :depth_first
-  @spec ascend_to_root(t()) :: t()
-  def ascend_to_root(%__MODULE__{} = z) do
-    case ascend(z) do
-      nil ->
-        z
+  @spec ascend_while(t(), predicate()) :: t()
+  def ascend_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
+    do: move_while(z, predicate, &ascend/1)
 
-      %__MODULE__{} = next_z ->
-        ascend_to_root(next_z)
-    end
-  end
+  @doc """
+  Ascends the Zipper until the root has been reached. If the root has
+  previous siblings, will move the the first sibling of the root.
+  """
+  @doc section: :depth_first
+  @spec ascend_to_last(t()) :: t()
+  def ascend_to_last(%__MODULE__{} = z),
+    do: ascend_while(z)
 
   ###
   ### SEARCHING
