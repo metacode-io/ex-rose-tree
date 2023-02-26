@@ -3769,7 +3769,7 @@ defmodule RoseTree.Zipper do
           z
 
         %__MODULE__{} = next_z ->
-          move_while(z, move_fn, predicate)
+          move_while(next_z, move_fn, predicate)
       end
     else
       z
@@ -3834,7 +3834,7 @@ defmodule RoseTree.Zipper do
   @doc section: :breadth_first
   @spec forward_while(t(), predicate()) :: t()
   def forward_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
-    do: move_while(z, predicate, &forward/1)
+    do: move_while(z, &forward/1, predicate)
 
   @doc """
   Moves forward through the Zipper until the last node of the tree
@@ -3904,7 +3904,7 @@ defmodule RoseTree.Zipper do
   @doc section: :breadth_first
   @spec backward_while(t(), predicate()) :: t()
   def backward_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
-    do: move_while(z, predicate, &backward/1)
+    do: move_while(z, &backward/1, predicate)
 
   @doc """
   Moves backward through the Zipper until the root has been reached. If the
@@ -3971,7 +3971,7 @@ defmodule RoseTree.Zipper do
   @doc section: :depth_first
   @spec descend_while(t(), predicate()) :: t()
   def descend_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
-    do: move_while(z, predicate, &descend/1)
+    do: move_while(z, &descend/1, predicate)
 
   @doc """
   Descends the Zipper until the last node of the tree has been reached.
@@ -4036,7 +4036,7 @@ defmodule RoseTree.Zipper do
   @doc section: :depth_first
   @spec ascend_while(t(), predicate()) :: t()
   def ascend_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
-    do: move_while(z, predicate, &ascend/1)
+    do: move_while(z, &ascend/1, predicate)
 
   @doc """
   Ascends the Zipper until the root has been reached. If the root has
