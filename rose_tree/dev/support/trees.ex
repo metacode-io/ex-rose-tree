@@ -21,5 +21,4 @@ defmodule RoseTree.Support.Trees do
       ]
     }
   end
-
 end

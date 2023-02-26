@@ -225,11 +225,11 @@ defmodule RoseTree.Support.Zippers do
         RoseTree.new(3, [
           RoseTree.new(10, [
             RoseTree.new(18),
-            RoseTree.new(19),
+            RoseTree.new(19)
           ]),
           RoseTree.new(11, [
             RoseTree.new(20),
-            RoseTree.new(21),
+            RoseTree.new(21)
           ]),
           RoseTree.new(12, [
             RoseTree.new(22),
@@ -549,10 +549,12 @@ defmodule RoseTree.Support.Zippers do
       path: [
         Location.new(5,
           prev: [RoseTree.new(4)],
-          next: [RoseTree.new(6)]),
+          next: [RoseTree.new(6)]
+        ),
         Location.new(8,
           prev: [RoseTree.new(7)],
-          next: [RoseTree.new(9)]),
+          next: [RoseTree.new(9)]
+        ),
         Location.new(10,
           prev: [],
           next: [
@@ -561,7 +563,8 @@ defmodule RoseTree.Support.Zippers do
               RoseTree.new(13),
               RoseTree.new(14)
             ])
-          ]),
+          ]
+        ),
         Location.new(15,
           prev: [
             RoseTree.new(-16, [
@@ -616,7 +619,8 @@ defmodule RoseTree.Support.Zippers do
               RoseTree.new(33),
               RoseTree.new(34)
             ])
-          ]),
+          ]
+        ),
         Location.new(35)
       ]
     }
@@ -624,65 +628,72 @@ defmodule RoseTree.Support.Zippers do
 
   def z_depth_first() do
     %Zipper{
-      focus: RoseTree.new(0, [
-        RoseTree.new(1, [
-          RoseTree.new(2, [
-            RoseTree.new(3),
-            RoseTree.new(4),
-            RoseTree.new(5, [
-              RoseTree.new(6),
-              RoseTree.new(7)
+      focus:
+        RoseTree.new(0, [
+          RoseTree.new(1, [
+            RoseTree.new(2, [
+              RoseTree.new(3),
+              RoseTree.new(4),
+              RoseTree.new(5, [
+                RoseTree.new(6),
+                RoseTree.new(7)
+              ])
+            ]),
+            RoseTree.new(8),
+            RoseTree.new(9),
+            RoseTree.new(10, [
+              RoseTree.new(11, [
+                RoseTree.new(12),
+                RoseTree.new(13)
+              ]),
+              RoseTree.new(14),
+              RoseTree.new(15, [
+                RoseTree.new(16)
+              ])
+            ]),
+            RoseTree.new(17)
+          ]),
+          RoseTree.new(18),
+          RoseTree.new(19, [
+            RoseTree.new(20),
+            RoseTree.new(21, [
+              RoseTree.new(22),
+              RoseTree.new(23),
+              RoseTree.new(24, [
+                RoseTree.new(25),
+                RoseTree.new(26)
+              ]),
+              RoseTree.new(27, [
+                RoseTree.new(28)
+              ]),
+              RoseTree.new(29)
+            ]),
+            RoseTree.new(30)
+          ]),
+          RoseTree.new(31, [
+            RoseTree.new(32)
+          ]),
+          RoseTree.new(33),
+          RoseTree.new(34, [
+            RoseTree.new(35, [
+              RoseTree.new(36),
+              RoseTree.new(37)
+            ]),
+            RoseTree.new(38),
+            RoseTree.new(39, [
+              RoseTree.new(40)
             ])
-          ]),
-          RoseTree.new(8),
-          RoseTree.new(9),
-          RoseTree.new(10, [
-            RoseTree.new(11, [
-              RoseTree.new(12),
-              RoseTree.new(13)
-            ]),
-            RoseTree.new(14),
-            RoseTree.new(15, [
-              RoseTree.new(16)
-            ])
-          ]),
-          RoseTree.new(17)
-        ]),
-        RoseTree.new(18),
-        RoseTree.new(19, [
-          RoseTree.new(20),
-          RoseTree.new(21, [
-            RoseTree.new(22),
-            RoseTree.new(23),
-            RoseTree.new(24, [
-              RoseTree.new(25),
-              RoseTree.new(26)
-            ]),
-            RoseTree.new(27, [
-              RoseTree.new(28)
-            ]),
-            RoseTree.new(29)
-          ]),
-          RoseTree.new(30)
-        ]),
-        RoseTree.new(31, [
-          RoseTree.new(32)
-        ]),
-        RoseTree.new(33),
-        RoseTree.new(34, [
-          RoseTree.new(35, [
-            RoseTree.new(36),
-            RoseTree.new(37)
-          ]),
-          RoseTree.new(38),
-          RoseTree.new(39, [
-            RoseTree.new(40)
           ])
-        ])
-      ]),
+        ]),
       prev: [],
       next: [],
       path: []
     }
+  end
+
+  def z_depth_first_siblings() do
+    z = z_depth_first()
+
+    %{z | prev: [RoseTree.new(-1)], next: [RoseTree.new(41)]}
   end
 end

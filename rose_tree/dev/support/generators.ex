@@ -5,10 +5,10 @@ defmodule RoseTree.Support.Generators do
   alias RoseTree.Zipper.Location
 
   @typep default_seed() :: %{
-    current_depth: non_neg_integer(),
-    num_children: non_neg_integer(),
-    shares_for_children: non_neg_integer()
-  }
+           current_depth: non_neg_integer(),
+           num_children: non_neg_integer(),
+           shares_for_children: non_neg_integer()
+         }
 
   @spec random_tree(keyword()) :: RoseTree.t()
   def random_tree(options \\ []) do
@@ -37,13 +37,12 @@ defmodule RoseTree.Support.Generators do
 
     if num_siblings == 0 do
       z
-
     else
-      random_trees = for _ <- 0..num_siblings-1, do: random_tree(options)
+      random_trees = for _ <- 0..(num_siblings - 1), do: random_tree(options)
 
       {prev, next} =
         random_trees
-        |> Util.split_at(Enum.random(0..num_siblings-1))
+        |> Util.split_at(Enum.random(0..(num_siblings - 1)))
 
       %Zipper{z | prev: prev, next: next}
     end
@@ -55,12 +54,11 @@ defmodule RoseTree.Support.Generators do
 
     if num_locations == 0 do
       z
-
     else
       random_locations =
-        for _ <- 0..num_locations-1 do
-           z = random_zipper(num_locations: 0)
-           %Location{prev: z.prev, term: z.focus.term, next: z.next}
+        for _ <- 0..(num_locations - 1) do
+          z = random_zipper(num_locations: 0)
+          %Location{prev: z.prev, term: z.focus.term, next: z.next}
         end
 
       %Zipper{z | path: random_locations}
@@ -73,14 +71,15 @@ defmodule RoseTree.Support.Generators do
 
     case seed do
       # stop if we run out of total remaining seeds
-      %{current_depth: _current_depth,
-        num_children: num_children,
-        shares_for_children: _} when num_children <= 0 ->
+      %{current_depth: _current_depth, num_children: num_children, shares_for_children: _}
+      when num_children <= 0 ->
         {:rand.uniform(range), []}
 
-      %{current_depth: current_depth,
+      %{
+        current_depth: current_depth,
         num_children: num_children,
-        shares_for_children: shares_for_children} ->
+        shares_for_children: shares_for_children
+      } ->
         new_depth = current_depth + 1
 
         {new_seeds, remaining_shares} =
@@ -92,6 +91,7 @@ defmodule RoseTree.Support.Generators do
 
             _, {new_children, remaining_shares} ->
               num_grandchildren = :rand.uniform(remaining_shares)
+
               num_grandchildren =
                 if num_grandchildren > max_children do
                   max_children
@@ -125,6 +125,7 @@ defmodule RoseTree.Support.Generators do
 
   defp do_allot_remaining_shares(processed, [seed | seeds] = _todo, shares) do
     allotted = :rand.uniform(shares)
+
     [%{seed | shares_for_children: seed.shares_for_children + allotted} | processed]
     |> do_allot_remaining_shares(seeds, shares - allotted)
   end
@@ -135,7 +136,12 @@ defmodule RoseTree.Support.Generators do
 
     max_children = Keyword.get(options, :max_children, total_nodes - 1)
 
-    root_children = if max_children == 0 do 0 else :rand.uniform(max_children) end
+    root_children =
+      if max_children == 0 do
+        0
+      else
+        :rand.uniform(max_children)
+      end
 
     initial_seed = new_seed(0, root_children, total_nodes - root_children - 1)
 
@@ -146,7 +152,11 @@ defmodule RoseTree.Support.Generators do
 
   @spec new_seed(non_neg_integer(), non_neg_integer(), non_neg_integer()) :: default_seed()
   def new_seed(current_depth, num_children, shares_for_children) do
-    %{current_depth: current_depth, num_children: num_children, shares_for_children: shares_for_children}
+    %{
+      current_depth: current_depth,
+      num_children: num_children,
+      shares_for_children: shares_for_children
+    }
   end
 
   @spec random_number_of_nodes() :: 1..100
