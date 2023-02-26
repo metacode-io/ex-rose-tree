@@ -3911,8 +3911,8 @@ defmodule RoseTree.Zipper do
   root has previous siblings, will move the the first sibling of the root.
   """
   @doc section: :breadth_first
-  @spec backward_to_last(t()) :: t()
-  def backward_to_last(%__MODULE__{} = z),
+  @spec backward_to_root(t()) :: t()
+  def backward_to_root(%__MODULE__{} = z),
     do: backward_while(z)
 
   ###
@@ -4043,8 +4043,8 @@ defmodule RoseTree.Zipper do
   previous siblings, will move the the first sibling of the root.
   """
   @doc section: :depth_first
-  @spec ascend_to_last(t()) :: t()
-  def ascend_to_last(%__MODULE__{} = z),
+  @spec ascend_to_root(t()) :: t()
+  def ascend_to_root(%__MODULE__{} = z),
     do: ascend_while(z)
 
   ###
