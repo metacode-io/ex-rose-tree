@@ -154,7 +154,7 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
 
       expected_tree = RoseTree.new(new_term)
 
-      assert %Zipper{prev: actual} = Zipper.insert_previous_sibling_at(z, expected_tree, 0)
+      assert %Zipper{prev: actual} = Zipper.insert_previous_sibling_at(z, new_term, 0)
       assert [^expected_tree | _] = Enum.reverse(actual)
     end
 
@@ -214,7 +214,7 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
       expected_tree = RoseTree.new(new_term)
 
       assert %Zipper{next: [^expected_tree | _]} =
-               Zipper.insert_next_sibling_at(z, expected_tree, 0)
+               Zipper.insert_next_sibling_at(z, new_term, 0)
     end
 
     test "should insert a new RoseTree at the correct index when given a positive index", %{
