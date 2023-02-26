@@ -243,7 +243,16 @@ defmodule RoseTree.Support.Zippers do
           RoseTree.new(16),
           RoseTree.new(17)
         ]),
-        RoseTree.new(1)
+        RoseTree.new(1, [
+          RoseTree.new(100, [
+            RoseTree.new(200, [
+              RoseTree.new(300),
+              RoseTree.new(301)
+            ]),
+            RoseTree.new(201)
+          ]),
+          RoseTree.new(101)
+        ])
       ],
       next: [
         RoseTree.new(7, [
@@ -270,7 +279,16 @@ defmodule RoseTree.Support.Zippers do
             RoseTree.new(36)
           ])
         ]),
-        RoseTree.new(9)
+        RoseTree.new(9, [
+          RoseTree.new(700),
+          RoseTree.new(701, [
+            RoseTree.new(800),
+            RoseTree.new(801, [
+              RoseTree.new(900),
+              RoseTree.new(901)
+            ])
+          ])
+        ])
       ],
       path: [
         Location.new(100)

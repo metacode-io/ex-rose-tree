@@ -330,6 +330,78 @@ defmodule RoseTree.Zipper.Zipper.NiblingTest do
     end
   end
 
+  describe "first_descendant_nibling/2" do
+    test "should return nil if no previous sibling found", %{simple_z: z} do
+      assert Zipper.first_descendant_nibling(z) == nil
+    end
+
+    test "should return nil if first previous sibling has no children", %{
+      z_with_niblings: z
+    } do
+      assert Zipper.first_descendant_nibling(z) == nil
+    end
+
+    test "should return nil if no previous descendant nibling, starting from first, found matching predicate", %{
+      z_with_descendant_niblings: z
+    } do
+      predicate = &(&1.focus.term == :not_found)
+
+      assert Zipper.first_descendant_nibling(z, predicate) == nil
+    end
+
+    test "should return the first descendant nibling found", %{
+      z_with_descendant_niblings: z
+    } do
+      assert %Zipper{focus: focus} = Zipper.first_descendant_nibling(z)
+      assert 300 == focus.term
+    end
+
+    test "should return the first previous descendant nibling, starting from first, found matching the predicate", %{
+      z_with_descendant_niblings: z
+    } do
+      predicate = &(&1.focus.term == 200)
+
+      assert %Zipper{focus: focus} = Zipper.first_descendant_nibling(z, predicate)
+      assert 200 == focus.term
+    end
+  end
+
+  describe "last_descendant_nibling/2" do
+    test "should return nil if no previous sibling found", %{simple_z: z} do
+      assert Zipper.last_descendant_nibling(z) == nil
+    end
+
+    test "should return nil if first previous sibling has no children", %{
+      z_with_niblings: z
+    } do
+      assert Zipper.last_descendant_nibling(z) == nil
+    end
+
+    test "should return nil if no previous descendant nibling, starting from first, found matching predicate", %{
+      z_with_descendant_niblings: z
+    } do
+      predicate = &(&1.focus.term == :not_found)
+
+      assert Zipper.last_descendant_nibling(z, predicate) == nil
+    end
+
+    test "should return the first descendant nibling found", %{
+      z_with_descendant_niblings: z
+    } do
+      assert %Zipper{focus: focus} = Zipper.last_descendant_nibling(z)
+      assert 901 == focus.term
+    end
+
+    test "should return the first previous descendant nibling, starting from first, found matching the predicate", %{
+      z_with_descendant_niblings: z
+    } do
+      predicate = &(&1.focus.term == 701)
+
+      assert %Zipper{focus: focus} = Zipper.last_descendant_nibling(z, predicate)
+      assert 701 == focus.term
+    end
+  end
+
   describe "previous_descendant_nibling/2" do
     test "should return nil if no previous sibling found", %{simple_z: z} do
       assert Zipper.previous_descendant_nibling(z) == nil
