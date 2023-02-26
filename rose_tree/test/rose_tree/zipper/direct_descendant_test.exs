@@ -9,6 +9,7 @@ defmodule RoseTree.Zipper.DirectDescendantTest do
       empty_z: Zippers.empty_z(),
       leaf_z: Zippers.leaf_z(),
       simple_z: Zippers.simple_z(),
+      z_with_siblings: Zippers.z_with_siblings(),
       z_with_grandchildren: Zippers.z_with_grandchildren(),
       z_with_grandchildren_2: Zippers.z_with_grandchildren_2(),
       z_with_great_grandchildren: Zippers.z_with_great_grandchildren(),
@@ -229,6 +230,62 @@ defmodule RoseTree.Zipper.DirectDescendantTest do
       for z <- [z_1, z_2] do
         assert Zipper.last_great_grandchild(z, predicate) == nil
       end
+    end
+  end
+
+  describe "rightmost_descendant/2" do
+    test "should return nil when given a zipper with no children",
+        %{empty_z: z_0, leaf_z: z_1, z_with_siblings: z_2} do
+      for z <- [z_0, z_1, z_2] do
+        assert Zipper.rightmost_descendant(z) == nil
+      end
+    end
+
+    test "should return the rightmost descendant of the Zipper", %{z_with_great_grandchildren: z} do
+      assert %Zipper{focus: actual} = Zipper.rightmost_descendant(z)
+      assert actual.term == 12
+    end
+
+    test "should return the rightmost descendant of the Zipper if predicate matches", %{z_with_great_grandchildren: z} do
+      predicate = &(&1.focus.term == 3)
+
+      assert %Zipper{focus: actual} = Zipper.rightmost_descendant(z, predicate)
+      assert actual.term == 3
+    end
+
+    test "should return rightmost descendant of the Zipper if predicate doesn't find a match", %{z_with_great_grandchildren: z} do
+      predicate = &(&1.focus.term == 30)
+
+      assert %Zipper{focus: actual} = Zipper.rightmost_descendant(z, predicate)
+      assert actual.term == 12
+    end
+  end
+
+  describe "leftmost_descendant/2" do
+    test "should return nil when given a zipper with no children",
+        %{empty_z: z_0, leaf_z: z_1, z_with_siblings: z_2} do
+      for z <- [z_0, z_1, z_2] do
+        assert Zipper.leftmost_descendant(z) == nil
+      end
+    end
+
+    test "should return the leftmost descendant of the Zipper", %{z_with_great_grandchildren: z} do
+      assert %Zipper{focus: actual} = Zipper.leftmost_descendant(z)
+      assert actual.term == 4
+    end
+
+    test "should return the rightmost descendant of the Zipper if predicate matches", %{z_with_great_grandchildren: z} do
+      predicate = &(&1.focus.term == 1)
+
+      assert %Zipper{focus: actual} = Zipper.leftmost_descendant(z, predicate)
+      assert actual.term == 1
+    end
+
+    test "should return rightmost descendant of the Zipper if predicate doesn't find a match", %{z_with_great_grandchildren: z} do
+      predicate = &(&1.focus.term == 40)
+
+      assert %Zipper{focus: actual} = Zipper.leftmost_descendant(z, predicate)
+      assert actual.term == 4
     end
   end
 end

@@ -15,7 +15,11 @@ defmodule RoseTree.Zipper.ZipperTest do
       z_with_siblings: Zippers.z_with_siblings(),
       z_with_ancestral_piblings: Zippers.z_with_ancestral_piblings(),
       z_with_descendant_niblings: Zippers.z_with_descendant_niblings(),
-      z_depth_first: Zippers.z_depth_first()
+      z_with_extended_cousins: Zippers.z_with_extended_cousins(),
+      z_depth_first: Zippers.z_depth_first(),
+      z_depth_first_siblings: Zippers.z_depth_first_siblings(),
+      z_breadth_first: Zippers.z_breadth_first(),
+      z_breadth_first_siblings: Zippers.z_breadth_first_siblings()
     }
   end
 
@@ -42,6 +46,33 @@ defmodule RoseTree.Zipper.ZipperTest do
         assert focus.term == root_location.term
       end
     end
+  end
+
+  describe "forward/1" do
+    test "should return nil if given an empty Zipper with no siblings", %{empty_z: z} do
+      assert Zipper.forward(z) == nil
+    end
+
+    test "should return nil if given a leaf Zipper with no siblings", %{leaf_z: z} do
+      assert Zipper.forward(z) == nil
+    end
+
+    test "should return the next sibling if given a Zipper with next siblings", %{z_breadth_first_siblings: z} do
+      assert %Zipper{focus: focus} = Zipper.forward(z)
+      assert 1 == focus.term
+    end
+
+    test "should return the next extended cousin if given a Zipper with no next siblings but with next extended cousins",
+         %{z_with_extended_cousins: z} do
+      assert %Zipper{focus: focus} = Zipper.forward(z)
+      assert 105 == focus.term
+    end
+
+    # test "should return the next ancestral pibling if given a Zipper with no children or siblings, but with next piblings",
+    #      %{z_with_ancestral_piblings: z} do
+    #   assert %Zipper{focus: focus} = Zipper.descend(z)
+    #   assert 6 == focus.term
+    # end
   end
 
   describe "descend/1" do
