@@ -215,6 +215,21 @@ defmodule RoseTree do
   end
 
   @doc """
+  Returns whether or not the current tree has a child that matches the predicate.
+
+  ## Examples
+
+      iex> tree = RoseTree.new(5, [4,3,2,1])
+      ...> RoseTree.has_child?(tree, &(&1.term == 2))
+      true
+
+  """
+  @spec has_child?(t(), (t() -> boolean())) :: boolean()
+  def has_child?(%__MODULE__{children: children} = tree, predicate) when is_function(predicate) do
+    Enum.any?(children, predicate)
+  end
+
+  @doc """
   Returns the children of a RoseTree.
 
   ## Examples

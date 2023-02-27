@@ -644,6 +644,100 @@ defmodule RoseTree.Support.Zippers do
     }
   end
 
+  def z_with_extended_niblings() do
+    %Zipper{
+      focus: RoseTree.new(20),
+      prev: [],
+      next: [],
+      path: [
+        Location.new(100),
+        Location.new(15),
+        Location.new(10,
+          prev: [
+            RoseTree.new(6),
+            RoseTree.new(4, [
+              RoseTree.new(22, [
+                RoseTree.new(44),
+                RoseTree.new(45, [
+                  RoseTree.new(101, [
+                    RoseTree.new(200),
+                    RoseTree.new(201)
+                  ]),
+                  RoseTree.new(102)
+                ]),
+                RoseTree.new(46)
+              ]),
+              RoseTree.new(23),
+              RoseTree.new(24, [
+                RoseTree.new(47),
+                RoseTree.new(48),
+                RoseTree.new(49)
+              ])
+            ]),
+            RoseTree.new(2, [
+              RoseTree.new(19),
+              RoseTree.new(20, [
+                RoseTree.new(50, [
+                  RoseTree.new(103, [
+                    RoseTree.new(202),
+                    RoseTree.new(203)
+                  ])
+                ]),
+                RoseTree.new(51, [
+                  RoseTree.new(104, [
+                    RoseTree.new(204)
+                  ])
+                ])
+              ]),
+              RoseTree.new(21)
+            ])
+          ],
+          next: [
+            RoseTree.new(14),
+            RoseTree.new(16, [
+              RoseTree.new(25),
+              RoseTree.new(26, [
+                RoseTree.new(52, [
+                  RoseTree.new(105, [
+                    RoseTree.new(204),
+                    RoseTree.new(205)
+                  ]),
+                  RoseTree.new(110)
+                ]),
+                RoseTree.new(53, [
+                  RoseTree.new(106, [
+                    RoseTree.new(206)
+                  ])
+                ])
+              ]),
+              RoseTree.new(27)
+            ]),
+            RoseTree.new(18, [
+              RoseTree.new(28, [
+                RoseTree.new(54),
+                RoseTree.new(55, [
+                  RoseTree.new(107, [
+                    RoseTree.new(207)
+                  ]),
+                  RoseTree.new(108, [
+                    RoseTree.new(208),
+                    RoseTree.new(209)
+                  ])
+                ]),
+                RoseTree.new(56)
+              ]),
+              RoseTree.new(29),
+              RoseTree.new(30, [
+                RoseTree.new(57),
+                RoseTree.new(58)
+              ])
+            ])
+          ]
+        )
+      ]
+    }
+  end
+
   def z_depth_first() do
     %Zipper{
       focus:

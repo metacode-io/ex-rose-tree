@@ -1955,7 +1955,7 @@ defmodule RoseTree.Zipper do
   @spec first_extended_nibling(t(), predicate()) :: t() | nil
   def first_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = first_extended_cousin <-
-           first_extended_cousin(z, &has_children?/1),
+           first_extended_cousin(z, &(RoseTree.has_child?(&1.focus, predicate))),
          %__MODULE__{} = first_child <- first_child(first_extended_cousin, predicate) do
       first_child
     else
@@ -1970,7 +1970,7 @@ defmodule RoseTree.Zipper do
   @doc section: :niblings
   @spec last_extended_nibling(t(), predicate()) :: t() | nil
   def last_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
-    with %__MODULE__{} = last_extended_cousin <- last_extended_cousin(z, &has_children?/1),
+    with %__MODULE__{} = last_extended_cousin <- last_extended_cousin(z, &(RoseTree.has_child?(&1.focus, predicate))),
          %__MODULE__{} = last_child <- last_child(last_extended_cousin, predicate) do
       last_child
     else
@@ -1986,7 +1986,7 @@ defmodule RoseTree.Zipper do
   @spec previous_extended_nibling(t(), predicate()) :: t() | nil
   def previous_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = prev_extended_cousin <-
-           previous_extended_cousin(z, &has_children?/1),
+           previous_extended_cousin(z, &(RoseTree.has_child?(&1, predicate))),
          %__MODULE__{} = last_child <- last_child(prev_extended_cousin, predicate) do
       last_child
     else
@@ -2001,7 +2001,7 @@ defmodule RoseTree.Zipper do
   @doc section: :niblings
   @spec next_extended_nibling(t(), predicate()) :: t() | nil
   def next_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
-    with %__MODULE__{} = next_extended_cousin <- next_extended_cousin(z, &has_children?/1),
+    with %__MODULE__{} = next_extended_cousin <- next_extended_cousin(z, &(RoseTree.has_child?(&1, predicate))),
          %__MODULE__{} = first_child <- first_child(next_extended_cousin, predicate) do
       first_child
     else
