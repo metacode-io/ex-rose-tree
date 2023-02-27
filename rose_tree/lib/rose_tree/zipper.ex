@@ -1071,7 +1071,7 @@ defmodule RoseTree.Zipper do
       iex> prev = for t <- [1,2,3,4], do: RoseTree.new(t)
       ...> tree = RoseTree.new(5)
       ...> z = RoseTree.Zipper.new(tree, prev: prev)
-      ...> RoseTree.Zipper.prev_siblings(z)
+      ...> RoseTree.Zipper.previous_siblings(z)
       [
         %RoseTree{term: 4, children: []},
         %RoseTree{term: 3, children: []},
@@ -1081,8 +1081,8 @@ defmodule RoseTree.Zipper do
 
   """
   @doc section: :siblings
-  @spec prev_siblings(t()) :: [RoseTree.t()]
-  def prev_siblings(%__MODULE__{prev: prev}),
+  @spec previous_siblings(t()) :: [RoseTree.t()]
+  def previous_siblings(%__MODULE__{prev: prev}),
     do: Enum.reverse(prev)
 
   @doc """
@@ -1117,7 +1117,7 @@ defmodule RoseTree.Zipper do
       ...> tree = RoseTree.new(5)
       ...> z = RoseTree.Zipper.new(tree, prev: prev)
       ...> map_fn = &RoseTree.map_term(&1, fn term -> term * 2 end)
-      ...> RoseTree.Zipper.map_prev_siblings(z, &map_fn.(&1))
+      ...> RoseTree.Zipper.map_previous_siblings(z, &map_fn.(&1))
       %RoseTree.Zipper{
         focus: %RoseTree{term: 5, children: []},
         prev: [
@@ -1132,8 +1132,8 @@ defmodule RoseTree.Zipper do
 
   """
   @doc section: :siblings
-  @spec map_prev_siblings(t(), (RoseTree.t() -> RoseTree.t())) :: t()
-  def map_prev_siblings(%__MODULE__{prev: prev} = z, map_fn) when is_function(map_fn) do
+  @spec map_previous_siblings(t(), (RoseTree.t() -> RoseTree.t())) :: t()
+  def map_previous_siblings(%__MODULE__{prev: prev} = z, map_fn) when is_function(map_fn) do
     new_siblings =
       prev
       |> Enum.map(fn sibling -> map_fn.(sibling) end)

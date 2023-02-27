@@ -278,7 +278,7 @@ defmodule RoseTree.ZipperTest do
     end
   end
 
-  describe "map_prev_siblings/2" do
+  describe "map_previous_siblings/2" do
     test "should raise ArgumentError if the map_fn returns a result that is not a RoseTree", %{
       simple_z: z,
       tree_x5: tree
@@ -287,7 +287,7 @@ defmodule RoseTree.ZipperTest do
 
       new_z = %Zipper{z | prev: [tree]}
 
-      assert_raise(ArgumentError, fn -> Zipper.map_prev_siblings(new_z, map_fn) end)
+      assert_raise(ArgumentError, fn -> Zipper.map_previous_siblings(new_z, map_fn) end)
     end
   end
 

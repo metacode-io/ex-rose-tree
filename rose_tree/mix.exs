@@ -36,6 +36,10 @@ defmodule RoseTree.MixProject do
         groups_for_docs: [
           Guards: &(&1[:section] == :guards),
           "Basic Functionality": &(&1[:section] == :basic),
+          "Common Traversal": &(&1[:section] == :traversal),
+          "Path Traversal": &(&1[:section] == :path_traversal),
+          "Breadth-first Traversal": &(&1[:section] == :breadth_first),
+          "Depth-first Traversal": &(&1[:section] == :depth_first),
           "Direct Ancestors": &(&1[:section] == :ancestors),
           "Direct Descendants": &(&1[:section] == :descendants),
           Siblings: &(&1[:section] == :siblings),
@@ -44,10 +48,6 @@ defmodule RoseTree.MixProject do
           "First Cousins": &(&1[:section] == :first_cousins),
           "Second Cousins": &(&1[:section] == :second_cousins),
           "Extended Cousins": &(&1[:section] == :extended_cousins),
-          "Common Traversal": &(&1[:section] == :traversal),
-          "Path Traversal": &(&1[:section] == :path_traversal),
-          "Breadth-first Traversal": &(&1[:section] == :breadth_first),
-          "Depth-first Traversal": &(&1[:section] == :depth_first)
         ],
         extras: []
       ]
