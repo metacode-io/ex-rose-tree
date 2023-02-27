@@ -1240,7 +1240,7 @@ defmodule RoseTree.Zipper do
     do: do_insert_previous_sibling_at(z, RoseTree.new(sibling), index)
 
   @spec do_insert_previous_sibling_at(t(), RoseTree.t(), integer()) :: t()
-  def do_insert_previous_sibling_at(%__MODULE__{} = z, sibling, index)
+  defp do_insert_previous_sibling_at(%__MODULE__{} = z, sibling, index)
       when RoseTree.rose_tree?(sibling) and is_integer(index) do
     {siblings_before, siblings_after} =
       z.prev
@@ -1262,7 +1262,7 @@ defmodule RoseTree.Zipper do
   def insert_next_sibling_at(%__MODULE__{} = z, sibling, index),
     do: do_insert_next_sibling_at(z, RoseTree.new(sibling), index)
 
-  def do_insert_next_sibling_at(%__MODULE__{} = z, sibling, index)
+  defp do_insert_next_sibling_at(%__MODULE__{} = z, sibling, index)
       when RoseTree.rose_tree?(sibling) and is_integer(index) do
     {siblings_before, siblings_after} = Enum.split(z.next, index)
     new_siblings = siblings_before ++ [sibling | siblings_after]
