@@ -3565,7 +3565,7 @@ defmodule RoseTree.Zipper do
       ...> tree = RoseTree.new(5)
       ...> z = RoseTree.Zipper.new(tree, path: locs)
       ...> move_fn = &RoseTree.Zipper.parent/1
-      ...> z = RoseTree.Zipper.move_for(z, 2, move_fn)
+      ...> z = RoseTree.Zipper.move_for(z, move_fn, 2)
       ...> RoseTree.Zipper.current_focus(z).term
       3
 
@@ -3576,8 +3576,6 @@ defmodule RoseTree.Zipper do
           move_fn(),
           pos_integer()
         ) :: t() | nil
-  def move_for(%__MODULE__{} = z, _move_fn, 0), do: z
-
   def move_for(%__MODULE__{} = z, move_fn, reps) when reps > 0 and is_function(move_fn) do
     1..reps
     |> Enum.reduce_while(z, fn _rep, zipper ->
@@ -3768,7 +3766,7 @@ defmodule RoseTree.Zipper do
       ...> locs = for n <- loc_trees, do: RoseTree.Zipper.Location.new(n)
       ...> tree = RoseTree.new(5)
       ...> z = RoseTree.Zipper.new(tree, path: locs)
-      ...> z = RoseTree.Zipper.rewind(z)
+      ...> z = RoseTree.Zipper.rewind_to_root(z)
       ...> RoseTree.Zipper.root?(z)
       true
 
