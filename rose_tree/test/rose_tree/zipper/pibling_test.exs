@@ -12,7 +12,8 @@ defmodule RoseTree.Zipper.PiblingTest do
       z_with_piblings: Zippers.z_with_piblings(),
       z_with_grandpiblings: Zippers.z_with_grandpiblings(),
       z_with_ancestral_piblings: Zippers.z_with_ancestral_piblings(),
-      z_with_no_ancestral_piblings: Zippers.z_with_no_ancestral_piblings()
+      z_with_no_ancestral_piblings: Zippers.z_with_no_ancestral_piblings(),
+      z_with_extended_cousins: Zippers.z_with_extended_cousins()
     }
   end
 
@@ -517,6 +518,174 @@ defmodule RoseTree.Zipper.PiblingTest do
 
       actual = Zipper.next_ancestral_pibling(z, predicate)
       assert 7 == actual.focus.term
+    end
+  end
+
+  describe "first_extended_pibling/2" do
+    test "should return nil if no parent found", %{simple_z: z} do
+      assert Zipper.first_extended_pibling(z) == nil
+    end
+
+    test "should return nil if no grandparent found", %{z_with_parent: z} do
+      assert Zipper.first_extended_pibling(z) == nil
+    end
+
+    test "should return nil if grandparent has no siblings", %{z_with_grandparent: z} do
+      assert Zipper.first_extended_pibling(z) == nil
+    end
+
+    test "should return nil if no previous grandpibling has children",
+         %{z_with_grandpiblings: z} do
+      assert Zipper.first_extended_pibling(z) == nil
+    end
+
+    test "should return nil if no extended pibling found matching predicate",
+         %{
+          z_with_extended_cousins: z
+         } do
+      predicate = &(&1.term == :not_found)
+
+      assert Zipper.first_extended_pibling(z, predicate) == nil
+    end
+
+    test "should return the first extended pibling found",
+         %{z_with_extended_cousins: z} do
+      assert %Zipper{focus: actual} = Zipper.first_extended_pibling(z)
+      assert 50 == actual.term
+    end
+
+    test "should return the first extended pibling found matching the predicate",
+         %{z_with_extended_cousins: z} do
+      predicate = &(&1.term == 45)
+
+      assert %Zipper{focus: actual} = Zipper.first_extended_pibling(z, predicate)
+      assert 45 == actual.term
+    end
+  end
+
+  describe "last_extended_pibling/2" do
+    test "should return nil if no parent found", %{simple_z: z} do
+      assert Zipper.last_extended_pibling(z) == nil
+    end
+
+    test "should return nil if no grandparent found", %{z_with_parent: z} do
+      assert Zipper.last_extended_pibling(z) == nil
+    end
+
+    test "should return nil if grandparent has no siblings", %{z_with_grandparent: z} do
+      assert Zipper.last_extended_pibling(z) == nil
+    end
+
+    test "should return nil if no next grandpibling has children",
+         %{z_with_grandpiblings: z} do
+      assert Zipper.last_extended_pibling(z) == nil
+    end
+
+    test "should return nil if no extended pibling found matching predicate",
+         %{
+          z_with_extended_cousins: z
+         } do
+      predicate = &(&1.term == :not_found)
+
+      assert Zipper.last_extended_pibling(z, predicate) == nil
+    end
+
+    test "should return the last extended pibling found",
+         %{z_with_extended_cousins: z} do
+      assert %Zipper{focus: actual} = Zipper.last_extended_pibling(z)
+      assert 58 == actual.term
+    end
+
+    test "should return the last extended pibling found matching the predicate",
+         %{z_with_extended_cousins: z} do
+      predicate = &(&1.term == 54)
+
+      assert %Zipper{focus: actual} = Zipper.last_extended_pibling(z, predicate)
+      assert 54 == actual.term
+    end
+  end
+
+  describe "previous_extended_pibling/2" do
+    test "should return nil if no parent found", %{simple_z: z} do
+      assert Zipper.previous_extended_pibling(z) == nil
+    end
+
+    test "should return nil if no grandparent found", %{z_with_parent: z} do
+      assert Zipper.previous_extended_pibling(z) == nil
+    end
+
+    test "should return nil if grandparent has no siblings", %{z_with_grandparent: z} do
+      assert Zipper.previous_extended_pibling(z) == nil
+    end
+
+    test "should return nil if no previous grandpibling has children",
+         %{z_with_grandpiblings: z} do
+      assert Zipper.previous_extended_pibling(z) == nil
+    end
+
+    test "should return nil if no extended pibling found matching predicate",
+         %{
+          z_with_extended_cousins: z
+         } do
+      predicate = &(&1.term == :not_found)
+
+      assert Zipper.previous_extended_pibling(z, predicate) == nil
+    end
+
+    test "should return the previous extended pibling found",
+         %{z_with_extended_cousins: z} do
+      assert %Zipper{focus: actual} = Zipper.previous_extended_pibling(z)
+      assert 49 == actual.term
+    end
+
+    test "should return the previous extended pibling found matching the predicate",
+         %{z_with_extended_cousins: z} do
+      predicate = &(&1.term == 45)
+
+      assert %Zipper{focus: actual} = Zipper.previous_extended_pibling(z, predicate)
+      assert 45 == actual.term
+    end
+  end
+
+  describe "next_extended_pibling/2" do
+    test "should return nil if no parent found", %{simple_z: z} do
+      assert Zipper.next_extended_pibling(z) == nil
+    end
+
+    test "should return nil if no grandparent found", %{z_with_parent: z} do
+      assert Zipper.next_extended_pibling(z) == nil
+    end
+
+    test "should return nil if grandparent has no siblings", %{z_with_grandparent: z} do
+      assert Zipper.next_extended_pibling(z) == nil
+    end
+
+    test "should return nil if no next grandpibling has children",
+         %{z_with_grandpiblings: z} do
+      assert Zipper.next_extended_pibling(z) == nil
+    end
+
+    test "should return nil if no extended pibling found matching predicate",
+         %{
+          z_with_extended_cousins: z
+         } do
+      predicate = &(&1.term == :not_found)
+
+      assert Zipper.next_extended_pibling(z, predicate) == nil
+    end
+
+    test "should return the next extended pibling found",
+         %{z_with_extended_cousins: z} do
+      assert %Zipper{focus: actual} = Zipper.next_extended_pibling(z)
+      assert 52 == actual.term
+    end
+
+    test "should return the next extended pibling found matching the predicate",
+         %{z_with_extended_cousins: z} do
+      predicate = &(&1.term == 54)
+
+      assert %Zipper{focus: actual} = Zipper.next_extended_pibling(z, predicate)
+      assert 54 == actual.term
     end
   end
 end
