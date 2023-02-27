@@ -153,6 +153,38 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "forward_if/2" do
+    test "should return nil if there are no breadth-first descendants", %{leaf_z: z} do
+      assert Zipper.forward_if(z, &(&1.focus.term == 5)) == nil
+    end
+
+    test "should return nil if the given predicate fails to match", %{simple_z: z} do
+      assert Zipper.forward_if(z, &(&1.focus.term == :not_found)) == nil
+    end
+
+    test "should return the new zipper if the given predicate matches", %{z_with_siblings: z} do
+      assert %Zipper{focus: focus} = Zipper.forward_if(z, &(&1.focus.term == 6))
+      assert focus.term == 6
+    end
+  end
+
+  describe "forward_until/2" do
+    test "should return nil if there are no breadth-first descendants", %{leaf_z: z} do
+      assert Zipper.forward_until(z, &(&1.focus.term == 5)) == nil
+    end
+
+    test "should return nil if the given predicate fails to match", %{simple_z: z} do
+      assert Zipper.forward_until(z, &(&1.focus.term == :not_found)) == nil
+    end
+
+    test "should return the new zipper if the given predicate is eventually matched", %{
+      z_breadth_first_siblings: z
+    } do
+      assert %Zipper{focus: focus} = Zipper.forward_until(z, &(&1.focus.term == 4))
+      assert focus.term == 4
+    end
+  end
+
   describe "descend/1" do
     test "should return nil if given an empty Zipper with no siblings", %{empty_z: z} do
       assert Zipper.descend(z) == nil
