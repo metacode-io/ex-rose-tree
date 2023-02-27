@@ -14,8 +14,10 @@ defmodule RoseTree.Zipper.ZipperTest do
       z_with_grandchildren: Zippers.z_with_grandchildren(),
       z_with_siblings: Zippers.z_with_siblings(),
       z_with_ancestral_piblings: Zippers.z_with_ancestral_piblings(),
+      z_with_niblings: Zippers.z_with_niblings(),
       z_with_descendant_niblings: Zippers.z_with_descendant_niblings(),
       z_with_extended_cousins: Zippers.z_with_extended_cousins(),
+      z_with_extended_niblings: Zippers.z_with_extended_niblings(),
       z_depth_first: Zippers.z_depth_first(),
       z_depth_first_siblings: Zippers.z_depth_first_siblings(),
       z_breadth_first: Zippers.z_breadth_first(),
@@ -94,11 +96,30 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert 105 == focus.term
     end
 
-    # test "should return the next ancestral pibling if given a Zipper with no children or siblings, but with next piblings",
-    #      %{z_with_ancestral_piblings: z} do
-    #   assert %Zipper{focus: focus} = Zipper.descend(z)
-    #   assert 6 == focus.term
-    # end
+    test "should return the first extended nibling if given a Zipper with no next siblings or next extended cousins, but with first extended niblings",
+         %{z_with_extended_niblings: z} do
+      remove_next_from_path =
+        z.path
+        |> Enum.map(fn loc -> %{loc | next: []} end)
+      new_z = %{z | path: remove_next_from_path}
+      assert %Zipper{focus: focus} = Zipper.forward(new_z)
+      assert 202 == focus.term
+    end
+
+    test "should return the first nibling if given a Zipper with no next sibling, next extended cousin, or first extended nibling", %{
+      z_with_niblings: z
+    } do
+      new_z = %{z | next: []}
+      assert %Zipper{focus: focus} = Zipper.forward(new_z)
+      assert 10 == focus.term
+    end
+
+    test "should return first child if given a Zipper with no next siblings, next extended cousins, first extended niblings, or first niblings", %{
+      simple_z: z
+    } do
+      assert %Zipper{focus: focus} = Zipper.forward(z)
+      assert 2 == focus.term
+    end
   end
 
   describe "descend/1" do
