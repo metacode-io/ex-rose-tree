@@ -67,6 +67,13 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "move_while/3" do
+    test "should move until the the move function can no longer continue", %{simple_z: z} do
+      assert %Zipper{focus: actual} = Zipper.move_while(z, &Zipper.descend/1)
+      assert actual.term == 4
+    end
+  end
+
   describe "forward/1" do
     test "should return nil if given an empty Zipper with no siblings", %{empty_z: z} do
       assert Zipper.forward(z) == nil

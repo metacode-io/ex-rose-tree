@@ -3639,8 +3639,8 @@ defmodule RoseTree.Zipper do
   to the next node. Otherwise, returns nil.
   """
   @doc section: :traversal
-  @spec move_if(t(), predicate(), move_fn()) :: t() | nil
-  def move_if(%__MODULE__{} = z, predicate, move_fn)
+  @spec move_if(t(), move_fn(), predicate()) :: t() | nil
+  def move_if(%__MODULE__{} = z, move_fn, predicate)
       when is_function(move_fn) and is_function(predicate) do
     case move_fn.(z) do
       nil ->
@@ -3661,8 +3661,8 @@ defmodule RoseTree.Zipper do
   node. Otherwise, returns nil.
   """
   @doc section: :traversal
-  @spec move_until(t(), predicate(), move_fn()) :: t() | nil
-  def move_until(%__MODULE__{} = z, predicate, move_fn)
+  @spec move_until(t(), move_fn(), predicate()) :: t() | nil
+  def move_until(%__MODULE__{} = z, move_fn, predicate)
       when is_function(move_fn) and is_function(predicate) do
     case move_fn.(z) do
       nil ->
@@ -3672,7 +3672,7 @@ defmodule RoseTree.Zipper do
         if predicate.(next_z) do
           next_z
         else
-          move_until(next_z, predicate, move_fn)
+          move_until(next_z, move_fn, predicate)
         end
     end
   end
@@ -3738,7 +3738,7 @@ defmodule RoseTree.Zipper do
   @doc section: :breadth_first
   @spec forward_if(t(), predicate()) :: t() | nil
   def forward_if(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_if(z, predicate, &forward/1)
+    do: move_if(z, &forward/1, predicate)
 
   @doc """
   Moves forward in the Zipper continuously until the provided predicate
@@ -3747,7 +3747,7 @@ defmodule RoseTree.Zipper do
   @doc section: :breadth_first
   @spec forward_until(t(), predicate()) :: t() | nil
   def forward_until(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_until(z, predicate, &forward/1)
+    do: move_until(z, &forward/1, predicate)
 
   @doc """
   Moves forward in the Zipper while the given predicate remains true.
@@ -3808,7 +3808,7 @@ defmodule RoseTree.Zipper do
   @doc section: :breadth_first
   @spec backward_if(t(), predicate()) :: t() | nil
   def backward_if(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_if(z, predicate, &backward/1)
+    do: move_if(z, &backward/1, predicate)
 
   @doc """
   Moves backward in the Zipper continuously until the provided predicate
@@ -3817,7 +3817,7 @@ defmodule RoseTree.Zipper do
   @doc section: :breadth_first
   @spec backward_until(t(), predicate()) :: t() | nil
   def backward_until(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_until(z, predicate, &backward/1)
+    do: move_until(z, &backward/1, predicate)
 
   @doc """
   Moves backward in the Zipper while the given predicate remains true.
@@ -3875,7 +3875,7 @@ defmodule RoseTree.Zipper do
   @doc section: :depth_first
   @spec descend_if(t(), predicate()) :: t() | nil
   def descend_if(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_if(z, predicate, &descend/1)
+    do: move_if(z, &descend/1, predicate)
 
   @doc """
   Descends into the Zipper continuously until the provided predicate
@@ -3885,7 +3885,7 @@ defmodule RoseTree.Zipper do
   @doc section: :depth_first
   @spec descend_until(t(), predicate()) :: t() | nil
   def descend_until(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_until(z, predicate, &descend/1)
+    do: move_until(z, &descend/1, predicate)
 
   @doc """
   Descends the Zipper while the given predicate remains true. If no custom
@@ -3941,7 +3941,7 @@ defmodule RoseTree.Zipper do
   @doc section: :depth_first
   @spec ascend_if(t(), predicate()) :: t() | nil
   def ascend_if(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_if(z, predicate, &ascend/1)
+    do: move_if(z, &ascend/1, predicate)
 
   @doc """
   Ascends the Zipper continuously until the provided predicate function
@@ -3950,7 +3950,7 @@ defmodule RoseTree.Zipper do
   @doc section: :depth_first
   @spec ascend_until(t(), predicate()) :: t() | nil
   def ascend_until(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_until(z, predicate, &ascend/1)
+    do: move_until(z, &ascend/1, predicate)
 
   @doc """
   Ascends the Zipper while the given predicate remains true. If no custom
