@@ -122,6 +122,37 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "forward_for/2" do
+    test "should return nil if given a number of reps <= 0", %{simple_z: z} do
+      for reps <- 0..-5 do
+        assert Zipper.forward_for(z, reps) == nil
+      end
+    end
+
+    test "should return nil if given a Zipper with no breadth-first descendants", %{leaf_z: z} do
+      for reps <- 1..5 do
+        assert Zipper.forward_for(z, reps) == nil
+      end
+    end
+
+    test "should return correct result of descending x number of times", %{
+      z_breadth_first_siblings: z
+    } do
+      expected_results = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+      actual_results =
+        1..10
+        |> Enum.map(fn reps ->
+          assert %Zipper{focus: focus} = Zipper.forward_for(z, reps),
+                 "Expected a new Zipper for #{reps} reps "
+
+          focus.term
+        end)
+
+      assert actual_results == expected_results
+    end
+  end
+
   describe "descend/1" do
     test "should return nil if given an empty Zipper with no siblings", %{empty_z: z} do
       assert Zipper.descend(z) == nil
