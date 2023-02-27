@@ -185,6 +185,31 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "forward_while/2" do
+    test "should move forward through the Zipper breadth-first until the last node is reached when the default predicate is used", %{
+      z_breadth_first_siblings: z
+    } do
+      assert %Zipper{focus: actual} = Zipper.forward_while(z)
+      assert actual.term == 41
+    end
+
+    test "should move forward through the Zipper breadth-first until the predicate returns false", %{
+      z_breadth_first_siblings: z
+    } do
+      assert %Zipper{focus: actual} = Zipper.forward_while(z, &(&1.focus.term < 20))
+      assert actual.term == 20
+    end
+  end
+
+  describe "forward_to_last/1" do
+    test "should move forward through the Zipper breadth-first until the last node is reached when the default predicate is used", %{
+      z_breadth_first_siblings: z
+    } do
+      assert %Zipper{focus: actual} = Zipper.forward_to_last(z)
+      assert actual.term == 41
+    end
+  end
+
   describe "descend/1" do
     test "should return nil if given an empty Zipper with no siblings", %{empty_z: z} do
       assert Zipper.descend(z) == nil
