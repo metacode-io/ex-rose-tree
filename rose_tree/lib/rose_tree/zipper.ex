@@ -1955,7 +1955,7 @@ defmodule RoseTree.Zipper do
   @spec first_extended_nibling(t(), predicate()) :: t() | nil
   def first_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = first_extended_cousin <-
-           first_extended_cousin(z, &(RoseTree.has_child?(&1.focus, predicate))),
+           first_extended_cousin(z, &(RoseTree.has_child?(&1, predicate))),
          %__MODULE__{} = first_child <- first_child(first_extended_cousin, predicate) do
       first_child
     else
@@ -1970,7 +1970,8 @@ defmodule RoseTree.Zipper do
   @doc section: :niblings
   @spec last_extended_nibling(t(), predicate()) :: t() | nil
   def last_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
-    with %__MODULE__{} = last_extended_cousin <- last_extended_cousin(z, &(RoseTree.has_child?(&1.focus, predicate))),
+    with %__MODULE__{} = last_extended_cousin <-
+            last_extended_cousin(z, &(RoseTree.has_child?(&1, predicate))),
          %__MODULE__{} = last_child <- last_child(last_extended_cousin, predicate) do
       last_child
     else
@@ -2643,8 +2644,6 @@ defmodule RoseTree.Zipper do
   def first_extended_cousin(%__MODULE__{} = z, predicate) when is_function(predicate) do
     target_depth = depth_of_focus(z)
 
-    # IO.inspect(target_depth, label: "Target Depth")
-
     {starting_point_on_path, path_details} =
       z
       |> parent()
@@ -2701,9 +2700,6 @@ defmodule RoseTree.Zipper do
     # about path locations that preceed our final candidate
     pruned_path_details = Enum.drop(path_details, candidate_depth)
 
-    # IO.inspect(candidate_z.focus.term, label: "Starting Term")
-    # IO.inspect(pruned_path_details, label: "Starting Path Details")
-
     {candidate_z, pruned_path_details}
   end
 
@@ -2754,9 +2750,6 @@ defmodule RoseTree.Zipper do
          _target_depth,
          _predicate
        ) do
-    # IO.inspect(z.focus.term, label: "Path Fully Explored - No Match")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(nil, label: "\tLoc Details")
     nil
   end
 
@@ -2770,9 +2763,6 @@ defmodule RoseTree.Zipper do
        )
        when current_details.index == loc_details.index and
               current_details.depth == loc_details.depth do
-    # IO.inspect(z.focus.term, label: "Subtrees Fully Explored for Location, Descend Path")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
     case first_extended_cousin_descend_path(z, path_details) do
       {_, []} ->
         nil
@@ -2801,24 +2791,17 @@ defmodule RoseTree.Zipper do
          predicate
        )
        when current_details.depth == target_depth do
-    # IO.inspect(z.focus.term, label: "Target Depth Reached - Next Empty")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
-    if predicate.(z) do
-      # IO.puts("\tTarget Found")
+    if predicate.(z.focus) do
       z
     else
-      # IO.puts("\tTarget Not Found")
       case next_ancestral_pibling(z) do
         nil ->
-          # IO.puts("\tNo Next Ancestral Pibling Found")
           nil
 
         %__MODULE__{} = next_ancestral_pibling ->
           new_depth = depth_of_focus(next_ancestral_pibling)
 
           if new_depth < loc_details.depth do
-            # IO.puts("\tNext Ancestral Pibling Found Exceeds Boundary")
             nil
           else
             new_details = %{
@@ -2843,14 +2826,9 @@ defmodule RoseTree.Zipper do
          predicate
        )
        when current_details.depth == target_depth do
-    # IO.inspect(z.focus.term, label: "Target Depth Reached - Next Remaining")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
-    if predicate.(z) do
-      # IO.puts("\tTarget Found")
+    if predicate.(z.focus) do
       z
     else
-      # IO.puts("\tTarget Not Found")
       new_details = %{current_details | index: current_details.index + 1}
 
       z
@@ -2871,19 +2849,14 @@ defmodule RoseTree.Zipper do
          predicate
        )
        when not RoseTree.parent?(z.focus) do
-    # IO.inspect(z.focus.term, label: "No Children to Explore - Next Empty")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
     case next_ancestral_pibling(z) do
       nil ->
-        # IO.puts("\tNo Next Ancestral Pibling Found")
         nil
 
       %__MODULE__{} = next_ancestral_pibling ->
         new_depth = depth_of_focus(next_ancestral_pibling)
 
         if new_depth < loc_details.depth do
-          # IO.inspect({new_depth, loc_details.depth}, label: "\tNext Ancestral Pibling Found Exceeds Boundary")
           nil
         else
           new_details = %{
@@ -2907,9 +2880,6 @@ defmodule RoseTree.Zipper do
          predicate
        )
        when not RoseTree.parent?(z.focus) do
-    # IO.inspect(z.focus.term, label: "No Children to Explore - Next Remaining")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
     new_details = %{current_details | index: current_details.index + 1}
 
     z
@@ -2929,21 +2899,16 @@ defmodule RoseTree.Zipper do
          target_depth,
          predicate
        ) do
-    # IO.inspect(z.focus.term, label: "Exploring Subtree Of - Next Empty")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
     case leftmost_descendant(z, &(depth_of_focus(&1) == target_depth)) do
       nil ->
         case next_ancestral_pibling(z) do
           nil ->
-            # IO.puts("\tNo Next Ancestral Pibling Found")
             nil
 
           %__MODULE__{} = next_ancestral_pibling ->
             new_depth = depth_of_focus(next_ancestral_pibling)
 
             if new_depth < loc_details.depth do
-              # IO.puts("\tNext Ancestral Pibling Found Exceeds Boundary")
               nil
             else
               new_details = %{
@@ -2977,9 +2942,6 @@ defmodule RoseTree.Zipper do
          target_depth,
          predicate
        ) do
-    # IO.inspect(z.focus.term, label: "Exploring Subtree Of - Next Remaining")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
     case leftmost_descendant(z, &(depth_of_focus(&1) == target_depth)) do
       nil ->
         new_details = %{current_details | index: current_details.index + 1}
@@ -3011,8 +2973,6 @@ defmodule RoseTree.Zipper do
   def last_extended_cousin(%__MODULE__{} = z, predicate)
       when is_function(predicate) do
     target_depth = depth_of_focus(z)
-
-    # IO.inspect(target_depth, label: "Target Depth")
 
     {starting_point_on_path, path_details} =
       z
@@ -3073,9 +3033,6 @@ defmodule RoseTree.Zipper do
     # about path locations that preceed our final candidate
     pruned_path_details = Enum.drop(path_details, candidate_depth)
 
-    # IO.inspect(candidate_z.focus.term, label: "Starting Term")
-    # IO.inspect(pruned_path_details, label: "Starting Path Details")
-
     {candidate_z, pruned_path_details}
   end
 
@@ -3126,9 +3083,6 @@ defmodule RoseTree.Zipper do
          _target_depth,
          _predicate
        ) do
-    # IO.inspect(z.focus.term, label: "Path Fully Explored - No Match")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(nil, label: "\tLoc Details")
     nil
   end
 
@@ -3142,9 +3096,6 @@ defmodule RoseTree.Zipper do
        )
        when current_details.index == loc_details.index and
               current_details.depth == loc_details.depth do
-    # IO.inspect(z.focus.term, label: "Subtrees Fully Explored for Location, Descend Path")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
     case last_extended_cousin_descend_path(z, path_details) do
       {_, []} ->
         nil
@@ -3173,24 +3124,17 @@ defmodule RoseTree.Zipper do
          predicate
        )
        when current_details.depth == target_depth do
-    # IO.inspect(z.focus.term, label: "Target Depth Reached - Previous Empty")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
-    if predicate.(z) do
-      # IO.puts("\tTarget Found")
+    if predicate.(z.focus) do
       z
     else
-      # IO.puts("\tTarget Not Found")
       case previous_ancestral_pibling(z) do
         nil ->
-          # IO.puts("\tNo Previous Ancestral Pibling Found")
           nil
 
         %__MODULE__{} = previous_ancestral_pibling ->
           new_depth = depth_of_focus(previous_ancestral_pibling)
 
           if new_depth < loc_details.depth do
-            # IO.puts("\tPrevious Ancestral Pibling Found Exceeds Boundary")
             nil
           else
             new_details = %{
@@ -3215,14 +3159,9 @@ defmodule RoseTree.Zipper do
          predicate
        )
        when current_details.depth == target_depth do
-    # IO.inspect(z.focus.term, label: "Target Depth Reached - Previous Remaining")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
-    if predicate.(z) do
-      # IO.puts("\tTarget Found")
+    if predicate.(z.focus) do
       z
     else
-      # IO.puts("\tTarget Not Found")
       new_details = %{current_details | index: current_details.index - 1}
 
       z
@@ -3243,19 +3182,14 @@ defmodule RoseTree.Zipper do
          predicate
        )
        when not RoseTree.parent?(z.focus) do
-    # IO.inspect(z.focus.term, label: "No Children to Explore - Previous Empty")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
     case previous_ancestral_pibling(z) do
       nil ->
-        # IO.puts("\tNo Previous Ancestral Pibling Found")
         nil
 
       %__MODULE__{} = previous_ancestral_pibling ->
         new_depth = depth_of_focus(previous_ancestral_pibling)
 
         if new_depth < loc_details.depth do
-          # IO.inspect({new_depth, loc_details.depth}, label: "\tPrevious Ancestral Pibling Found Exceeds Boundary")
           nil
         else
           new_details = %{
@@ -3279,9 +3213,6 @@ defmodule RoseTree.Zipper do
          predicate
        )
        when not RoseTree.parent?(z.focus) do
-    # IO.inspect(z.focus.term, label: "No Children to Explore - Previous Remaining")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
     new_details = %{current_details | index: current_details.index - 1}
 
     z
@@ -3301,21 +3232,16 @@ defmodule RoseTree.Zipper do
          target_depth,
          predicate
        ) do
-    # IO.inspect(z.focus.term, label: "Exploring Subtree Of - Previous Empty")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
     case rightmost_descendant(z, &(depth_of_focus(&1) == target_depth)) do
       nil ->
         case previous_ancestral_pibling(z) do
           nil ->
-            # IO.puts("\tNo Previous Ancestral Pibling Found")
             nil
 
           %__MODULE__{} = previous_ancestral_pibling ->
             new_depth = depth_of_focus(previous_ancestral_pibling)
 
             if new_depth < loc_details.depth do
-              # IO.puts("\tPrevious Ancestral Pibling Found Exceeds Boundary")
               nil
             else
               new_details = %{
@@ -3349,9 +3275,6 @@ defmodule RoseTree.Zipper do
          target_depth,
          predicate
        ) do
-    # IO.inspect(z.focus.term, label: "Exploring Subtree Of - Previous Remaining")
-    # IO.inspect(current_details, label: "\tCurrent Details")
-    # IO.inspect(loc_details, label: "\tLoc Details")
     case rightmost_descendant(z, &(depth_of_focus(&1) == target_depth)) do
       nil ->
         new_details = %{current_details | index: current_details.index - 1}

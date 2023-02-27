@@ -62,7 +62,7 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
            z_with_2nd_cousins: z_2,
            z_with_extended_cousins: z_3
          } do
-      predicate = &(&1.focus.term == :not_found)
+      predicate = &(&1.term == :not_found)
 
       for z <- [z_1, z_2, z_3] do
         assert Zipper.first_extended_cousin(z, predicate) == nil
@@ -77,7 +77,7 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
 
     test "should return the first extended cousin found matching the predicate",
          %{z_with_extended_cousins: z} do
-      predicate = &(&1.focus.term == 102)
+      predicate = &(&1.term == 102)
 
       assert %Zipper{focus: actual} = Zipper.first_extended_cousin(z, predicate)
       assert 102 == actual.term
@@ -91,7 +91,7 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
 
     test "should return the first extended cousin found matching the predicate in scenario 2",
          %{z_with_extended_cousins_2: z} do
-      predicate = &(&1.focus.term == -31)
+      predicate = &(&1.term == -31)
 
       assert %Zipper{focus: actual} = Zipper.first_extended_cousin(z, predicate)
       assert -31 == actual.term
@@ -142,7 +142,7 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
            z_with_2nd_cousins: z_2,
            z_with_extended_cousins: z_3
          } do
-      predicate = &(&1.focus.term == :not_found)
+      predicate = &(&1.term == :not_found)
 
       for z <- [z_1, z_2, z_3] do
         assert Zipper.last_extended_cousin(z, predicate) == nil
@@ -157,7 +157,7 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
 
     test "should return the last extended cousin found matching the predicate",
          %{z_with_extended_cousins: z} do
-      predicate = &(&1.focus.term == 106)
+      predicate = &(&1.term == 106)
 
       assert %Zipper{focus: actual} = Zipper.last_extended_cousin(z, predicate)
       assert 106 == actual.term
@@ -171,7 +171,7 @@ defmodule RoseTree.Zipper.ExtendedCousinTest do
 
     test "should return the last extended cousin found matching the predicate in scenario 2",
          %{z_with_extended_cousins_2: z} do
-      predicate = &(&1.focus.term == 29)
+      predicate = &(&1.term == 29)
 
       assert %Zipper{focus: actual} = Zipper.last_extended_cousin(z, predicate)
       assert 29 == actual.term
