@@ -44,10 +44,10 @@ defmodule RoseTree.MixProject do
           "First Cousins": &(&1[:section] == :first_cousins),
           "Second Cousins": &(&1[:section] == :second_cousins),
           "Extended Cousins": &(&1[:section] == :extended_cousins),
-          "Basic Traversal": &(&1[:section] == :traversal),
+          "Common Traversal": &(&1[:section] == :traversal),
+          "Path Traversal": &(&1[:section] == :path_traversal),
           "Breadth-first Traversal": &(&1[:section] == :breadth_first),
-          "Depth-first Traversal": &(&1[:section] == :depth_first),
-          Searching: &(&1[:section] == :searching)
+          "Depth-first Traversal": &(&1[:section] == :depth_first)
         ],
         extras: []
       ]

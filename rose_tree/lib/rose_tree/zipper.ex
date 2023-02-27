@@ -42,6 +42,10 @@ defmodule RoseTree.Zipper do
           path: [Location.t()]
         }
 
+  @typep acc_fn() :: (t(), term() -> term())
+
+  @typep map_fn() :: (t() -> t())
+
   @typep move_fn() :: (t() -> t() | nil)
 
   @typep predicate() :: (term() -> boolean())
@@ -3551,50 +3555,6 @@ defmodule RoseTree.Zipper do
   ###
 
   @doc """
-  Rewinds a zipper back to the root.
-
-  ## Examples
-
-      iex> loc_trees = for n <- [4,3,2,1], do: RoseTree.new(n)
-      ...> locs = for n <- loc_trees, do: RoseTree.Zipper.Location.new(n)
-      ...> tree = RoseTree.new(5)
-      ...> z = RoseTree.Zipper.new(tree, path: locs)
-      ...> z = RoseTree.Zipper.rewind(z)
-      ...> RoseTree.Zipper.root?(z)
-      true
-
-  """
-  @doc section: :traversal
-  @spec rewind(t()) :: t()
-  def rewind(%__MODULE__{} = z) do
-    case parent(z) do
-      nil ->
-        z
-
-      parent ->
-        rewind(parent)
-    end
-  end
-
-  @doc """
-  Moves the focus back to the root along the path and accumulates an additional
-  value using the provided `acc_fn`. Returns a tuple including the root Zipper
-  and the accumulated value.
-  """
-  @doc section: :traversal
-  @spec rewind_accumulate(t(), term(), (t(), term() -> term())) ::
-          {t(), term()}
-  def rewind_accumulate(%__MODULE__{} = z, acc, acc_fn) do
-    case parent(z) do
-      nil ->
-        {z, acc_fn.(z, acc)}
-
-      %__MODULE__{} = parent ->
-        rewind_accumulate(parent, acc_fn.(z, acc), acc_fn)
-    end
-  end
-
-  @doc """
   Repeats a call to the given move function, `move_fn`, by the
   given number of `reps`.
 
@@ -3613,12 +3573,12 @@ defmodule RoseTree.Zipper do
   @doc section: :traversal
   @spec move_for(
           t(),
-          pos_integer(),
-          move_fn()
+          move_fn(),
+          pos_integer()
         ) :: t() | nil
-  def move_for(%__MODULE__{} = z, 0, _move_fn), do: z
+  def move_for(%__MODULE__{} = z, _move_fn, 0), do: z
 
-  def move_for(%__MODULE__{} = z, reps, move_fn) when reps > 0 and is_function(move_fn) do
+  def move_for(%__MODULE__{} = z, move_fn, reps) when reps > 0 and is_function(move_fn) do
     1..reps
     |> Enum.reduce_while(z, fn _rep, zipper ->
       case move_fn.(zipper) do
@@ -3631,7 +3591,7 @@ defmodule RoseTree.Zipper do
     end)
   end
 
-  def move_for(%__MODULE__{}, _reps, _move_fn), do: nil
+  def move_for(%__MODULE__{}, _move_fn, _reps), do: nil
 
   @doc """
   Moves a direction in the Zipper, determined by the `move_fn()`, if
@@ -3699,6 +3659,153 @@ defmodule RoseTree.Zipper do
     end
   end
 
+  @doc """
+  Using the designated move function, `move_fn()`, searches for the first
+  tree that satisfies the given `predicate` function.
+  """
+  @doc section: :traversal
+  @spec find(t(), move_fn(), predicate()) :: t() | nil
+  def find(%__MODULE__{} = z, move_fn, predicate)
+      when is_function(move_fn) and is_function(predicate) do
+    if predicate.(z) do
+      z
+    else
+      case move_fn.(z) do
+        nil ->
+          nil
+
+        %__MODULE__{} = next_z ->
+          find(next_z, predicate, move_fn)
+      end
+    end
+  end
+
+  def find(%__MODULE__{}, _predicate, _move_fn), do: nil
+
+  @doc """
+  Traverses the Zipper using the provided `move_fn()` and maps the `term`
+  at each node using the provided `map_fn()`. Returns the new Zipper with
+  mapped values.
+  """
+  @doc section: :traversal
+  @spec map(t(), move_fn(), map_fn()) :: t()
+  def map(%__MODULE__{} = z, move_fn, map_fn)
+      when is_function(move_fn) and is_function(map_fn) do
+    new_z = %{z | focus: map_fn.(z.focus)}
+    case move_fn.(new_z) do
+      nil ->
+        new_z
+
+      %__MODULE__{} = next_z ->
+        map(next_z, move_fn, map_fn)
+    end
+  end
+
+  @doc """
+  Accumulates an additional value using the provided `acc_fn` while traversing the
+  Zipper using the provided `move_fn()`. Returns a tuple including the new Zipper
+  context and the accumulated value.
+  """
+  @doc section: :traversal
+  @spec accumulate(t(), move_fn(), term(), acc_fn()) ::
+          {t(), term()}
+  def accumulate(%__MODULE__{} = z, move_fn, acc, acc_fn)
+      when is_function(move_fn) and is_function(acc_fn) do
+    case move_fn.(z) do
+      nil ->
+        {z, acc_fn.(z, acc)}
+
+      %__MODULE__{} = next_z ->
+        accumulate(next_z, move_fn, acc_fn.(z, acc), acc_fn)
+    end
+  end
+
+  ###
+  ### PATH TRAVERSAL
+  ###
+
+  @doc """
+  Rewinds a Zipper along the `path` by the given number of `reps`.
+  """
+  @doc section: :path_traversal
+  @spec rewind_for(t(), pos_integer()) :: t() | nil
+  def rewind_for(%__MODULE__{} = z, reps),
+    do: move_for(z, reps, &parent/1)
+
+  @doc """
+  Rewinds a Zipper along the `path` if the provided predicate function
+  returns true when applied to the parent node. Otherwise, returns nil.
+  """
+  @doc section: :path_traversal
+  @spec rewind_if(t(), predicate()) :: t() | nil
+  def rewind_if(%__MODULE__{} = z, predicate) when is_function(predicate),
+    do: move_if(z, &parent/1, predicate)
+
+  @doc """
+  Rewinds a Zipper continuously until the provided predicate function
+  returns true when applied to the next parent node. Otherwise, returns nil.
+  """
+  @doc section: :path_traversal
+  @spec rewind_until(t(), predicate()) :: t() | nil
+  def rewind_until(%__MODULE__{} = z, predicate) when is_function(predicate),
+    do: move_until(z, &parent/1, predicate)
+
+  @doc """
+  Rewinds a Zipper while the given predicate remains true. If no custom
+  predicate is given, `parent/1` will repeat until it reaches the root.
+  """
+  @doc section: :path_traversal
+  @spec rewind_while(t(), predicate()) :: t()
+  def rewind_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
+    do: move_while(z, &parent/1, predicate)
+
+  @doc """
+  Rewinds a zipper back to the root.
+
+  ## Examples
+
+      iex> loc_trees = for n <- [4,3,2,1], do: RoseTree.new(n)
+      ...> locs = for n <- loc_trees, do: RoseTree.Zipper.Location.new(n)
+      ...> tree = RoseTree.new(5)
+      ...> z = RoseTree.Zipper.new(tree, path: locs)
+      ...> z = RoseTree.Zipper.rewind(z)
+      ...> RoseTree.Zipper.root?(z)
+      true
+
+  """
+  @doc section: :path_traversal
+  @spec rewind_to_root(t()) :: t()
+  def rewind_to_root(%__MODULE__{} = z),
+    do: rewind_while(z)
+
+  @doc """
+  Searches for a predicate match by rewinding the path in the Zipper. If no match
+  is found, returns nil.
+  """
+  @doc section: :path_traversal
+  @spec rewind_find(t(), predicate()) :: t() | nil
+  def rewind_find(%__MODULE__{} = z, predicate) when is_function(predicate),
+    do: find(z, &parent/1, predicate)
+
+  @doc """
+  Rewinds the Zipper and maps the `term` at each node using the provided `map_fn()`.
+  Returns the new Zipper at the root with mapped values.
+  """
+  @doc section: :path_traversal
+  @spec rewind_map(t(), map_fn()) :: t()
+  def rewind_map(%__MODULE__{} = z, map_fn) when is_function(map_fn),
+    do: map(z, &parent/1, map_fn)
+
+  @doc """
+  Rewinds the Zipper and accumulates an additional value using the provided
+  `acc_fn`. Returns a tuple including the root Zipper and the accumulated value.
+  """
+  @doc section: :path_traversal
+  @spec rewind_accumulate(t(), term(), acc_fn()) ::
+          {t(), term()}
+  def rewind_accumulate(%__MODULE__{} = z, acc, acc_fn) when is_function(acc_fn),
+    do: accumulate(z, &parent/1, acc, acc_fn)
+
   ###
   ### FORWARD, BREADTH-FIRST TRAVERSAL
   ###
@@ -3726,10 +3833,8 @@ defmodule RoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec forward_for(t(), pos_integer()) :: t() | nil
-  def forward_for(%__MODULE__{} = z, reps) when reps > 0,
-    do: move_for(z, reps, &forward/1)
-
-  def forward_for(%__MODULE__{}, _reps), do: nil
+  def forward_for(%__MODULE__{} = z, reps),
+    do: move_for(z, &forward/1, reps)
 
   @doc """
   Moves forward in the Zipper if the provided predicate function
@@ -3768,6 +3873,33 @@ defmodule RoseTree.Zipper do
   def forward_to_last(%__MODULE__{} = z),
     do: forward_while(z)
 
+  @doc """
+  Searches for a predicate match by moving forward in the Zipper. If no match
+  is found, returns nil.
+  """
+  @doc section: :breadth_first
+  @spec forward_find(t(), predicate()) :: t() | nil
+  def forward_find(%__MODULE__{} = z, predicate) when is_function(predicate),
+    do: find(z, &forward/1, predicate)
+
+  @doc """
+  Moves forward in the Zipper and maps the `term` at each node using the provided
+  `map_fn()`. Returns the new Zipper with mapped values.
+  """
+  @doc section: :breadth_first
+  @spec forward_map(t(), map_fn()) :: t()
+  def forward_map(%__MODULE__{} = z, map_fn) when is_function(map_fn),
+    do: map(z, &forward/1, map_fn)
+
+  @doc """
+  Moves forward in the Zipper and accumulates an additional value using the provided
+  `acc_fn`. Returns a tuple including the new Zipper and the accumulated value.
+  """
+  @doc section: :breadth_first
+  @spec forward_accumulate(t(), term(), acc_fn()) :: {t(), term()}
+  def forward_accumulate(%__MODULE__{} = z, acc, acc_fn) when is_function(acc_fn),
+    do: accumulate(z, &forward/1, acc, acc_fn)
+
   ###
   ### BACKWARD, BREADTH-FIRST TRAVERSAL
   ###
@@ -3797,10 +3929,8 @@ defmodule RoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec backward_for(t(), pos_integer()) :: t() | nil
-  def backward_for(%__MODULE__{} = z, reps) when reps > 0,
-    do: move_for(z, reps, &backward/1)
-
-  def backward_for(%__MODULE__{}, _reps), do: nil
+  def backward_for(%__MODULE__{} = z, reps),
+    do: move_for(z, &backward/1, reps)
 
   @doc """
   Moves backward in the Zipper if the provided predicate function
@@ -3839,6 +3969,33 @@ defmodule RoseTree.Zipper do
   def backward_to_root(%__MODULE__{} = z),
     do: backward_while(z)
 
+  @doc """
+  Searches for a predicate match by moving backward in the Zipper. If no match
+  is found, returns nil.
+  """
+  @doc section: :breadth_first
+  @spec backward_find(t(), predicate()) :: t() | nil
+  def backward_find(%__MODULE__{} = z, predicate) when is_function(predicate),
+    do: find(z, &backward/1, predicate)
+
+  @doc """
+  Moves backward in the Zipper and maps the `term` at each node using the provided
+  `map_fn()`. Returns the new Zipper with mapped values.
+  """
+  @doc section: :breadth_first
+  @spec backward_map(t(), map_fn()) :: t()
+  def backward_map(%__MODULE__{} = z, map_fn) when is_function(map_fn),
+    do: map(z, &backward/1, map_fn)
+
+  @doc """
+  Moves backward in the Zipper and accumulates an additional value using the provided
+  `acc_fn`. Returns a tuple including the new Zipper and the accumulated value.
+  """
+  @doc section: :breadth_first
+  @spec backward_accumulate(t(), term(), acc_fn()) :: {t(), term()}
+  def backward_accumulate(%__MODULE__{} = z, acc, acc_fn) when is_function(acc_fn),
+    do: accumulate(z, &backward/1, acc, acc_fn)
+
   ###
   ### DESCEND, DEPTH-FIRST TRAVERSAL
   ###
@@ -3864,10 +4021,8 @@ defmodule RoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec descend_for(t(), pos_integer()) :: t() | nil
-  def descend_for(%__MODULE__{} = z, reps) when reps > 0,
-    do: move_for(z, reps, &descend/1)
-
-  def descend_for(%__MODULE__{}, _reps), do: nil
+  def descend_for(%__MODULE__{} = z, reps),
+    do: move_for(z, &descend/1, reps)
 
   @doc """
   Descends into the Zipper if the provided predicate function
@@ -3905,6 +4060,33 @@ defmodule RoseTree.Zipper do
   def descend_to_last(%__MODULE__{} = z),
     do: descend_while(z)
 
+  @doc """
+  Searches for a predicate match by descending the Zipper. If no match
+  is found, returns nil.
+  """
+  @doc section: :depth_first
+  @spec descend_find(t(), predicate()) :: t() | nil
+  def descend_find(%__MODULE__{} = z, predicate) when is_function(predicate),
+    do: find(z, &descend/1, predicate)
+
+  @doc """
+  Descends the Zipper and maps the `term` at each node using the provided
+  `map_fn()`. Returns the new Zipper with mapped values.
+  """
+  @doc section: :depth_first
+  @spec descend_map(t(), map_fn()) :: t()
+  def descend_map(%__MODULE__{} = z, map_fn) when is_function(map_fn),
+    do: map(z, &descend/1, map_fn)
+
+  @doc """
+  Descends the Zipper and accumulates an additional value using the provided
+  `acc_fn`. Returns a tuple including the new Zipper and the accumulated value.
+  """
+  @doc section: :depth_first
+  @spec descend_accumulate(t(), term(), acc_fn()) :: {t(), term()}
+  def descend_accumulate(%__MODULE__{} = z, acc, acc_fn) when is_function(acc_fn),
+    do: accumulate(z, &descend/1, acc, acc_fn)
+
   ###
   ### ASCEND, DEPTH-FIRST TRAVERSAL
   ###
@@ -3930,10 +4112,8 @@ defmodule RoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec ascend_for(t(), pos_integer()) :: t() | nil
-  def ascend_for(%__MODULE__{} = z, reps) when reps > 0,
-    do: move_for(z, reps, &ascend/1)
-
-  def ascend_for(%__MODULE__{}, _reps), do: nil
+  def ascend_for(%__MODULE__{} = z, reps),
+    do: move_for(z, &ascend/1, reps)
 
   @doc """
   Ascends the Zipper if the provided predicate function returns true
@@ -3971,54 +4151,30 @@ defmodule RoseTree.Zipper do
   def ascend_to_root(%__MODULE__{} = z),
     do: ascend_while(z)
 
-  ###
-  ### SEARCHING
-  ###
+  @doc """
+  Searches for a predicate match by ascending the Zipper. If no match
+  is found, returns nil.
+  """
+  @doc section: :depth_first
+  @spec ascend_find(t(), predicate()) :: t() | nil
+  def ascend_find(%__MODULE__{} = z, predicate) when is_function(predicate),
+    do: find(z, &ascend/1, predicate)
 
   @doc """
-  Using the designated move function, `move_fn`, searches for the first
-  tree that satisfies the given `predicate` function.
+  Ascends the Zipper and maps the `term` at each node using the provided
+  `map_fn()`. Returns the new Zipper with mapped values.
   """
-  @doc section: :searching
-  @spec find(
-          t(),
-          (t() -> boolean()),
-          (t(), keyword() -> t() | nil)
-        ) :: t() | nil
-  def find(%__MODULE__{} = z, predicate, move_fn)
-      when is_function(predicate) and is_function(move_fn) do
-    if predicate.(z) do
-      z
-    else
-      case move_fn.(z) do
-        nil ->
-          nil
-
-        %__MODULE__{} = new_focus ->
-          find(new_focus, predicate, move_fn)
-      end
-    end
-  end
-
-  def find(%__MODULE__{}, _predicate, _move_fn), do: nil
+  @doc section: :depth_first
+  @spec ascend_map(t(), map_fn()) :: t()
+  def ascend_map(%__MODULE__{} = z, map_fn) when is_function(map_fn),
+    do: map(z, &ascend/1, map_fn)
 
   @doc """
-  Searches the list of parents comparing at each step to the given predicate,
-  stopping either when the match is successful, or no more parents exist.
+  Ascends the Zipper and accumulates an additional value using the provided
+  `acc_fn`. Returns a tuple including the new Zipper and the accumulated value.
   """
-  @doc section: :searching
-  @spec find_parent(t(), predicate()) :: t() | nil
-  def find_parent(%__MODULE__{} = z, predicate) when is_function(predicate) do
-    case parent(z) do
-      nil ->
-        nil
-
-      %__MODULE__{} = parent ->
-        if predicate.(parent) do
-          parent
-        else
-          find_parent(parent, predicate)
-        end
-    end
-  end
+  @doc section: :depth_first
+  @spec ascend_accumulate(t(), term(), acc_fn()) :: {t(), term()}
+  def ascend_accumulate(%__MODULE__{} = z, acc, acc_fn) when is_function(acc_fn),
+    do: accumulate(z, &ascend/1, acc, acc_fn)
 end
