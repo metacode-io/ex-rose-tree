@@ -3777,13 +3777,14 @@ defmodule RoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec backward(t()) :: t()
-  def backward(%__MODULE__{path: []}), do: nil
+  def backward(%__MODULE__{prev: [], path: []}), do: nil
 
   def backward(%__MODULE__{} = z) do
     funs = [
       fn x -> previous_sibling(x) end,
       fn x -> previous_extended_cousin(x) end,
       fn x -> last_extended_pibling(x) end,
+      fn x -> last_pibling(x) end,
       &parent/1
     ]
 

@@ -13,6 +13,7 @@ defmodule RoseTree.Zipper.ZipperTest do
       z_with_parent: Zippers.z_with_parent(),
       z_with_grandchildren: Zippers.z_with_grandchildren(),
       z_with_siblings: Zippers.z_with_siblings(),
+      z_with_piblings: Zippers.z_with_piblings(),
       z_with_ancestral_piblings: Zippers.z_with_ancestral_piblings(),
       z_with_niblings: Zippers.z_with_niblings(),
       z_with_descendant_niblings: Zippers.z_with_descendant_niblings(),
@@ -135,7 +136,7 @@ defmodule RoseTree.Zipper.ZipperTest do
       end
     end
 
-    test "should return correct result of descending x number of times", %{
+    test "should return correct result of moving forward x number of times", %{
       z_breadth_first_siblings: z
     } do
       expected_results = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -202,11 +203,151 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "forward_to_last/1" do
-    test "should move forward through the Zipper breadth-first until the last node is reached when the default predicate is used", %{
+    test "should move forward through the Zipper breadth-first until the last node is reached", %{
       z_breadth_first_siblings: z
     } do
       assert %Zipper{focus: actual} = Zipper.forward_to_last(z)
       assert actual.term == 41
+    end
+  end
+
+  describe "backward/1" do
+    test "should return nil if given an empty Zipper with no siblings", %{empty_z: z} do
+      assert Zipper.backward(z) == nil
+    end
+
+    test "should return nil if given a leaf Zipper with no siblings", %{leaf_z: z} do
+      assert Zipper.backward(z) == nil
+    end
+
+    test "should return the previous sibling if given a Zipper with previous siblings", %{z_with_siblings: z} do
+      assert %Zipper{focus: focus} = Zipper.backward(z)
+      assert 4 == focus.term
+    end
+
+    test "should return the previous extended cousin if given a Zipper with no previous siblings but with previous extended cousins",
+         %{z_with_extended_cousins: z} do
+      assert %Zipper{focus: focus} = Zipper.backward(z)
+      assert 102 == focus.term
+    end
+
+    test "should return the last extended pibling if given a Zipper with no previous siblings or previous extended cousins, but with last extended piblings",
+         %{z_with_extended_cousins: z} do
+      remove_prev_from_path =
+        z.path
+        |> Enum.map(fn loc -> %{loc | prev: []} end)
+      new_z = %{z | path: remove_prev_from_path}
+      assert %Zipper{focus: focus} = Zipper.backward(new_z)
+      assert 58 == focus.term
+    end
+
+    test "should return the last pibling if given a Zipper with no previous sibling, previous extended cousin, or last extended pibling", %{
+      z_with_piblings: z
+    } do
+      new_z = %{z | prev: []}
+      assert %Zipper{focus: focus} = Zipper.backward(new_z)
+      assert 18 == focus.term
+    end
+
+    test "should return parent if given a Zipper with no previous sibling, previous extended cousin, or last extended pibling", %{
+      z_with_parent: z
+    } do
+      assert %Zipper{focus: focus} = Zipper.backward(z)
+      assert 10 == focus.term
+    end
+  end
+
+  describe "backward_for/2" do
+    test "should return nil if given a number of reps <= 0", %{simple_z: z} do
+      for reps <- 0..-5 do
+        assert Zipper.backward_for(z, reps) == nil
+      end
+    end
+
+    test "should return nil if given a Zipper with no breadth-first ancestors", %{leaf_z: z} do
+      for reps <- 1..5 do
+        assert Zipper.backward_for(z, reps) == nil
+      end
+    end
+
+    test "should return correct result of moving backward x number of times", %{
+      z_breadth_first_siblings: z
+    } do
+      new_z = Zipper.forward_for(z, 10)
+
+      expected_results = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+
+      actual_results =
+        1..10
+        |> Enum.map(fn reps ->
+          assert %Zipper{focus: focus} = Zipper.backward_for(new_z, reps),
+                 "Expected a new Zipper for #{reps} reps"
+
+          focus.term
+        end)
+
+      assert actual_results == expected_results
+    end
+  end
+
+  describe "backward_if/2" do
+    test "should return nil if there are no breadth-first ancestors", %{leaf_z: z} do
+      assert Zipper.backward_if(z, &(&1.focus.term == 5)) == nil
+    end
+
+    test "should return nil if the given predicate fails to match", %{simple_z: z} do
+      assert Zipper.backward_if(z, &(&1.focus.term == :not_found)) == nil
+    end
+
+    test "should return the new zipper if the given predicate matches", %{z_with_siblings: z} do
+      assert %Zipper{focus: focus} = Zipper.backward_if(z, &(&1.focus.term == 4))
+      assert focus.term == 4
+    end
+  end
+
+  describe "backward_until/2" do
+    test "should return nil if there are no breadth-first ancestors", %{leaf_z: z} do
+      assert Zipper.backward_until(z, &(&1.focus.term == 5)) == nil
+    end
+
+    test "should return nil if the given predicate fails to match", %{simple_z: z} do
+      assert Zipper.backward_until(z, &(&1.focus.term == :not_found)) == nil
+    end
+
+    test "should return the new zipper if the given predicate is eventually matched", %{
+      z_breadth_first_siblings: z
+    } do
+      new_z = Zipper.forward_to_last(z)
+      assert %Zipper{focus: focus} = Zipper.backward_until(new_z, &(&1.focus.term == 20))
+      assert focus.term == 20
+    end
+  end
+
+  describe "backward_while/2" do
+    test "should move backward through the Zipper breadth-first until the first sibling root node is reached when the default predicate is used", %{
+      z_breadth_first_siblings: z
+    } do
+      new_z = Zipper.forward_to_last(z)
+      assert %Zipper{focus: actual} = Zipper.backward_while(new_z)
+      assert actual.term == -1
+    end
+
+    test "should move backward through the Zipper breadth-first until the predicate returns false", %{
+      z_breadth_first_siblings: z
+    } do
+      new_z = Zipper.forward_to_last(z)
+      assert %Zipper{focus: actual} = Zipper.backward_while(new_z, &(&1.focus.term > 20))
+      assert actual.term == 20
+    end
+  end
+
+  describe "backward_to_root/1" do
+    test "should move backward through the Zipper breadth-first until the first sibling root node is reached", %{
+      z_breadth_first_siblings: z
+    } do
+      new_z = Zipper.forward_to_last(z)
+      assert %Zipper{focus: actual} = Zipper.backward_to_root(z)
+      assert actual.term == -1
     end
   end
 
@@ -302,17 +443,26 @@ defmodule RoseTree.Zipper.ZipperTest do
 
   describe "descend_while/2" do
     test "should descend the Zipper depth-first until the last node is reached when the default predicate is used", %{
-      z_depth_first: z
+      z_depth_first_siblings: z
     } do
       assert %Zipper{focus: actual} = Zipper.descend_while(z)
-      assert actual.term == 40
+      assert actual.term == 41
     end
 
     test "should descend the Zipper depth-first until the predicate returns false", %{
-      z_depth_first: z
+      z_depth_first_siblings: z
     } do
       assert %Zipper{focus: actual} = Zipper.descend_while(z, &(&1.focus.term < 20))
       assert actual.term == 20
+    end
+  end
+
+  describe "descend_to_last/1" do
+    test "should descend the Zipper depth-first until the last node is reached", %{
+      z_depth_first_siblings: z
+    } do
+      assert %Zipper{focus: actual} = Zipper.descend_to_last(z)
+      assert actual.term == 41
     end
   end
 
@@ -368,7 +518,7 @@ defmodule RoseTree.Zipper.ZipperTest do
         1..10
         |> Enum.map(fn reps ->
           assert %Zipper{focus: focus} = Zipper.ascend_for(new_z, reps),
-                 "Expected a new Zipper for #{reps} reps "
+                 "Expected a new Zipper for #{reps} reps"
 
           focus.term
         end)
@@ -422,7 +572,7 @@ defmodule RoseTree.Zipper.ZipperTest do
   describe "ascend_while/2" do
     setup ctx do
       %{
-        z_at_last_depth_first: Zipper.descend_to_last(ctx.z_depth_first)
+        z_at_last_depth_first: Zipper.descend_to_last(ctx.z_depth_first_siblings)
       }
     end
 
@@ -430,7 +580,7 @@ defmodule RoseTree.Zipper.ZipperTest do
       z_at_last_depth_first: z
     } do
       assert %Zipper{focus: actual} = Zipper.ascend_while(z)
-      assert actual.term == 0
+      assert actual.term == -1
     end
 
     test "should ascend the Zipper depth-first until the predicate returns false", %{
@@ -438,6 +588,16 @@ defmodule RoseTree.Zipper.ZipperTest do
     } do
       assert %Zipper{focus: actual} = Zipper.ascend_while(z, &(&1.focus.term > 20))
       assert actual.term == 20
+    end
+  end
+
+  describe "ascend_to_root/1" do
+    test "should ascend the Zipper depth-first until the first sibling root node is reached", %{
+      z_depth_first_siblings: z
+    } do
+      new_z = Zipper.descend_to_last(z)
+      assert %Zipper{focus: actual} = Zipper.ascend_to_root(z)
+      assert actual.term == -1
     end
   end
 end
