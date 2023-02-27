@@ -212,9 +212,10 @@ defmodule RoseTree.Util do
     do_split_when([], elements, predicate)
   end
 
-  def do_split_when(_acc, [] = remaining, predicate), do: {[], []}
+  @spec do_split_when(list(), list(), (term() -> boolean())) :: {[term()], [term()]}
+  defp do_split_when(_acc, [] = remaining, predicate), do: {[], []}
 
-  def do_split_when(acc, [head | tail] = remaining, predicate) do
+  defp do_split_when(acc, [head | tail] = remaining, predicate) do
     if predicate.(head) do
       {acc, remaining}
     else
