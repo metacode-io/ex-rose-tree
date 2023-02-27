@@ -48,6 +48,25 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "move_for/3" do
+    test "should return nil when given a rep less than zero", %{simple_z: z} do
+      assert nil == Zipper.move_for(z, -5, &Zipper.descend/1)
+    end
+
+    test "should return the current Zipper unchanged when given a rep of 0", %{simple_z: z} do
+      assert z == Zipper.move_for(z, 0, &Zipper.descend/1)
+    end
+
+    test "should return nil when given a rep that is greater than total count of possible movements", %{simple_z: z} do
+      assert nil == Zipper.move_for(z, 50, &Zipper.descend/1)
+    end
+
+    test "should return new position when given a rep that is within movement range", %{z_with_grandchildren: z} do
+      assert %Zipper{focus: actual} = Zipper.move_for(z, 6, &Zipper.descend/1)
+      assert actual.term == 7
+    end
+  end
+
   describe "forward/1" do
     test "should return nil if given an empty Zipper with no siblings", %{empty_z: z} do
       assert Zipper.forward(z) == nil
