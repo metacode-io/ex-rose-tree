@@ -41,6 +41,20 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert nil == Zipper.move_for(z, &Zipper.descend/1, 50)
     end
 
+    test "should return nil when the move_fn returns nil", %{simple_z: z} do
+      nil_fn = fn _ -> nil end
+
+      assert nil == Zipper.move_for(z, nil_fn, 2)
+    end
+
+    test "should raise CaseClauseError when the move_fn has bad return", %{simple_z: z} do
+      not_a_move_fn = fn _ -> :not_a_zipper end
+
+      assert_raise CaseClauseError, fn ->
+        Zipper.move_for(z, not_a_move_fn, 2)
+      end
+    end
+
     test "should return new position when given a rep that is within movement range", %{z_with_grandchildren: z} do
       assert %Zipper{focus: actual} = Zipper.move_for(z, &Zipper.descend/1, 6)
       assert actual.term == 7
