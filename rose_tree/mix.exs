@@ -36,6 +36,8 @@ defmodule RoseTree.MixProject do
         groups_for_docs: [
           Guards: &(&1[:section] == :guards),
           "Basic Functionality": &(&1[:section] == :basic),
+          Term: &(&1[:section] == :term),
+          Children: &(&1[:section] == :children),
           "Common Traversal": &(&1[:section] == :traversal),
           "Path Traversal": &(&1[:section] == :path_traversal),
           "Breadth-first Traversal": &(&1[:section] == :breadth_first),
@@ -48,6 +50,7 @@ defmodule RoseTree.MixProject do
           "First Cousins": &(&1[:section] == :first_cousins),
           "Second Cousins": &(&1[:section] == :second_cousins),
           "Extended Cousins": &(&1[:section] == :extended_cousins),
+          "Special": &(&1[:section] == :special)
         ],
         extras: []
       ]

@@ -977,7 +977,7 @@ defmodule RoseTree.Zipper do
   starting focus.
   """
   @doc section: :descendants
-  @spec rightmost_descendant(t(), predicate()) :: t() | nil
+  @spec rightmost_descendant(t(), predicate() | nil) :: t() | nil
   def rightmost_descendant(zipper, predicate \\ nil)
 
   def rightmost_descendant(%__MODULE__{focus: focus}, _predicate) when RoseTree.leaf?(focus),
@@ -1021,7 +1021,7 @@ defmodule RoseTree.Zipper do
   starting focus.
   """
   @doc section: :descendants
-  @spec leftmost_descendant(t(), predicate()) :: t() | nil
+  @spec leftmost_descendant(t(), predicate() | nil) :: t() | nil
   def leftmost_descendant(zipper, predicate \\ nil)
 
   def leftmost_descendant(%__MODULE__{focus: focus}, _predicate) when RoseTree.leaf?(focus),
@@ -2640,7 +2640,7 @@ defmodule RoseTree.Zipper do
       and you have not found a suitable note at the right depth, you will not find one.
   """
   @doc section: :extended_cousins
-  @spec first_extended_cousin(t(), keyword()) :: t() | nil
+  @spec first_extended_cousin(t(), predicate()) :: t() | nil
   def first_extended_cousin(z, predicate \\ &Util.always/1)
 
   def first_extended_cousin(%__MODULE__{path: []} = z, _predicate), do: nil
@@ -2672,7 +2672,7 @@ defmodule RoseTree.Zipper do
     end
   end
 
-  @spec first_extended_cousin_starting_point(t()) :: {t(), non_neg_integer()}
+  @spec first_extended_cousin_starting_point(t()) :: {t() | nil, [map()]}
   defp first_extended_cousin_starting_point(%__MODULE__{} = z) do
     {_root, {candidate_depth, candidate_z, path_details}} =
       rewind_accumulate(z, {0, nil, []}, fn
@@ -2969,7 +2969,7 @@ defmodule RoseTree.Zipper do
   Searches for the last extended cousin or the last first-cousin of the focused tree.
   """
   @doc section: :extended_cousins
-  @spec last_extended_cousin(t(), keyword()) :: t() | nil
+  @spec last_extended_cousin(t(), predicate()) :: t() | nil
   def last_extended_cousin(z, predicate \\ &Util.always/1)
 
   def last_extended_cousin(%__MODULE__{path: []} = z, _predicate), do: nil
@@ -3003,7 +3003,7 @@ defmodule RoseTree.Zipper do
     end
   end
 
-  @spec last_extended_cousin_starting_point(t()) :: {t(), non_neg_integer()}
+  @spec last_extended_cousin_starting_point(t()) :: {t() | nil, [map()]}
   defp last_extended_cousin_starting_point(%__MODULE__{} = z) do
     {_root, {candidate_depth, candidate_z, path_details}} =
       rewind_accumulate(z, {0, nil, []}, fn
@@ -3302,7 +3302,7 @@ defmodule RoseTree.Zipper do
   Searches for the previous extended cousin or the previous first-cousin of the focused tree.
   """
   @doc section: :extended_cousins
-  @spec previous_extended_cousin(t(), keyword()) :: t() | nil
+  @spec previous_extended_cousin(t(), predicate()) :: t() | nil
   def previous_extended_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
     target_depth = depth_of_focus(z)
@@ -3428,7 +3428,7 @@ defmodule RoseTree.Zipper do
   Searches for the next extended cousin or the next first-cousin of the focused tree.
   """
   @doc section: :extended_cousins
-  @spec next_extended_cousin(t(), keyword()) :: t() | nil
+  @spec next_extended_cousin(t(), predicate()) :: t() | nil
   def next_extended_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
       when is_function(predicate) do
     target_depth = depth_of_focus(z)
@@ -3728,7 +3728,7 @@ defmodule RoseTree.Zipper do
   @doc section: :path_traversal
   @spec rewind_for(t(), pos_integer()) :: t() | nil
   def rewind_for(%__MODULE__{} = z, reps),
-    do: move_for(z, reps, &parent/1)
+    do: move_for(z, &parent/1, reps)
 
   @doc """
   Rewinds a Zipper along the `path` if the provided predicate function

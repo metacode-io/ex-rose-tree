@@ -105,6 +105,7 @@ defmodule RoseTree do
       %RoseTree{term: nil, children: []}
 
   """
+  @doc section: :basic
   @spec empty() :: t()
   def empty(), do: %__MODULE__{term: nil, children: []}
 
@@ -145,6 +146,7 @@ defmodule RoseTree do
       }
 
   """
+  @doc section: :basic
   @spec new(term(), [t() | term()]) :: t()
   def new(term, children \\ [])
 
@@ -168,6 +170,27 @@ defmodule RoseTree do
   end
 
   @doc """
+  Returns whether a list of values are all RoseTrees or not. Will return
+  true if passed an empty list.
+
+  ## Examples
+
+      iex> trees = for t <- [5,4,3,2,1], do: RoseTree.new(t)
+      ...> RoseTree.all_rose_trees?(trees)
+      true
+
+  """
+  @doc section: :basic
+  @spec all_rose_trees?([term()]) :: boolean()
+  def all_rose_trees?(values) when is_list(values) do
+    Enum.all?(values, &rose_tree?(&1))
+  end
+
+  ###
+  ### TERM
+  ###
+
+  @doc """
   Returns the inner term of a RoseTree.
 
   ## Examples
@@ -177,7 +200,7 @@ defmodule RoseTree do
     5
 
   """
-
+  @doc section: :term
   @spec get_term(t()) :: term()
   def get_term(tree) when rose_tree?(tree), do: tree.term
 
@@ -191,6 +214,7 @@ defmodule RoseTree do
     %RoseTree{term: "five", children: []}
 
   """
+  @doc section: :term
   @spec set_term(t(), term()) :: t()
   def set_term(%__MODULE__{} = tree, term) do
     %{tree | term: term}
@@ -206,6 +230,7 @@ defmodule RoseTree do
       %RoseTree{term: 10, children: []}
 
   """
+  @doc section: :term
   @spec map_term(t(), (term() -> term())) :: t()
   def map_term(%__MODULE__{term: term} = tree, map_fn)
       when is_function(map_fn) do
@@ -213,6 +238,10 @@ defmodule RoseTree do
 
     %{tree | term: new_term}
   end
+
+  ###
+  ### CHILDREN
+  ###
 
   @doc """
   Returns whether or not the current tree has a child that matches the predicate.
@@ -224,6 +253,7 @@ defmodule RoseTree do
       true
 
   """
+  @doc section: :children
   @spec has_child?(t(), (t() -> boolean())) :: boolean()
   def has_child?(%__MODULE__{children: children} = tree, predicate) when is_function(predicate) do
     Enum.any?(children, predicate)
@@ -244,6 +274,7 @@ defmodule RoseTree do
     ]
 
   """
+  @doc section: :children
   @spec get_children(t()) :: [t()]
   def get_children(tree) when rose_tree?(tree), do: tree.children
 
@@ -265,6 +296,7 @@ defmodule RoseTree do
       }
 
   """
+  @doc section: :children
   @spec set_children(t(), [t() | term()]) :: t()
   def set_children(%__MODULE__{} = tree, children) when is_list(children) do
     new_children =
@@ -301,6 +333,7 @@ defmodule RoseTree do
       }
 
   """
+  @doc section: :children
   @spec map_children(t(), (t() -> t())) :: t()
   def map_children(%__MODULE__{children: children} = tree, map_fn)
       when is_function(map_fn) do
@@ -334,6 +367,7 @@ defmodule RoseTree do
       }
 
   """
+  @doc section: :children
   @spec prepend_child(t(), t() | term()) :: t()
   def prepend_child(%__MODULE__{children: children} = tree, child)
       when rose_tree?(child) do
@@ -363,6 +397,7 @@ defmodule RoseTree do
       }
 
   """
+  @doc section: :children
   @spec pop_first_child(t()) :: {t(), t() | nil}
   def pop_first_child(%__MODULE__{children: []} = tree), do: {tree, nil}
 
@@ -389,6 +424,7 @@ defmodule RoseTree do
       }
 
   """
+  @doc section: :children
   @spec append_child(t(), t() | term()) :: t()
   def append_child(%__MODULE__{children: children} = tree, child)
       when rose_tree?(child) do
@@ -418,6 +454,7 @@ defmodule RoseTree do
       }
 
   """
+  @doc section: :children
   @spec pop_last_child(t()) :: {t(), t() | nil}
   def pop_last_child(%__MODULE__{children: []} = tree), do: {tree, nil}
 
@@ -445,6 +482,7 @@ defmodule RoseTree do
       }
 
   """
+  @doc section: :children
   @spec insert_child(t(), t() | term(), integer()) :: t()
   def insert_child(%__MODULE__{} = tree, child, index) when rose_tree?(child),
     do: do_insert_child(tree, child, index)
@@ -480,6 +518,7 @@ defmodule RoseTree do
       }
 
   """
+  @doc section: :children
   @spec remove_child(t(), integer()) :: {t(), t() | nil}
   def remove_child(%__MODULE__{children: []} = tree, _index), do: {tree, nil}
 
@@ -555,6 +594,7 @@ defmodule RoseTree do
       }
 
   """
+  @doc section: :special
   @spec unfold(seed :: term(), unfold_fn()) :: t()
   def unfold(seed, unfold_fn) when is_function(unfold_fn) do
     {current, next} = unfold_fn.(seed)
@@ -586,22 +626,6 @@ defmodule RoseTree do
         %{current: current, todo: todo, done: []}
         |> do_unfold([%{acc | todo: rest} | stack], unfold_fn)
     end
-  end
-
-  @doc """
-  Returns whether a list of values are all RoseTrees or not. Will return
-  true if passed an empty list.
-
-  ## Examples
-
-      iex> trees = for t <- [5,4,3,2,1], do: RoseTree.new(t)
-      ...> RoseTree.all_rose_trees?(trees)
-      true
-
-  """
-  @spec all_rose_trees?([term()]) :: boolean()
-  def all_rose_trees?(values) when is_list(values) do
-    Enum.all?(values, &rose_tree?(&1))
   end
 
   ## Implement Enumerable Protocol

@@ -9,8 +9,11 @@ defmodule RoseTree.Zipper.Location do
   defstruct ~w(prev term next)a
 
   @typedoc """
-  A `Location` is made up of three fields:
-  * `term` is a `RoseTree.term`.
+  A `Location` is made up of three fields, the `term` of a `RoseTree`,
+  and `prev` siblings and `next` siblings, both of which are lists of
+  `RoseTree`.
+
+  * `term` is a `RoseTree` `term`.
   * `prev` is a list of `RoseTree`s. They are the siblings that
       occur prior the `term`. It is reversed such that the
       head of the list is the nearest previous sibling.
@@ -23,6 +26,7 @@ defmodule RoseTree.Zipper.Location do
           next: [RoseTree.t()]
         }
 
+  @doc section: :guards
   defguard location?(value)
            when is_struct(value) and
                   value.__struct__ == __MODULE__ and
@@ -31,8 +35,7 @@ defmodule RoseTree.Zipper.Location do
 
   @doc """
   Builds a new `Location` given a `term()` or a `RoseTree` as the first
-  argument, and a `prev` and `next` list of `RoseTree`s as the second and
-  third argument.
+  argument, and optional `:prev` and `:next` keywords of lists of `RoseTree`s.
 
   If the first argument is a `RoseTree`, it will unwrap its `term` element.
 
