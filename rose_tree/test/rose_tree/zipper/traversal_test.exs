@@ -3,7 +3,6 @@ defmodule RoseTree.Zipper.ZipperTest do
 
   alias RoseTree.Support.{Generators, Zippers}
   alias RoseTree.Zipper
-  alias RoseTree.Zipper.Location
 
   setup_all do
     %{
@@ -346,7 +345,7 @@ defmodule RoseTree.Zipper.ZipperTest do
       z_breadth_first_siblings: z
     } do
       new_z = Zipper.forward_to_last(z)
-      assert %Zipper{focus: actual} = Zipper.backward_to_root(z)
+      assert %Zipper{focus: actual} = Zipper.backward_to_root(new_z)
       assert actual.term == -1
     end
   end
@@ -596,7 +595,7 @@ defmodule RoseTree.Zipper.ZipperTest do
       z_depth_first_siblings: z
     } do
       new_z = Zipper.descend_to_last(z)
-      assert %Zipper{focus: actual} = Zipper.ascend_to_root(z)
+      assert %Zipper{focus: actual} = Zipper.ascend_to_root(new_z)
       assert actual.term == -1
     end
   end

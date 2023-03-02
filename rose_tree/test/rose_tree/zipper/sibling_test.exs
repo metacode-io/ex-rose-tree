@@ -4,7 +4,7 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
   alias RoseTree.Support.Zippers
   alias RoseTree.Zipper
 
-  setup all do
+  setup_all do
     %{
       simple_z: Zippers.simple_z(),
       z_with_siblings: Zippers.z_with_siblings()
