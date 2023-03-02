@@ -3652,7 +3652,7 @@ defmodule RoseTree.Zipper do
   @spec move_while(t(), move_fn(), predicate()) :: t()
   def move_while(%__MODULE__{} = z, move_fn, predicate \\ &Util.always/1)
       when is_function(move_fn) and is_function(predicate) do
-    if predicate.(z) do
+    if predicate.(z) == true do
       case move_fn.(z) do
         nil ->
           z
