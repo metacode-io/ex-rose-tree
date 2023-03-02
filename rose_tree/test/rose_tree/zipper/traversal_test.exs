@@ -237,6 +237,12 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "forward_if/2" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert nil == Zipper.forward_if(z, not_a_predicate)
+    end
+
     test "should return nil if there are no breadth-first descendants", %{leaf_z: z} do
       assert Zipper.forward_if(z, &(&1.focus.term == 5)) == nil
     end
@@ -373,6 +379,12 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "backward_if/2" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert nil == Zipper.backward_if(z, not_a_predicate)
+    end
+
     test "should return nil if there are no breadth-first ancestors", %{leaf_z: z} do
       assert Zipper.backward_if(z, &(&1.focus.term == 5)) == nil
     end
@@ -492,6 +504,12 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "descend_if/2" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert nil == Zipper.descend_if(z, not_a_predicate)
+    end
+
     test "should return nil if there are no descendants", %{leaf_z: z} do
       assert Zipper.descend_if(z, &(&1.focus.term == 5)) == nil
     end
@@ -610,6 +628,12 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "ascend_if/2" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert nil == Zipper.ascend_if(z, not_a_predicate)
+    end
+
     test "should return nil if no previous descendant niblings, siblings, or parent", %{
       simple_z: z
     } do
