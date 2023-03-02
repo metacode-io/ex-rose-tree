@@ -18,7 +18,7 @@ defmodule RoseTree.Zipper.Location do
       occur prior the `term`. It is reversed such that the
       head of the list is the nearest previous sibling.
   * `next` is a list of `RoseTree`s. They are the siblings that
-      occur after the `term.
+      occur after the `term`.
   """
   @type t :: %__MODULE__{
           prev: [RoseTree.t()],
