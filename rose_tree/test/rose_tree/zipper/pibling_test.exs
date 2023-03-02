@@ -541,7 +541,7 @@ defmodule RoseTree.Zipper.PiblingTest do
 
     test "should return nil if no extended pibling found matching predicate",
          %{
-          z_with_extended_cousins: z
+           z_with_extended_cousins: z
          } do
       predicate = &(&1.term == :not_found)
 
@@ -583,7 +583,7 @@ defmodule RoseTree.Zipper.PiblingTest do
 
     test "should return nil if no extended pibling found matching predicate",
          %{
-          z_with_extended_cousins: z
+           z_with_extended_cousins: z
          } do
       predicate = &(&1.term == :not_found)
 
@@ -625,7 +625,7 @@ defmodule RoseTree.Zipper.PiblingTest do
 
     test "should return nil if no extended pibling found matching predicate",
          %{
-          z_with_extended_cousins: z
+           z_with_extended_cousins: z
          } do
       predicate = &(&1.term == :not_found)
 
@@ -667,7 +667,7 @@ defmodule RoseTree.Zipper.PiblingTest do
 
     test "should return nil if no extended pibling found matching predicate",
          %{
-          z_with_extended_cousins: z
+           z_with_extended_cousins: z
          } do
       predicate = &(&1.term == :not_found)
 

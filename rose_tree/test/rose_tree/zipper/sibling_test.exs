@@ -213,8 +213,7 @@ defmodule RoseTree.Zipper.Zipper.SiblingTest do
 
       expected_tree = RoseTree.new(new_term)
 
-      assert %Zipper{next: [^expected_tree | _]} =
-               Zipper.insert_next_sibling_at(z, new_term, 0)
+      assert %Zipper{next: [^expected_tree | _]} = Zipper.insert_next_sibling_at(z, new_term, 0)
     end
 
     test "should insert a new RoseTree at the correct index when given a positive index", %{

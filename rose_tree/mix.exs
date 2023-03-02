@@ -50,7 +50,7 @@ defmodule RoseTree.MixProject do
           "First Cousins": &(&1[:section] == :first_cousins),
           "Second Cousins": &(&1[:section] == :second_cousins),
           "Extended Cousins": &(&1[:section] == :extended_cousins),
-          "Special": &(&1[:section] == :special)
+          Special: &(&1[:section] == :special)
         ],
         extras: []
       ]

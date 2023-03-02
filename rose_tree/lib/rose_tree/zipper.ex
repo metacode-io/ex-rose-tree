@@ -1241,7 +1241,7 @@ defmodule RoseTree.Zipper do
 
   @spec do_insert_previous_sibling_at(t(), RoseTree.t(), integer()) :: t()
   defp do_insert_previous_sibling_at(%__MODULE__{} = z, sibling, index)
-      when RoseTree.rose_tree?(sibling) and is_integer(index) do
+       when RoseTree.rose_tree?(sibling) and is_integer(index) do
     {siblings_before, siblings_after} =
       z.prev
       |> Enum.reverse()
@@ -1263,7 +1263,7 @@ defmodule RoseTree.Zipper do
     do: do_insert_next_sibling_at(z, RoseTree.new(sibling), index)
 
   defp do_insert_next_sibling_at(%__MODULE__{} = z, sibling, index)
-      when RoseTree.rose_tree?(sibling) and is_integer(index) do
+       when RoseTree.rose_tree?(sibling) and is_integer(index) do
     {siblings_before, siblings_after} = Enum.split(z.next, index)
     new_siblings = siblings_before ++ [sibling | siblings_after]
     %{z | next: new_siblings}
@@ -1959,7 +1959,7 @@ defmodule RoseTree.Zipper do
   @spec first_extended_nibling(t(), predicate()) :: t() | nil
   def first_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = first_extended_cousin <-
-           first_extended_cousin(z, &(RoseTree.has_child?(&1, predicate))),
+           first_extended_cousin(z, &RoseTree.has_child?(&1, predicate)),
          %__MODULE__{} = first_child <- first_child(first_extended_cousin, predicate) do
       first_child
     else
@@ -1975,7 +1975,7 @@ defmodule RoseTree.Zipper do
   @spec last_extended_nibling(t(), predicate()) :: t() | nil
   def last_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = last_extended_cousin <-
-            last_extended_cousin(z, &(RoseTree.has_child?(&1, predicate))),
+           last_extended_cousin(z, &RoseTree.has_child?(&1, predicate)),
          %__MODULE__{} = last_child <- last_child(last_extended_cousin, predicate) do
       last_child
     else
@@ -1991,7 +1991,7 @@ defmodule RoseTree.Zipper do
   @spec previous_extended_nibling(t(), predicate()) :: t() | nil
   def previous_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
     with %__MODULE__{} = prev_extended_cousin <-
-           previous_extended_cousin(z, &(RoseTree.has_child?(&1, predicate))),
+           previous_extended_cousin(z, &RoseTree.has_child?(&1, predicate)),
          %__MODULE__{} = last_child <- last_child(prev_extended_cousin, predicate) do
       last_child
     else
@@ -2006,7 +2006,8 @@ defmodule RoseTree.Zipper do
   @doc section: :niblings
   @spec next_extended_nibling(t(), predicate()) :: t() | nil
   def next_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
-    with %__MODULE__{} = next_extended_cousin <- next_extended_cousin(z, &(RoseTree.has_child?(&1, predicate))),
+    with %__MODULE__{} = next_extended_cousin <-
+           next_extended_cousin(z, &RoseTree.has_child?(&1, predicate)),
          %__MODULE__{} = first_child <- first_child(next_extended_cousin, predicate) do
       first_child
     else
@@ -3695,7 +3696,8 @@ defmodule RoseTree.Zipper do
   @spec map(t(), move_fn(), map_fn()) :: t()
   def map(%__MODULE__{} = z, move_fn, map_fn)
       when is_function(move_fn) and is_function(map_fn) do
-    new_z = %{z | focus: map_fn.(z.focus)}
+    new_z = map_focus(z, map_fn)
+
     case move_fn.(new_z) do
       nil ->
         new_z
