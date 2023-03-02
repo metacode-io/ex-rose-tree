@@ -9,6 +9,7 @@ defmodule RoseTree.Zipper.DirectAncestorTest do
       empty_z: Zippers.empty_z(),
       leaf_z: Zippers.leaf_z(),
       simple_z: Zippers.simple_z(),
+      z_with_siblings: Zippers.z_with_siblings(),
       z_with_parent: Zippers.z_with_parent(),
       z_with_grandparent: Zippers.z_with_grandparent(),
       z_with_great_grandparent: Zippers.z_with_great_grandparent()
@@ -20,8 +21,10 @@ defmodule RoseTree.Zipper.DirectAncestorTest do
       assert Zipper.parent(z) == nil
     end
 
-    test "should return nil for Zipper with no parent", %{simple_z: z} do
-      assert Zipper.parent(z) == nil
+    test "should return nil for Zipper with no parent", %{simple_z: z_1, z_with_siblings: z_2} do
+      for z <- [z_1, z_2] do
+        assert Zipper.parent(z) == nil
+      end
     end
 
     test "should move focus to parent if one is found", %{z_with_parent: z} do

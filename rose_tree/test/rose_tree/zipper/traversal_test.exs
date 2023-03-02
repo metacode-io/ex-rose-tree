@@ -11,6 +11,7 @@ defmodule RoseTree.Zipper.ZipperTest do
       simple_z: Zippers.simple_z(),
       z_with_parent: Zippers.z_with_parent(),
       z_with_grandchildren: Zippers.z_with_grandchildren(),
+      z_with_great_grandparent: Zippers.z_with_great_grandparent(),
       z_with_siblings: Zippers.z_with_siblings(),
       z_with_piblings: Zippers.z_with_piblings(),
       z_with_ancestral_piblings: Zippers.z_with_ancestral_piblings(),
@@ -23,6 +24,53 @@ defmodule RoseTree.Zipper.ZipperTest do
       z_breadth_first: Zippers.z_breadth_first(),
       z_breadth_first_siblings: Zippers.z_breadth_first_siblings()
     }
+  end
+
+  ## General Traversal
+
+  describe "move_for/3" do
+    test "should return nil when given a rep less than zero", %{simple_z: z} do
+      assert nil == Zipper.move_for(z, &Zipper.descend/1, -5)
+    end
+
+    test "should return nil when given a req equal to zero", %{simple_z: z} do
+      assert nil == Zipper.move_for(z, &Zipper.descend/1, 0)
+    end
+
+    test "should return nil when given a rep that is greater than total count of possible movements", %{simple_z: z} do
+      assert nil == Zipper.move_for(z, &Zipper.descend/1, 50)
+    end
+
+    test "should return new position when given a rep that is within movement range", %{z_with_grandchildren: z} do
+      assert %Zipper{focus: actual} = Zipper.move_for(z, &Zipper.descend/1, 6)
+      assert actual.term == 7
+    end
+  end
+
+  describe "move_while/3" do
+    test "should move until the the move function can no longer continue", %{simple_z: z} do
+      assert %Zipper{focus: actual} = Zipper.move_while(z, &Zipper.descend/1)
+      assert actual.term == 4
+    end
+  end
+
+  ## Path Traversal
+
+  describe "rewind_for/2" do
+    test "should return nil if asked to rewind 0 or fewer times", %{z_with_parent: z} do
+      for reps <- [0, -1] do
+        assert nil == Zipper.rewind_for(z, reps)
+      end
+    end
+
+    test "should return nil if asked to rewind more times than there are parents", %{simple_z: z} do
+      assert nil == Zipper.rewind_for(z, 3)
+    end
+
+    test "should rewind the focus along the path n number of times", %{z_with_great_grandparent: z} do
+      assert %Zipper{focus: actual} = Zipper.rewind_for(z, 3)
+      assert actual.term ==  1
+    end
   end
 
   describe "rewind_to_root/1" do
@@ -50,31 +98,6 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
-  describe "move_for/3" do
-    test "should return nil when given a rep less than zero", %{simple_z: z} do
-      assert nil == Zipper.move_for(z, &Zipper.descend/1, -5)
-    end
-
-    test "should return nil when given a req equal to zero", %{simple_z: z} do
-      assert nil == Zipper.move_for(z, &Zipper.descend/1, 0)
-    end
-
-    test "should return nil when given a rep that is greater than total count of possible movements", %{simple_z: z} do
-      assert nil == Zipper.move_for(z, &Zipper.descend/1, 50)
-    end
-
-    test "should return new position when given a rep that is within movement range", %{z_with_grandchildren: z} do
-      assert %Zipper{focus: actual} = Zipper.move_for(z, &Zipper.descend/1, 6)
-      assert actual.term == 7
-    end
-  end
-
-  describe "move_while/3" do
-    test "should move until the the move function can no longer continue", %{simple_z: z} do
-      assert %Zipper{focus: actual} = Zipper.move_while(z, &Zipper.descend/1)
-      assert actual.term == 4
-    end
-  end
 
   describe "forward/1" do
     test "should return nil if given an empty Zipper with no siblings", %{empty_z: z} do
