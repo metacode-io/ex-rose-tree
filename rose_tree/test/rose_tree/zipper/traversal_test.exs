@@ -108,11 +108,28 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
-  describe "rewind_if/2" do
-    test "should return nil if given a function that is not a real predicate", %{z_with_parent: z} do
-      not_a_predicate = fn _ -> 5 end
+  describe "rewind_if/3" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
 
       assert nil == Zipper.rewind_if(z, not_a_predicate)
+    end
+
+    test "should return nil when parent/1 returns nil", %{simple_z: z} do
+      assert nil == Zipper.rewind_if(z, &Util.always/1)
+    end
+
+    test "should return nil if predicate returns false", %{simple_z: z} do
+      predicate = &(&1.focus.term == :no_match)
+
+      assert nil == Zipper.rewind_if(z, predicate)
+    end
+
+    test "should move the focus if the predicate returns true", %{z_with_parent: z} do
+      predicate = &(&1.focus.term == 10)
+
+      assert %Zipper{focus: actual} = Zipper.rewind_if(z, predicate)
+      assert actual.term == 10
     end
   end
 
