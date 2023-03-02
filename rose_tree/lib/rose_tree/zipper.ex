@@ -3686,8 +3686,6 @@ defmodule RoseTree.Zipper do
     end
   end
 
-  def find(%__MODULE__{}, _predicate, _move_fn), do: nil
-
   @doc """
   Traverses the Zipper using the provided `move_fn()` and maps the `term`
   at each node using the provided `map_fn()`. Returns the new Zipper with
