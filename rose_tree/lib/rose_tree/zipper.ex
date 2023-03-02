@@ -3613,7 +3613,7 @@ defmodule RoseTree.Zipper do
         nil
 
       %__MODULE__{} = next_z ->
-        if predicate.(next_z) do
+        if predicate.(next_z) == true do
           next_z
         else
           nil

@@ -2,7 +2,7 @@ defmodule RoseTree.Zipper.ZipperTest do
   use ExUnit.Case, async: true
 
   alias RoseTree.Support.{Generators, Zippers}
-  alias RoseTree.Zipper
+  alias RoseTree.{Util, Zipper}
 
   setup_all do
     %{
@@ -47,6 +47,41 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "move_if/3" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert nil == Zipper.move_if(z, &Zipper.descend/1, not_a_predicate)
+    end
+
+    test "should return nil when the move_fn returns nil", %{simple_z: z} do
+      nil_fn = fn _ -> nil end
+
+      assert nil == Zipper.move_if(z, nil_fn, &Util.always/1)
+    end
+
+    test "should raise CaseClauseError when the move_fn has bad return", %{simple_z: z} do
+      not_a_move_fn = fn _ -> :not_a_zipper end
+
+      assert_raise CaseClauseError, fn ->
+        Zipper.move_if(z, not_a_move_fn, &Util.always/1)
+      end
+    end
+
+    test "should return nil if predicate returns false", %{simple_z: z} do
+      predicate = &(&1.focus.term == :no_match)
+
+      assert nil == Zipper.move_if(z, &Zipper.descend/1, predicate)
+    end
+
+    test "should move the focus if the predicate returns true", %{simple_z: z} do
+      predicate = &(&1.focus.term == 2)
+
+      assert %Zipper{focus: actual} = Zipper.move_if(z, &Zipper.descend/1, predicate)
+      assert actual.term == 2
+    end
+  end
+
   describe "move_while/3" do
     test "should move until the the move function can no longer continue", %{simple_z: z} do
       assert %Zipper{focus: actual} = Zipper.move_while(z, &Zipper.descend/1)
@@ -70,6 +105,14 @@ defmodule RoseTree.Zipper.ZipperTest do
     test "should rewind the focus along the path n number of times", %{z_with_great_grandparent: z} do
       assert %Zipper{focus: actual} = Zipper.rewind_for(z, 3)
       assert actual.term ==  1
+    end
+  end
+
+  describe "rewind_if/2" do
+    test "should return nil if given a function that is not a real predicate", %{z_with_parent: z} do
+      not_a_predicate = fn _ -> 5 end
+
+      assert nil == Zipper.rewind_if(z, not_a_predicate)
     end
   end
 
