@@ -127,6 +127,21 @@ defmodule RoseTree.Util do
   def always(_term), do: true
 
   @doc """
+  A function that always returns false, regardless of what is passed to it.
+
+  ## Examples
+
+      iex> RoseTree.Util.never(5)
+      false
+
+      iex> RoseTree.Util.never(true)
+      false
+
+  """
+  @spec never(term()) :: false
+  def never(_term), do: false
+
+  @doc """
   A function that applies a predicate to a term. If the function application
   is true, returns the original term. If false, returns nil.
 

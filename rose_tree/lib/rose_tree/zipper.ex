@@ -3673,7 +3673,7 @@ defmodule RoseTree.Zipper do
   @spec find(t(), move_fn(), predicate()) :: t() | nil
   def find(%__MODULE__{} = z, move_fn, predicate)
       when is_function(move_fn) and is_function(predicate) do
-    if predicate.(z) do
+    if predicate.(z) == true do
       z
     else
       case move_fn.(z) do
@@ -3681,7 +3681,7 @@ defmodule RoseTree.Zipper do
           nil
 
         %__MODULE__{} = next_z ->
-          find(next_z, predicate, move_fn)
+          find(next_z, move_fn, predicate)
       end
     end
   end

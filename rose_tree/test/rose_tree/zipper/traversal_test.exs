@@ -158,9 +158,51 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert z == Zipper.move_while(z, &Zipper.descend/1, predicate)
     end
 
+    test "should move until the predicate stops matching", %{simple_z: z} do
+      predicate = &(&1.focus.term != 3)
+
+      assert %Zipper{focus: actual} = Zipper.move_while(z, &Zipper.descend/1, predicate)
+      assert actual.term == 3
+    end
+
     test "should move until the the move function can no longer continue", %{simple_z: z} do
       assert %Zipper{focus: actual} = Zipper.move_while(z, &Zipper.descend/1)
       assert actual.term == 4
+    end
+  end
+
+  describe "find/3" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert nil == Zipper.find(z, &Zipper.descend/1, not_a_predicate)
+    end
+
+    test "should return nil when the move_fn returns nil", %{simple_z: z} do
+      nil_fn = fn _ -> nil end
+
+      assert nil == Zipper.find(z, nil_fn, &Util.never/1)
+    end
+
+    test "should raise CaseClauseError when the move_fn has bad return", %{simple_z: z} do
+      not_a_move_fn = fn _ -> :not_a_zipper end
+
+      assert_raise CaseClauseError, fn ->
+        Zipper.find(z, not_a_move_fn, &Util.never/1)
+      end
+    end
+
+    test "should return nil if predicate never matches", %{simple_z: z} do
+      predicate = &(&1.focus.term == :no_match)
+
+      assert nil == Zipper.find(z, &Zipper.descend/1, predicate)
+    end
+
+    test "should move until the predicate matches", %{simple_z: z} do
+      predicate = &(&1.focus.term == 3)
+
+      assert %Zipper{focus: actual} = Zipper.find(z, &Zipper.descend/1, predicate)
+      assert actual.term == 3
     end
   end
 
