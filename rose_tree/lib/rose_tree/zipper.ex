@@ -353,7 +353,7 @@ defmodule RoseTree.Zipper do
   @spec remove_focus(t()) :: {t(), RoseTree.t() | nil}
   def remove_focus(%__MODULE__{} = z) when empty?(z), do: {z, nil}
 
-  def remove_focus(%__MODULE__{prev: [], next: [], path: []} = z), do: {empty(), nil}
+  def remove_focus(%__MODULE__{prev: [], next: [], path: []}), do: {empty(), nil}
 
   def remove_focus(%__MODULE__{prev: [], next: []} = z),
     do: {do_parental_shift(z, []), z.focus}
@@ -598,7 +598,7 @@ defmodule RoseTree.Zipper do
   @spec parent(t()) :: t() | nil
   def parent(%__MODULE__{path: []}), do: nil
 
-  def parent(%__MODULE__{path: [parent | g_parents]} = z) do
+  def parent(%__MODULE__{path: [_parent | _g_parents]} = z) do
     combined_siblings = Enum.reverse(z.prev) ++ [z.focus | z.next]
 
     z
@@ -606,7 +606,7 @@ defmodule RoseTree.Zipper do
   end
 
   @spec do_parental_shift(t(), [RoseTree.t()]) :: t()
-  defp do_parental_shift(%__MODULE__{path: []}), do: nil
+  defp do_parental_shift(%__MODULE__{path: []}, _combined_siblings), do: nil
 
   defp do_parental_shift(%__MODULE__{path: [parent | g_parents]} = z, combined_siblings)
        when is_list(combined_siblings) do
@@ -1615,7 +1615,7 @@ defmodule RoseTree.Zipper do
   """
   @doc section: :siblings
   @spec sibling_at(t(), non_neg_integer()) :: t() | nil
-  def sibling_at(%__MODULE__{prev: [], next: []} = z, index), do: nil
+  def sibling_at(%__MODULE__{prev: [], next: []}, _index), do: nil
 
   def sibling_at(%__MODULE__{} = z, index) when is_integer(index) do
     current_idx = index_of_focus(z)
@@ -2248,7 +2248,9 @@ defmodule RoseTree.Zipper do
   """
   @doc section: :piblings
   @spec first_ancestral_pibling(t(), predicate()) :: t() | nil
-  def first_ancestral_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def first_ancestral_pibling(z, predicate \\ &Util.always/1)
+
+  def first_ancestral_pibling(%__MODULE__{} = z, predicate)
       when is_function(predicate) do
     case first_pibling(z, predicate) do
       nil ->
@@ -2272,7 +2274,9 @@ defmodule RoseTree.Zipper do
   """
   @doc section: :piblings
   @spec previous_ancestral_pibling(t(), predicate()) :: t() | nil
-  def previous_ancestral_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def previous_ancestral_pibling(z, predicate \\ &Util.always/1)
+
+  def previous_ancestral_pibling(%__MODULE__{} = z, predicate)
       when is_function(predicate) do
     case previous_pibling(z, predicate) do
       nil ->
@@ -2296,7 +2300,9 @@ defmodule RoseTree.Zipper do
   """
   @doc section: :piblings
   @spec next_ancestral_pibling(t(), predicate()) :: t() | nil
-  def next_ancestral_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def next_ancestral_pibling(z, predicate \\ &Util.always/1)
+
+  def next_ancestral_pibling(%__MODULE__{} = z, predicate)
       when is_function(predicate) do
     case next_pibling(z, predicate) do
       nil ->
@@ -2320,7 +2326,9 @@ defmodule RoseTree.Zipper do
   """
   @doc section: :piblings
   @spec last_ancestral_pibling(t(), predicate()) :: t() | nil
-  def last_ancestral_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def last_ancestral_pibling(z, predicate \\ &Util.always/1)
+
+  def last_ancestral_pibling(%__MODULE__{} = z, predicate)
       when is_function(predicate) do
     case last_pibling(z, predicate) do
       nil ->
@@ -2643,7 +2651,7 @@ defmodule RoseTree.Zipper do
   @spec first_extended_cousin(t(), predicate()) :: t() | nil
   def first_extended_cousin(z, predicate \\ &Util.always/1)
 
-  def first_extended_cousin(%__MODULE__{path: []} = z, _predicate), do: nil
+  def first_extended_cousin(%__MODULE__{path: []}, _predicate), do: nil
 
   def first_extended_cousin(%__MODULE__{} = z, predicate) when is_function(predicate) do
     target_depth = depth_of_focus(z)
@@ -2748,8 +2756,8 @@ defmodule RoseTree.Zipper do
           t() | nil
   # Path Details have been exhausted, thus no match
   defp do_first_extended_cousin(
-         %__MODULE__{} = z,
-         current_details,
+         %__MODULE__{},
+         _current_details,
          [] = _path_details,
          _target_depth,
          _predicate
@@ -2825,7 +2833,7 @@ defmodule RoseTree.Zipper do
   defp do_first_extended_cousin(
          %__MODULE__{} = z,
          current_details,
-         [loc_details | _] = path_details,
+         [_loc_details | _] = path_details,
          target_depth,
          predicate
        )
@@ -2847,7 +2855,7 @@ defmodule RoseTree.Zipper do
   # we also have no match. Otherwise, continue the search.
   defp do_first_extended_cousin(
          %__MODULE__{next: []} = z,
-         current_details,
+         _current_details,
          [loc_details | _] = path_details,
          target_depth,
          predicate
@@ -2879,7 +2887,7 @@ defmodule RoseTree.Zipper do
   defp do_first_extended_cousin(
          %__MODULE__{} = z,
          current_details,
-         [loc_details | _] = path_details,
+         [_loc_details | _] = path_details,
          target_depth,
          predicate
        )
@@ -2898,7 +2906,7 @@ defmodule RoseTree.Zipper do
   # that tree.
   defp do_first_extended_cousin(
          %__MODULE__{next: []} = z,
-         current_details,
+         _current_details,
          [loc_details | _] = path_details,
          target_depth,
          predicate
@@ -2942,7 +2950,7 @@ defmodule RoseTree.Zipper do
   defp do_first_extended_cousin(
          %__MODULE__{} = z,
          current_details,
-         [loc_details | _] = path_details,
+         [_loc_details | _] = path_details,
          target_depth,
          predicate
        ) do
@@ -2972,7 +2980,7 @@ defmodule RoseTree.Zipper do
   @spec last_extended_cousin(t(), predicate()) :: t() | nil
   def last_extended_cousin(z, predicate \\ &Util.always/1)
 
-  def last_extended_cousin(%__MODULE__{path: []} = z, _predicate), do: nil
+  def last_extended_cousin(%__MODULE__{path: []}, _predicate), do: nil
 
   def last_extended_cousin(%__MODULE__{} = z, predicate)
       when is_function(predicate) do
@@ -3081,8 +3089,8 @@ defmodule RoseTree.Zipper do
           t() | nil
   # Path Details have been exhausted, thus no match
   defp do_last_extended_cousin(
-         %__MODULE__{} = z,
-         current_details,
+         %__MODULE__{},
+         _current_details,
          [] = _path_details,
          _target_depth,
          _predicate
@@ -3158,7 +3166,7 @@ defmodule RoseTree.Zipper do
   defp do_last_extended_cousin(
          %__MODULE__{} = z,
          current_details,
-         [loc_details | _] = path_details,
+         [_loc_details | _] = path_details,
          target_depth,
          predicate
        )
@@ -3180,7 +3188,7 @@ defmodule RoseTree.Zipper do
   # # we also have no match. Otherwise, continue the search.
   defp do_last_extended_cousin(
          %__MODULE__{prev: []} = z,
-         current_details,
+         _current_details,
          [loc_details | _] = path_details,
          target_depth,
          predicate
@@ -3212,7 +3220,7 @@ defmodule RoseTree.Zipper do
   defp do_last_extended_cousin(
          %__MODULE__{} = z,
          current_details,
-         [loc_details | _] = path_details,
+         [_loc_details | _] = path_details,
          target_depth,
          predicate
        )
@@ -3231,7 +3239,7 @@ defmodule RoseTree.Zipper do
   # # that tree.
   defp do_last_extended_cousin(
          %__MODULE__{prev: []} = z,
-         current_details,
+         _current_details,
          [loc_details | _] = path_details,
          target_depth,
          predicate
@@ -3275,7 +3283,7 @@ defmodule RoseTree.Zipper do
   defp do_last_extended_cousin(
          %__MODULE__{} = z,
          current_details,
-         [loc_details | _] = path_details,
+         [_loc_details | _] = path_details,
          target_depth,
          predicate
        ) do

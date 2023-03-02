@@ -32,7 +32,7 @@ defmodule RoseTree.Util do
   def first_of(term, [h | t] = _funs) when is_function(h) do
     case h.(term) do
       {:ok, result} -> result
-      {:error, error} -> first_of(term, t)
+      {:error, _error} -> first_of(term, t)
       :error -> first_of(term, t)
       nil -> first_of(term, t)
       false -> first_of(term, t)
@@ -68,7 +68,7 @@ defmodule RoseTree.Util do
              is_list(opts) do
     case h.(term, opts) do
       {:ok, result} -> result
-      {:error, error} -> first_of_with_opts(term, t, opts)
+      {:error, _error} -> first_of_with_opts(term, t, opts)
       :error -> first_of_with_opts(term, t, opts)
       nil -> first_of_with_opts(term, t, opts)
       false -> first_of_with_opts(term, t, opts)
@@ -103,7 +103,7 @@ defmodule RoseTree.Util do
              is_list(args) do
     case apply(h, [term | args]) do
       {:ok, result} -> result
-      {:error, error} -> first_of_with_args(term, t, args)
+      {:error, _error} -> first_of_with_args(term, t, args)
       :error -> first_of_with_args(term, t, args)
       nil -> first_of_with_args(term, t, args)
       false -> first_of_with_args(term, t, args)
@@ -213,7 +213,7 @@ defmodule RoseTree.Util do
   end
 
   @spec do_split_when(list(), list(), (term() -> boolean())) :: {[term()], [term()]}
-  defp do_split_when(_acc, [] = remaining, predicate), do: {[], []}
+  defp do_split_when(_acc, [] = _remaining, _predicate), do: {[], []}
 
   defp do_split_when(acc, [head | tail] = remaining, predicate) do
     if predicate.(head) do

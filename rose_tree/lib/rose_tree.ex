@@ -255,7 +255,7 @@ defmodule RoseTree do
   """
   @doc section: :children
   @spec has_child?(t(), (t() -> boolean())) :: boolean()
-  def has_child?(%__MODULE__{children: children} = tree, predicate) when is_function(predicate) do
+  def has_child?(%__MODULE__{children: children}, predicate) when is_function(predicate) do
     Enum.any?(children, predicate)
   end
 
@@ -487,7 +487,7 @@ defmodule RoseTree do
   def insert_child(%__MODULE__{} = tree, child, index) when rose_tree?(child),
     do: do_insert_child(tree, child, index)
 
-  def insert_child(%__MODULE__{children: children} = tree, child, index),
+  def insert_child(%__MODULE__{} = tree, child, index),
     do: do_insert_child(tree, new(child), index)
 
   @spec do_insert_child(t(), t() | term(), integer()) :: t()
@@ -531,7 +531,7 @@ defmodule RoseTree do
     end
   end
 
-  def remove_child(%__MODULE__{children: children} = tree, index) when is_integer(index),
+  def remove_child(%__MODULE__{} = tree, index) when is_integer(index),
     do: do_remove_child(tree, index)
 
   @spec do_remove_child(t(), integer()) :: {t(), t() | nil}
