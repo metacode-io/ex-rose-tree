@@ -345,7 +345,7 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
-  describe "rewind_if/3" do
+  describe "rewind_if/2" do
     test "should return nil when given a bad predicate", %{simple_z: z} do
       not_a_predicate = fn _ -> :anti_boolean end
 
@@ -370,7 +370,7 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
-  describe "rewind_until/3" do
+  describe "rewind_until/2" do
     test "should return nil when given a bad predicate", %{simple_z: z} do
       not_a_predicate = fn _ -> :anti_boolean end
 
@@ -391,6 +391,36 @@ defmodule RoseTree.Zipper.ZipperTest do
       predicate = &(&1.focus.term == 1)
 
       assert %Zipper{focus: actual} = Zipper.rewind_until(z, predicate)
+      assert actual.term == 1
+    end
+  end
+
+  describe "rewind_while/2" do
+    test "should return unchanged when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert z == Zipper.rewind_while(z, not_a_predicate)
+    end
+
+    test "should return unchanged when no parents", %{simple_z: z} do
+      assert z == Zipper.rewind_while(z, &Util.always/1)
+    end
+
+    test "should return unchanged if predicate never matches", %{z_with_great_grandparent: z} do
+      predicate = &(&1.focus.term == :no_match)
+
+      assert z == Zipper.rewind_while(z, predicate)
+    end
+
+    test "should move until the predicate stops matching", %{z_with_great_grandparent: z} do
+      predicate = &(&1.focus.term != 5)
+
+      assert %Zipper{focus: actual} = Zipper.rewind_while(z, predicate)
+      assert actual.term == 5
+    end
+
+    test "should move until the the move function can no longer continue", %{z_with_great_grandparent: z} do
+      assert %Zipper{focus: actual} = Zipper.rewind_while(z)
       assert actual.term == 1
     end
   end
