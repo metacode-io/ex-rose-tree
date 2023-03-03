@@ -22,8 +22,10 @@ defmodule RoseTree.Zipper.ZipperTest do
       z_with_extended_niblings: Zippers.z_with_extended_niblings(),
       z_depth_first: Zippers.z_depth_first(),
       z_depth_first_siblings: Zippers.z_depth_first_siblings(),
+      z_depth_first_siblings_at_end: Zipper.descend_to_last(Zippers.z_depth_first_siblings()),
       z_breadth_first: Zippers.z_breadth_first(),
-      z_breadth_first_siblings: Zippers.z_breadth_first_siblings()
+      z_breadth_first_siblings: Zippers.z_breadth_first_siblings(),
+      z_breadth_first_siblings_at_end: Zipper.forward_to_last(Zippers.z_breadth_first_siblings())
     }
   end
 
@@ -1178,6 +1180,12 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "backward_until/2" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert nil == Zipper.backward_until(z, not_a_predicate)
+    end
+
     test "should return nil if there are no breadth-first ancestors", %{leaf_z: z} do
       assert Zipper.backward_until(z, &(&1.focus.term == 5)) == nil
     end
@@ -1187,44 +1195,93 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
 
     test "should return the new zipper if the given predicate is eventually matched", %{
-      z_breadth_first_siblings: z
+      z_breadth_first_siblings_at_end: z
     } do
-      new_z = Zipper.forward_to_last(z)
-      assert %Zipper{focus: focus} = Zipper.backward_until(new_z, &(&1.focus.term == 20))
+      assert %Zipper{focus: focus} = Zipper.backward_until(z, &(&1.focus.term == 20))
       assert focus.term == 20
     end
   end
 
   describe "backward_while/2" do
+    test "should return unchanged when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert z == Zipper.backward_while(z, not_a_predicate)
+    end
+
+    test "should return unchanged when no breadth-first ancestors", %{leaf_z: z} do
+      assert z == Zipper.backward_while(z, &Util.always/1)
+    end
+
+    test "should return unchanged if predicate fails at the start", %{z_breadth_first_siblings: z} do
+      predicate = &(&1.focus.term == :no_match)
+
+      assert z == Zipper.backward_while(z, predicate)
+    end
+
     test "should move backward through the Zipper breadth-first until the first sibling root node is reached when the default predicate is used",
          %{
-           z_breadth_first_siblings: z
+           z_breadth_first_siblings_at_end: z
          } do
-      new_z = Zipper.forward_to_last(z)
-      assert %Zipper{focus: actual} = Zipper.backward_while(new_z)
+      assert %Zipper{focus: actual} = Zipper.backward_while(z)
       assert actual.term == -1
     end
 
     test "should move backward through the Zipper breadth-first until the predicate returns false",
          %{
-           z_breadth_first_siblings: z
+          z_breadth_first_siblings_at_end: z
          } do
-      new_z = Zipper.forward_to_last(z)
-      assert %Zipper{focus: actual} = Zipper.backward_while(new_z, &(&1.focus.term > 20))
+      assert %Zipper{focus: actual} = Zipper.backward_while(z, &(&1.focus.term > 20))
       assert actual.term == 20
     end
   end
 
   describe "backward_to_root/1" do
+    test "should return the current Zipper if already at the first breadth-first descendant", %{leaf_z: z} do
+      assert ^z = Zipper.backward_to_root(z)
+    end
+
     test "should move backward through the Zipper breadth-first until the first sibling root node is reached",
          %{
-           z_breadth_first_siblings: z
+          z_breadth_first_siblings_at_end: z
          } do
-      new_z = Zipper.forward_to_last(z)
-      assert %Zipper{focus: actual} = Zipper.backward_to_root(new_z)
+      assert %Zipper{focus: actual} = Zipper.backward_to_root(z)
       assert actual.term == -1
     end
   end
+
+  describe "backward_find/2" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert nil == Zipper.backward_find(z, not_a_predicate)
+    end
+
+    test "should return nil when no breadth-first ancestors", %{leaf_z: z} do
+      assert nil == Zipper.backward_find(z, &Util.never/1)
+    end
+
+    test "should return nil if predicate never matches", %{z_breadth_first_siblings_at_end: z} do
+      predicate = &(&1.focus.term == :no_match)
+
+      assert nil == Zipper.backward_find(z, predicate)
+    end
+
+    test "should return unmoved if predicate matches at starting focus", %{z_breadth_first_siblings_at_end: z} do
+      predicate = &(&1.focus.term == 41)
+
+      assert z == Zipper.backward_find(z, predicate)
+    end
+
+    test "should move until the predicate matches if match isn't found at starting focus", %{z_breadth_first_siblings_at_end: z} do
+      predicate = &(&1.focus.term == 30)
+
+      assert %Zipper{focus: actual} = Zipper.backward_find(z, predicate)
+      assert actual.term == 30
+    end
+  end
+
+  ## Descend Traversal
 
   describe "descend/1" do
     test "should return nil if given an empty Zipper with no siblings", %{empty_z: z} do
