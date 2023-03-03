@@ -803,6 +803,135 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "forward_map/2" do
+    test "should return new leaf Zipper if given an empty zipper with valid map_fn", %{empty_z: z} do
+      map_fn = &RoseTree.set_term(&1, 2)
+
+      assert %Zipper{focus: actual, prev: [], next: [], path: []} =
+               Zipper.forward_map(z, map_fn)
+
+      assert actual.term == 2
+      assert actual.children == z.focus.children
+    end
+
+    test "should change only the focus and remain there if no breadth-first descendants",
+         %{leaf_z: z} do
+      map_fn = &RoseTree.map_term(&1, fn t -> t * 2 end)
+
+      assert %Zipper{focus: actual, prev: prev, next: next, path: path} =
+               Zipper.forward_map(z, map_fn)
+
+      assert actual.term == 2
+      assert actual.children == z.focus.children
+      assert prev == z.prev
+      assert next == z.next
+      assert path == z.path
+    end
+
+    test "should change every node of the Zipper that lies along the path, ending with a focus on last node visited",
+         %{z_breadth_first_siblings: z} do
+      map_fn = &RoseTree.map_term(&1, fn t -> t * 2 end)
+
+      expected_z = %RoseTree.Zipper{
+        focus: %RoseTree{term: 82, children: []},
+        prev: [],
+        next: [],
+        path: [
+          %RoseTree.Zipper.Location{
+            prev: [
+              %RoseTree{
+                term: 56,
+                children: [
+                  %RoseTree{term: 78, children: []},
+                  %RoseTree{term: 80, children: []}
+                ]
+              },
+              %RoseTree{term: 54, children: []},
+              %RoseTree{term: 52, children: []}
+            ],
+            term: 58,
+            next: [%RoseTree{term: 60, children: []}]
+          },
+          %RoseTree.Zipper.Location{
+            prev: [%RoseTree{term: 26, children: []}],
+            term: 28,
+            next: [%RoseTree{term: 30, children: []}]
+          },
+          %RoseTree.Zipper.Location{
+            prev: [
+              %RoseTree{term: 6, children: []},
+              %RoseTree{
+                term: 4,
+                children: [
+                  %RoseTree{
+                    term: 16,
+                    children: [
+                      %RoseTree{term: 40, children: []},
+                      %RoseTree{term: 42, children: []},
+                      %RoseTree{
+                        term: 44,
+                        children: [
+                          %RoseTree{term: 68, children: []},
+                          %RoseTree{term: 70, children: []}
+                        ]
+                      }
+                    ]
+                  },
+                  %RoseTree{term: 18, children: []},
+                  %RoseTree{term: 20, children: []},
+                  %RoseTree{
+                    term: 22,
+                    children: [
+                      %RoseTree{
+                        term: 46,
+                        children: [
+                          %RoseTree{term: 72, children: []},
+                          %RoseTree{term: 74, children: []}
+                        ]
+                      },
+                      %RoseTree{term: 48, children: []},
+                      %RoseTree{
+                        term: 50,
+                        children: [%RoseTree{term: 76, children: []}]
+                      }
+                    ]
+                  },
+                  %RoseTree{term: 24, children: []}
+                ]
+              }
+            ],
+            term: 8,
+            next: [
+              %RoseTree{term: 10, children: [%RoseTree{term: 32, children: []}]},
+              %RoseTree{term: 12, children: []},
+              %RoseTree{
+                term: 14,
+                children: [
+                  %RoseTree{
+                    term: 34,
+                    children: [
+                      %RoseTree{term: 62, children: []},
+                      %RoseTree{term: 64, children: []}
+                    ]
+                  },
+                  %RoseTree{term: 36, children: []},
+                  %RoseTree{term: 38, children: [%RoseTree{term: 66, children: []}]}
+                ]
+              }
+            ]
+          },
+          %RoseTree.Zipper.Location{
+            prev: [%RoseTree{term: -1, children: []}],
+            term: 0,
+            next: [%RoseTree{term: 2, children: []}]
+          }
+        ]
+      }
+
+      assert expected_z == Zipper.forward_map(z, map_fn)
+    end
+  end
+
   ## Backward Traversal
 
   describe "backward/1" do
