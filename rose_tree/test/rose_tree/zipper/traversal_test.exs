@@ -1922,22 +1922,32 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "ascend_while/2" do
-    setup ctx do
-      %{
-        z_at_last_depth_first: Zipper.descend_to_last(ctx.z_depth_first_siblings)
-      }
+    test "should return unchanged when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert z == Zipper.ascend_while(z, not_a_predicate)
+    end
+
+    test "should return unchanged when no depth-first ancestors", %{leaf_z: z} do
+      assert z == Zipper.ascend_while(z, &Util.always/1)
+    end
+
+    test "should return unchanged if predicate fails at the start", %{z_depth_first_siblings_at_end: z} do
+      predicate = &(&1.focus.term == :no_match)
+
+      assert z == Zipper.ascend_while(z, predicate)
     end
 
     test "should ascend the Zipper depth-first until the root node is reached when the default predicate is used",
          %{
-           z_at_last_depth_first: z
+          z_depth_first_siblings_at_end: z
          } do
       assert %Zipper{focus: actual} = Zipper.ascend_while(z)
       assert actual.term == -1
     end
 
     test "should ascend the Zipper depth-first until the predicate returns false", %{
-      z_at_last_depth_first: z
+      z_depth_first_siblings_at_end: z
     } do
       assert %Zipper{focus: actual} = Zipper.ascend_while(z, &(&1.focus.term > 20))
       assert actual.term == 20
