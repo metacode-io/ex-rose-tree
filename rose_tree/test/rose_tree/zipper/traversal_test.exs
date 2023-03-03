@@ -965,110 +965,14 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
 
     test "should accumulate every node of the Zipper that lies along the path, ending with a focus on last node visited and the accumulated value",
-         %{z_breadth_first_siblings: z} do
+         %{z_breadth_first_siblings: z, z_breadth_first_siblings_at_end: z_at_end} do
       acc_fn = fn next_z, acc ->
         [next_z.focus.term | acc]
       end
 
-      expected_z = %RoseTree.Zipper{
-        focus: %RoseTree{term: 41, children: []},
-        prev: [],
-        next: [],
-        path: [
-          %RoseTree.Zipper.Location{
-            prev: [
-              %RoseTree{
-                term: 28,
-                children: [
-                  %RoseTree{term: 39, children: []},
-                  %RoseTree{term: 40, children: []}
-                ]
-              },
-              %RoseTree{term: 27, children: []},
-              %RoseTree{term: 26, children: []}
-            ],
-            term: 29,
-            next: [%RoseTree{term: 30, children: []}]
-          },
-          %RoseTree.Zipper.Location{
-            prev: [%RoseTree{term: 13, children: []}],
-            term: 14,
-            next: [%RoseTree{term: 15, children: []}]
-          },
-          %RoseTree.Zipper.Location{
-            prev: [
-              %RoseTree{term: 3, children: []},
-              %RoseTree{
-                term: 2,
-                children: [
-                  %RoseTree{
-                    term: 8,
-                    children: [
-                      %RoseTree{term: 20, children: []},
-                      %RoseTree{term: 21, children: []},
-                      %RoseTree{
-                        term: 22,
-                        children: [
-                          %RoseTree{term: 34, children: []},
-                          %RoseTree{term: 35, children: []}
-                        ]
-                      }
-                    ]
-                  },
-                  %RoseTree{term: 9, children: []},
-                  %RoseTree{term: 10, children: []},
-                  %RoseTree{
-                    term: 11,
-                    children: [
-                      %RoseTree{
-                        term: 23,
-                        children: [
-                          %RoseTree{term: 36, children: []},
-                          %RoseTree{term: 37, children: []}
-                        ]
-                      },
-                      %RoseTree{term: 24, children: []},
-                      %RoseTree{
-                        term: 25,
-                        children: [%RoseTree{term: 38, children: []}]
-                      }
-                    ]
-                  },
-                  %RoseTree{term: 12, children: []}
-                ]
-              }
-            ],
-            term: 4,
-            next: [
-              %RoseTree{term: 5, children: [%RoseTree{term: 16, children: []}]},
-              %RoseTree{term: 6, children: []},
-              %RoseTree{
-                term: 7,
-                children: [
-                  %RoseTree{
-                    term: 17,
-                    children: [
-                      %RoseTree{term: 31, children: []},
-                      %RoseTree{term: 32, children: []}
-                    ]
-                  },
-                  %RoseTree{term: 18, children: []},
-                  %RoseTree{term: 19, children: [%RoseTree{term: 33, children: []}]}
-                ]
-              }
-            ]
-          },
-          %RoseTree.Zipper.Location{
-            prev: [%RoseTree{term: -1, children: []}],
-            term: 0,
-            next: [%RoseTree{term: 1, children: []}]
-          }
-        ]
-      }
-
       expected_acc = Enum.to_list(0..41) |> Enum.reverse()
 
-      assert {^expected_z, ^expected_acc} = Zipper.forward_accumulate(z, [], acc_fn)
+      assert {^z_at_end, ^expected_acc} = Zipper.forward_accumulate(z, [], acc_fn)
     end
   end
 
