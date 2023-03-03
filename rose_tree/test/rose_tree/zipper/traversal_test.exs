@@ -1955,11 +1955,14 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "ascend_to_root/1" do
+    test "should return the current Zipper if already at the first depth-first descendant", %{leaf_z: z} do
+      assert ^z = Zipper.ascend_to_root(z)
+    end
+
     test "should ascend the Zipper depth-first until the first sibling root node is reached", %{
-      z_depth_first_siblings: z
+      z_depth_first_siblings_at_end: z
     } do
-      new_z = Zipper.descend_to_last(z)
-      assert %Zipper{focus: actual} = Zipper.ascend_to_root(new_z)
+      assert %Zipper{focus: actual} = Zipper.ascend_to_root(z)
       assert actual.term == -1
     end
   end
