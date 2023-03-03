@@ -266,6 +266,64 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "accumulate/3" do
+    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn", %{empty_z: z} do
+      accumulate_terms = fn next_z, acc ->
+        case next_z.focus.term do
+          nil ->
+            acc
+
+          term ->
+            [term | acc]
+          end
+        end
+
+      assert {^z, []} = Zipper.accumulate(z, &Zipper.descend/1, [], accumulate_terms)
+    end
+
+    test "should return unmoved Zipper and accumulator if the move_fn returns nil immediately",
+         %{simple_z: z} do
+      move_fn = fn _ -> nil end
+      map_fn =
+      acc_fn = fn next_z, acc ->
+        case next_z.focus.term do
+          nil ->
+            acc
+
+          term ->
+            [term * 2 | acc]
+        end
+      end
+
+      assert {^z, [2]} = Zipper.accumulate(z, move_fn, [], map_fn)
+    end
+
+    test "should accumulate every node of the Zipper that lies along the move_fn's path, ending with a focus on last node visited and the accumulated value",
+         %{simple_z: z} do
+      acc_fn = fn next_z, acc ->
+        next_z.focus.term + acc
+      end
+
+      expected_z = %Zipper{
+        focus: %RoseTree{term: 4, children: []},
+        prev: [
+          %RoseTree{term: 3, children: []},
+          %RoseTree{term: 2, children: []}
+        ],
+        next: [],
+        path: [
+          %Location{
+            prev: [],
+            term: 1,
+            next: []
+          }
+        ]
+      }
+
+      assert {^expected_z, 10} = Zipper.accumulate(z, &Zipper.descend/1, 0, acc_fn)
+    end
+  end
+
   ## Path Traversal
 
   describe "rewind_for/2" do
