@@ -1895,6 +1895,12 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "ascend_until/2" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert nil == Zipper.ascend_until(z, not_a_predicate)
+    end
+
     test "should return nil if no previous descendant niblings, siblings, or parent", %{
       simple_z: z
     } do
