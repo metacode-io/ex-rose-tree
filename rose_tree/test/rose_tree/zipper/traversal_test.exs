@@ -272,7 +272,7 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
-  describe "accumulate/3" do
+  describe "accumulate/4" do
     test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn", %{empty_z: z} do
       accumulate_terms = fn next_z, acc ->
         case next_z.focus.term do
@@ -290,7 +290,6 @@ defmodule RoseTree.Zipper.ZipperTest do
     test "should return unmoved Zipper and accumulator if the move_fn returns nil immediately",
          %{simple_z: z} do
       move_fn = fn _ -> nil end
-      map_fn =
       acc_fn = fn next_z, acc ->
         case next_z.focus.term do
           nil ->
@@ -301,7 +300,7 @@ defmodule RoseTree.Zipper.ZipperTest do
         end
       end
 
-      assert {^z, [2]} = Zipper.accumulate(z, move_fn, [], map_fn)
+      assert {^z, [2]} = Zipper.accumulate(z, move_fn, [], acc_fn)
     end
 
     test "should accumulate every node of the Zipper that lies along the move_fn's path, ending with a focus on last node visited and the accumulated value",
@@ -512,7 +511,7 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert path == z.path
     end
 
-    test "should change every node of the Zipper that lies along the move_fn's path, ending with a focus on last node visited",
+    test "should change every node of the Zipper that lies along the path, ending with a focus on last node visited",
          %{z_with_great_grandparent: z} do
       map_fn = &RoseTree.map_term(&1, fn t -> t * 2 end)
 
@@ -536,6 +535,65 @@ defmodule RoseTree.Zipper.ZipperTest do
       }
 
       assert expected_z == Zipper.rewind_map(z, map_fn)
+    end
+  end
+
+  describe "rewind_accumulate/3" do
+    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn", %{empty_z: z} do
+      accumulate_terms = fn next_z, acc ->
+        case next_z.focus.term do
+          nil ->
+            acc
+
+          term ->
+            [term | acc]
+          end
+        end
+
+      assert {^z, []} = Zipper.rewind_accumulate(z, [], accumulate_terms)
+    end
+
+    test "should return unmoved Zipper and accumulator if no parent",
+         %{simple_z: z} do
+      acc_fn = fn next_z, acc ->
+        case next_z.focus.term do
+          nil ->
+            acc
+
+          term ->
+            [term * 2 | acc]
+        end
+      end
+
+      assert {^z, [2]} = Zipper.rewind_accumulate(z, [], acc_fn)
+    end
+
+    test "should accumulate every node of the Zipper that lies along the path, ending with a focus on last node visited and the accumulated value",
+         %{z_with_great_grandparent: z} do
+      acc_fn = fn next_z, acc ->
+        next_z.focus.term + acc
+      end
+
+      expected_z = %RoseTree.Zipper{
+        focus: %RoseTree{
+          term: 1,
+          children: [
+            %RoseTree{
+              term: 5,
+              children: [
+                %RoseTree{term: 10, children: [
+                  %RoseTree{term: 20, children: []}
+                ]}
+              ]
+            }
+          ]
+        },
+        prev: [],
+        next: [],
+        path: []
+      }
+
+      assert {^expected_z, 36} = Zipper.rewind_accumulate(z, 0, acc_fn)
     end
   end
 
