@@ -1410,6 +1410,144 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "backward_accumulate/3" do
+    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn", %{empty_z: z} do
+      accumulate_terms = fn next_z, acc ->
+        case next_z.focus.term do
+          nil ->
+            acc
+
+          term ->
+            [term | acc]
+          end
+        end
+
+      assert {^z, []} = Zipper.backward_accumulate(z, [], accumulate_terms)
+    end
+
+    test "should return unmoved Zipper and accumulator if no breadth-first ancestors",
+         %{leaf_z: z} do
+      acc_fn = fn next_z, acc ->
+        case next_z.focus.term do
+          nil ->
+            acc
+
+          term ->
+            [term * 2 | acc]
+        end
+      end
+
+      assert {^z, [2]} = Zipper.backward_accumulate(z, [], acc_fn)
+    end
+
+    test "should accumulate every node of the Zipper that lies along the path, ending with a focus on last node visited and the accumulated value",
+         %{z_breadth_first_siblings_at_end: z} do
+      acc_fn = fn next_z, acc ->
+        [next_z.focus.term | acc]
+      end
+
+      expected_z = %RoseTree.Zipper{
+        focus: %RoseTree{term: -1, children: []},
+        prev: [],
+        next: [
+          %RoseTree{
+            term: 0,
+            children: [
+              %RoseTree{
+                term: 2,
+                children: [
+                  %RoseTree{
+                    term: 8,
+                    children: [
+                      %RoseTree{term: 20, children: []},
+                      %RoseTree{term: 21, children: []},
+                      %RoseTree{
+                        term: 22,
+                        children: [
+                          %RoseTree{term: 34, children: []},
+                          %RoseTree{term: 35, children: []}
+                        ]
+                      }
+                    ]
+                  },
+                  %RoseTree{term: 9, children: []},
+                  %RoseTree{term: 10, children: []},
+                  %RoseTree{
+                    term: 11,
+                    children: [
+                      %RoseTree{
+                        term: 23,
+                        children: [
+                          %RoseTree{term: 36, children: []},
+                          %RoseTree{term: 37, children: []}
+                        ]
+                      },
+                      %RoseTree{term: 24, children: []},
+                      %RoseTree{
+                        term: 25,
+                        children: [%RoseTree{term: 38, children: []}]
+                      }
+                    ]
+                  },
+                  %RoseTree{term: 12, children: []}
+                ]
+              },
+              %RoseTree{term: 3, children: []},
+              %RoseTree{
+                term: 4,
+                children: [
+                  %RoseTree{term: 13, children: []},
+                  %RoseTree{
+                    term: 14,
+                    children: [
+                      %RoseTree{term: 26, children: []},
+                      %RoseTree{term: 27, children: []},
+                      %RoseTree{
+                        term: 28,
+                        children: [
+                          %RoseTree{term: 39, children: []},
+                          %RoseTree{term: 40, children: []}
+                        ]
+                      },
+                      %RoseTree{
+                        term: 29,
+                        children: [%RoseTree{term: 41, children: []}]
+                      },
+                      %RoseTree{term: 30, children: []}
+                    ]
+                  },
+                  %RoseTree{term: 15, children: []}
+                ]
+              },
+              %RoseTree{term: 5, children: [%RoseTree{term: 16, children: []}]},
+              %RoseTree{term: 6, children: []},
+              %RoseTree{
+                term: 7,
+                children: [
+                  %RoseTree{
+                    term: 17,
+                    children: [
+                      %RoseTree{term: 31, children: []},
+                      %RoseTree{term: 32, children: []}
+                    ]
+                  },
+                  %RoseTree{term: 18, children: []},
+                  %RoseTree{term: 19, children: [%RoseTree{term: 33, children: []}]}
+                ]
+              }
+            ]
+          },
+          %RoseTree{term: 1, children: []}
+        ],
+        path: []
+      }
+
+      expected_acc = Enum.to_list(-1..41)
+
+      assert {^expected_z, ^expected_acc} = Zipper.backward_accumulate(z, [], acc_fn)
+    end
+  end
+
   ## Descend Traversal
 
   describe "descend/1" do
