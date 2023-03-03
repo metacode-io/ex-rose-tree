@@ -156,7 +156,7 @@ defmodule RoseTree.Zipper.ZipperTest do
       end
     end
 
-    test "should return unchanged if predicate never matches", %{simple_z: z} do
+    test "should return unchanged if predicate fails at the start", %{simple_z: z} do
       predicate = &(&1.focus.term == :no_match)
 
       assert z == Zipper.move_while(z, &Zipper.descend/1, predicate)
@@ -200,6 +200,12 @@ defmodule RoseTree.Zipper.ZipperTest do
       predicate = &(&1.focus.term == :no_match)
 
       assert nil == Zipper.find(z, &Zipper.descend/1, predicate)
+    end
+
+    test "should return unmoved if predicate matches at starting focus", %{simple_z: z} do
+      predicate = &(&1.focus.term == 1)
+
+      assert z == Zipper.find(z, &Zipper.descend/1, predicate)
     end
 
     test "should move until the predicate matches", %{simple_z: z} do
@@ -406,7 +412,7 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert z == Zipper.rewind_while(z, &Util.always/1)
     end
 
-    test "should return unchanged if predicate never matches", %{z_with_great_grandparent: z} do
+    test "should return unchanged if predicate fails at the start", %{z_with_great_grandparent: z} do
       predicate = &(&1.focus.term == :no_match)
 
       assert z == Zipper.rewind_while(z, predicate)
@@ -447,6 +453,37 @@ defmodule RoseTree.Zipper.ZipperTest do
         assert %Zipper{focus: focus, path: []} = Zipper.rewind_to_root(some_zipper)
         assert focus.term == root_location.term
       end
+    end
+  end
+
+  describe "rewind_find/2" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert nil == Zipper.rewind_find(z, not_a_predicate)
+    end
+
+    test "should return nil when no parent", %{simple_z: z} do
+      assert nil == Zipper.rewind_find(z, &Util.never/1)
+    end
+
+    test "should return nil if predicate never matches", %{z_with_great_grandparent: z} do
+      predicate = &(&1.focus.term == :no_match)
+
+      assert nil == Zipper.rewind_find(z, predicate)
+    end
+
+    test "should return unmoved if predicate matches at starting focus", %{z_with_great_grandparent: z} do
+      predicate = &(&1.focus.term == 20)
+
+      assert z == Zipper.rewind_find(z, predicate)
+    end
+
+    test "should move until the predicate matches if match isn't found at starting focus", %{z_with_great_grandparent: z} do
+      predicate = &(&1.focus.term == 5)
+
+      assert %Zipper{focus: actual} = Zipper.rewind_find(z, predicate)
+      assert actual.term == 5
     end
   end
 
