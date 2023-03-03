@@ -703,6 +703,12 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "forward_until/2" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert nil == Zipper.forward_until(z, not_a_predicate)
+    end
+
     test "should return nil if there are no breadth-first descendants", %{leaf_z: z} do
       assert Zipper.forward_until(z, &(&1.focus.term == 5)) == nil
     end
@@ -720,6 +726,22 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "forward_while/2" do
+    test "should return unchanged when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert z == Zipper.forward_while(z, not_a_predicate)
+    end
+
+    test "should return unchanged when no breadth-first descendants", %{leaf_z: z} do
+      assert z == Zipper.forward_while(z, &Util.always/1)
+    end
+
+    test "should return unchanged if predicate fails at the start", %{z_breadth_first_siblings: z} do
+      predicate = &(&1.focus.term == :no_match)
+
+      assert z == Zipper.forward_while(z, predicate)
+    end
+
     test "should move forward through the Zipper breadth-first until the last node is reached when the default predicate is used",
          %{
            z_breadth_first_siblings: z
