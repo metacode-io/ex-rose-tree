@@ -487,6 +487,58 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "rewind_map/2" do
+    test "should return new leaf Zipper if given an empty zipper with valid map_fn", %{empty_z: z} do
+      map_fn = &RoseTree.set_term(&1, 2)
+
+      assert %Zipper{focus: actual, prev: [], next: [], path: []} =
+               Zipper.rewind_map(z, map_fn)
+
+      assert actual.term == 2
+      assert actual.children == z.focus.children
+    end
+
+    test "should change only the focus and remain there if no parents",
+         %{simple_z: z} do
+      map_fn = &RoseTree.map_term(&1, fn t -> t * 2 end)
+
+      assert %Zipper{focus: actual, prev: prev, next: next, path: path} =
+               Zipper.rewind_map(z, map_fn)
+
+      assert actual.term == 2
+      assert actual.children == z.focus.children
+      assert prev == z.prev
+      assert next == z.next
+      assert path == z.path
+    end
+
+    test "should change every node of the Zipper that lies along the move_fn's path, ending with a focus on last node visited",
+         %{z_with_great_grandparent: z} do
+      map_fn = &RoseTree.map_term(&1, fn t -> t * 2 end)
+
+      expected_z = %RoseTree.Zipper{
+        focus: %RoseTree{
+          term: 2,
+          children: [
+            %RoseTree{
+              term: 10,
+              children: [
+                %RoseTree{term: 20, children: [
+                  %RoseTree{term: 40, children: []}
+                ]}
+              ]
+            }
+          ]
+        },
+        prev: [],
+        next: [],
+        path: []
+      }
+
+      assert expected_z == Zipper.rewind_map(z, map_fn)
+    end
+  end
+
   ## Forward Traversal
 
   describe "forward/1" do
