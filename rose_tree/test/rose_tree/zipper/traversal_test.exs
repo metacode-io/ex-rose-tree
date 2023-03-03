@@ -1,33 +1,6 @@
 defmodule RoseTree.Zipper.ZipperTest do
   use ExUnit.Case, async: true
-
-  alias RoseTree.Support.{Generators, Zippers}
-  alias RoseTree.{Util, Zipper}
-  alias RoseTree.Zipper.Location
-
-  setup_all do
-    %{
-      empty_z: Zippers.empty_z(),
-      leaf_z: Zippers.leaf_z(),
-      simple_z: Zippers.simple_z(),
-      z_with_parent: Zippers.z_with_parent(),
-      z_with_grandchildren: Zippers.z_with_grandchildren(),
-      z_with_great_grandparent: Zippers.z_with_great_grandparent(),
-      z_with_siblings: Zippers.z_with_siblings(),
-      z_with_piblings: Zippers.z_with_piblings(),
-      z_with_ancestral_piblings: Zippers.z_with_ancestral_piblings(),
-      z_with_niblings: Zippers.z_with_niblings(),
-      z_with_descendant_niblings: Zippers.z_with_descendant_niblings(),
-      z_with_extended_cousins: Zippers.z_with_extended_cousins(),
-      z_with_extended_niblings: Zippers.z_with_extended_niblings(),
-      z_depth_first: Zippers.z_depth_first(),
-      z_depth_first_siblings: Zippers.z_depth_first_siblings(),
-      z_depth_first_siblings_at_end: Zipper.descend_to_last(Zippers.z_depth_first_siblings()),
-      z_breadth_first: Zippers.z_breadth_first(),
-      z_breadth_first_siblings: Zippers.z_breadth_first_siblings(),
-      z_breadth_first_siblings_at_end: Zipper.forward_to_last(Zippers.z_breadth_first_siblings())
-    }
-  end
+  use ZipperCase
 
   ## General Traversal
 
@@ -275,7 +248,8 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "accumulate/4" do
-    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn", %{empty_z: z} do
+    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn",
+         %{empty_z: z} do
       accumulate_terms = fn next_z, acc ->
         case next_z.focus.term do
           nil ->
@@ -283,8 +257,8 @@ defmodule RoseTree.Zipper.ZipperTest do
 
           term ->
             [term | acc]
-          end
         end
+      end
 
       assert {^z, []} = Zipper.accumulate(z, &Zipper.descend/1, [], accumulate_terms)
     end
@@ -292,6 +266,7 @@ defmodule RoseTree.Zipper.ZipperTest do
     test "should return unmoved Zipper and accumulator if the move_fn returns nil immediately",
          %{simple_z: z} do
       move_fn = fn _ -> nil end
+
       acc_fn = fn next_z, acc ->
         case next_z.focus.term do
           nil ->
@@ -426,7 +401,9 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert actual.term == 5
     end
 
-    test "should move until the the move function can no longer continue", %{z_with_great_grandparent: z} do
+    test "should move until the the move function can no longer continue", %{
+      z_with_great_grandparent: z
+    } do
       assert %Zipper{focus: actual} = Zipper.rewind_while(z)
       assert actual.term == 1
     end
@@ -474,13 +451,17 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert nil == Zipper.rewind_find(z, predicate)
     end
 
-    test "should return unmoved if predicate matches at starting focus", %{z_with_great_grandparent: z} do
+    test "should return unmoved if predicate matches at starting focus", %{
+      z_with_great_grandparent: z
+    } do
       predicate = &(&1.focus.term == 20)
 
       assert z == Zipper.rewind_find(z, predicate)
     end
 
-    test "should move until the predicate matches if match isn't found at starting focus", %{z_with_great_grandparent: z} do
+    test "should move until the predicate matches if match isn't found at starting focus", %{
+      z_with_great_grandparent: z
+    } do
       predicate = &(&1.focus.term == 5)
 
       assert %Zipper{focus: actual} = Zipper.rewind_find(z, predicate)
@@ -492,8 +473,7 @@ defmodule RoseTree.Zipper.ZipperTest do
     test "should return new leaf Zipper if given an empty zipper with valid map_fn", %{empty_z: z} do
       map_fn = &RoseTree.set_term(&1, 2)
 
-      assert %Zipper{focus: actual, prev: [], next: [], path: []} =
-               Zipper.rewind_map(z, map_fn)
+      assert %Zipper{focus: actual, prev: [], next: [], path: []} = Zipper.rewind_map(z, map_fn)
 
       assert actual.term == 2
       assert actual.children == z.focus.children
@@ -524,9 +504,12 @@ defmodule RoseTree.Zipper.ZipperTest do
             %RoseTree{
               term: 10,
               children: [
-                %RoseTree{term: 20, children: [
-                  %RoseTree{term: 40, children: []}
-                ]}
+                %RoseTree{
+                  term: 20,
+                  children: [
+                    %RoseTree{term: 40, children: []}
+                  ]
+                }
               ]
             }
           ]
@@ -541,7 +524,8 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "rewind_accumulate/3" do
-    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn", %{empty_z: z} do
+    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn",
+         %{empty_z: z} do
       accumulate_terms = fn next_z, acc ->
         case next_z.focus.term do
           nil ->
@@ -549,8 +533,8 @@ defmodule RoseTree.Zipper.ZipperTest do
 
           term ->
             [term | acc]
-          end
         end
+      end
 
       assert {^z, []} = Zipper.rewind_accumulate(z, [], accumulate_terms)
     end
@@ -583,9 +567,12 @@ defmodule RoseTree.Zipper.ZipperTest do
             %RoseTree{
               term: 5,
               children: [
-                %RoseTree{term: 10, children: [
-                  %RoseTree{term: 20, children: []}
-                ]}
+                %RoseTree{
+                  term: 10,
+                  children: [
+                    %RoseTree{term: 20, children: []}
+                  ]
+                }
               ]
             }
           ]
@@ -762,7 +749,9 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "forward_to_last/1" do
-    test "should return the current Zipper if already at the last breadth-first descendant", %{leaf_z: z} do
+    test "should return the current Zipper if already at the last breadth-first descendant", %{
+      leaf_z: z
+    } do
       assert ^z = Zipper.forward_to_last(z)
     end
 
@@ -791,13 +780,17 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert nil == Zipper.forward_find(z, predicate)
     end
 
-    test "should return unmoved if predicate matches at starting focus", %{z_breadth_first_siblings: z} do
+    test "should return unmoved if predicate matches at starting focus", %{
+      z_breadth_first_siblings: z
+    } do
       predicate = &(&1.focus.term == 0)
 
       assert z == Zipper.forward_find(z, predicate)
     end
 
-    test "should move until the predicate matches if match isn't found at starting focus", %{z_breadth_first_siblings: z} do
+    test "should move until the predicate matches if match isn't found at starting focus", %{
+      z_breadth_first_siblings: z
+    } do
       predicate = &(&1.focus.term == 30)
 
       assert %Zipper{focus: actual} = Zipper.forward_find(z, predicate)
@@ -809,8 +802,7 @@ defmodule RoseTree.Zipper.ZipperTest do
     test "should return new leaf Zipper if given an empty zipper with valid map_fn", %{empty_z: z} do
       map_fn = &RoseTree.set_term(&1, 2)
 
-      assert %Zipper{focus: actual, prev: [], next: [], path: []} =
-               Zipper.forward_map(z, map_fn)
+      assert %Zipper{focus: actual, prev: [], next: [], path: []} = Zipper.forward_map(z, map_fn)
 
       assert actual.term == 2
       assert actual.children == z.focus.children
@@ -935,7 +927,8 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "forward_accumulate/3" do
-    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn", %{empty_z: z} do
+    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn",
+         %{empty_z: z} do
       accumulate_terms = fn next_z, acc ->
         case next_z.focus.term do
           nil ->
@@ -943,8 +936,8 @@ defmodule RoseTree.Zipper.ZipperTest do
 
           term ->
             [term | acc]
-          end
         end
+      end
 
       assert {^z, []} = Zipper.forward_accumulate(z, [], accumulate_terms)
     end
@@ -1133,7 +1126,7 @@ defmodule RoseTree.Zipper.ZipperTest do
 
     test "should move backward through the Zipper breadth-first until the predicate returns false",
          %{
-          z_breadth_first_siblings_at_end: z
+           z_breadth_first_siblings_at_end: z
          } do
       assert %Zipper{focus: actual} = Zipper.backward_while(z, &(&1.focus.term > 20))
       assert actual.term == 20
@@ -1141,13 +1134,15 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "backward_to_root/1" do
-    test "should return the current Zipper if already at the first breadth-first descendant", %{leaf_z: z} do
+    test "should return the current Zipper if already at the first breadth-first descendant", %{
+      leaf_z: z
+    } do
       assert ^z = Zipper.backward_to_root(z)
     end
 
     test "should move backward through the Zipper breadth-first until the first sibling root node is reached",
          %{
-          z_breadth_first_siblings_at_end: z
+           z_breadth_first_siblings_at_end: z
          } do
       assert %Zipper{focus: actual} = Zipper.backward_to_root(z)
       assert actual.term == -1
@@ -1171,13 +1166,17 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert nil == Zipper.backward_find(z, predicate)
     end
 
-    test "should return unmoved if predicate matches at starting focus", %{z_breadth_first_siblings_at_end: z} do
+    test "should return unmoved if predicate matches at starting focus", %{
+      z_breadth_first_siblings_at_end: z
+    } do
       predicate = &(&1.focus.term == 41)
 
       assert z == Zipper.backward_find(z, predicate)
     end
 
-    test "should move until the predicate matches if match isn't found at starting focus", %{z_breadth_first_siblings_at_end: z} do
+    test "should move until the predicate matches if match isn't found at starting focus", %{
+      z_breadth_first_siblings_at_end: z
+    } do
       predicate = &(&1.focus.term == 30)
 
       assert %Zipper{focus: actual} = Zipper.backward_find(z, predicate)
@@ -1189,8 +1188,7 @@ defmodule RoseTree.Zipper.ZipperTest do
     test "should return new leaf Zipper if given an empty zipper with valid map_fn", %{empty_z: z} do
       map_fn = &RoseTree.set_term(&1, 2)
 
-      assert %Zipper{focus: actual, prev: [], next: [], path: []} =
-               Zipper.backward_map(z, map_fn)
+      assert %Zipper{focus: actual, prev: [], next: [], path: []} = Zipper.backward_map(z, map_fn)
 
       assert actual.term == 2
       assert actual.children == z.focus.children
@@ -1315,7 +1313,8 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "backward_accumulate/3" do
-    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn", %{empty_z: z} do
+    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn",
+         %{empty_z: z} do
       accumulate_terms = fn next_z, acc ->
         case next_z.focus.term do
           nil ->
@@ -1323,8 +1322,8 @@ defmodule RoseTree.Zipper.ZipperTest do
 
           term ->
             [term | acc]
-          end
         end
+      end
 
       assert {^z, []} = Zipper.backward_accumulate(z, [], accumulate_terms)
     end
@@ -1590,7 +1589,9 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "descend_to_last/1" do
-    test "should return the current Zipper if already at the last depth-first descendant", %{leaf_z: z} do
+    test "should return the current Zipper if already at the last depth-first descendant", %{
+      leaf_z: z
+    } do
       assert ^z = Zipper.descend_to_last(z)
     end
 
@@ -1619,13 +1620,17 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert nil == Zipper.descend_find(z, predicate)
     end
 
-    test "should return unmoved if predicate matches at starting focus", %{z_depth_first_siblings: z} do
+    test "should return unmoved if predicate matches at starting focus", %{
+      z_depth_first_siblings: z
+    } do
       predicate = &(&1.focus.term == 0)
 
       assert z == Zipper.descend_find(z, predicate)
     end
 
-    test "should move until the predicate matches if match isn't found at starting focus", %{z_depth_first_siblings: z} do
+    test "should move until the predicate matches if match isn't found at starting focus", %{
+      z_depth_first_siblings: z
+    } do
       predicate = &(&1.focus.term == 30)
 
       assert %Zipper{focus: actual} = Zipper.descend_find(z, predicate)
@@ -1637,8 +1642,7 @@ defmodule RoseTree.Zipper.ZipperTest do
     test "should return new leaf Zipper if given an empty zipper with valid map_fn", %{empty_z: z} do
       map_fn = &RoseTree.set_term(&1, 2)
 
-      assert %Zipper{focus: actual, prev: [], next: [], path: []} =
-               Zipper.descend_map(z, map_fn)
+      assert %Zipper{focus: actual, prev: [], next: [], path: []} = Zipper.descend_map(z, map_fn)
 
       assert actual.term == 2
       assert actual.children == z.focus.children
@@ -1763,7 +1767,8 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "descend_accumulate/3" do
-    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn", %{empty_z: z} do
+    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn",
+         %{empty_z: z} do
       accumulate_terms = fn next_z, acc ->
         case next_z.focus.term do
           nil ->
@@ -1771,8 +1776,8 @@ defmodule RoseTree.Zipper.ZipperTest do
 
           term ->
             [term | acc]
-          end
         end
+      end
 
       assert {^z, []} = Zipper.descend_accumulate(z, [], accumulate_terms)
     end
@@ -1932,7 +1937,9 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert z == Zipper.ascend_while(z, &Util.always/1)
     end
 
-    test "should return unchanged if predicate fails at the start", %{z_depth_first_siblings_at_end: z} do
+    test "should return unchanged if predicate fails at the start", %{
+      z_depth_first_siblings_at_end: z
+    } do
       predicate = &(&1.focus.term == :no_match)
 
       assert z == Zipper.ascend_while(z, predicate)
@@ -1940,7 +1947,7 @@ defmodule RoseTree.Zipper.ZipperTest do
 
     test "should ascend the Zipper depth-first until the root node is reached when the default predicate is used",
          %{
-          z_depth_first_siblings_at_end: z
+           z_depth_first_siblings_at_end: z
          } do
       assert %Zipper{focus: actual} = Zipper.ascend_while(z)
       assert actual.term == -1
@@ -1955,7 +1962,9 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "ascend_to_root/1" do
-    test "should return the current Zipper if already at the first depth-first descendant", %{leaf_z: z} do
+    test "should return the current Zipper if already at the first depth-first descendant", %{
+      leaf_z: z
+    } do
       assert ^z = Zipper.ascend_to_root(z)
     end
 
@@ -1984,13 +1993,17 @@ defmodule RoseTree.Zipper.ZipperTest do
       assert nil == Zipper.ascend_find(z, predicate)
     end
 
-    test "should return unmoved if predicate matches at starting focus", %{z_depth_first_siblings_at_end: z} do
+    test "should return unmoved if predicate matches at starting focus", %{
+      z_depth_first_siblings_at_end: z
+    } do
       predicate = &(&1.focus.term == 41)
 
       assert z == Zipper.ascend_find(z, predicate)
     end
 
-    test "should move until the predicate matches if match isn't found at starting focus", %{z_depth_first_siblings_at_end: z} do
+    test "should move until the predicate matches if match isn't found at starting focus", %{
+      z_depth_first_siblings_at_end: z
+    } do
       predicate = &(&1.focus.term == 30)
 
       assert %Zipper{focus: actual} = Zipper.ascend_find(z, predicate)
@@ -2002,8 +2015,7 @@ defmodule RoseTree.Zipper.ZipperTest do
     test "should return new leaf Zipper if given an empty zipper with valid map_fn", %{empty_z: z} do
       map_fn = &RoseTree.set_term(&1, 2)
 
-      assert %Zipper{focus: actual, prev: [], next: [], path: []} =
-               Zipper.ascend_map(z, map_fn)
+      assert %Zipper{focus: actual, prev: [], next: [], path: []} = Zipper.ascend_map(z, map_fn)
 
       assert actual.term == 2
       assert actual.children == z.focus.children
@@ -2128,7 +2140,8 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "ascend_accumulate/3" do
-    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn", %{empty_z: z} do
+    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn",
+         %{empty_z: z} do
       accumulate_terms = fn next_z, acc ->
         case next_z.focus.term do
           nil ->
@@ -2136,8 +2149,8 @@ defmodule RoseTree.Zipper.ZipperTest do
 
           term ->
             [term | acc]
-          end
         end
+      end
 
       assert {^z, []} = Zipper.ascend_accumulate(z, [], accumulate_terms)
     end

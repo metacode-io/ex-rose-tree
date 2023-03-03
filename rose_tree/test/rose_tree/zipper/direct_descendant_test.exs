@@ -1,21 +1,6 @@
 defmodule RoseTree.Zipper.DirectDescendantTest do
   use ExUnit.Case, async: true
-
-  alias RoseTree.Support.Zippers
-  alias RoseTree.Zipper
-
-  setup_all do
-    %{
-      empty_z: Zippers.empty_z(),
-      leaf_z: Zippers.leaf_z(),
-      simple_z: Zippers.simple_z(),
-      z_with_siblings: Zippers.z_with_siblings(),
-      z_with_grandchildren: Zippers.z_with_grandchildren(),
-      z_with_grandchildren_2: Zippers.z_with_grandchildren_2(),
-      z_with_great_grandchildren: Zippers.z_with_great_grandchildren(),
-      z_with_great_grandchildren_2: Zippers.z_with_great_grandchildren_2()
-    }
-  end
+  use ZipperCase
 
   describe "first_child/2" do
     test "should return nil when given a Zipper with an empty focus", %{empty_z: z} do

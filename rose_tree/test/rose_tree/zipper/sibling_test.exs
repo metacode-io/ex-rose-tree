@@ -1,15 +1,6 @@
 defmodule RoseTree.Zipper.Zipper.SiblingTest do
   use ExUnit.Case, async: true
-
-  alias RoseTree.Support.Zippers
-  alias RoseTree.Zipper
-
-  setup_all do
-    %{
-      simple_z: Zippers.simple_z(),
-      z_with_siblings: Zippers.z_with_siblings()
-    }
-  end
+  use ZipperCase
 
   describe "prepend_first_sibling/2" do
     test "should increase the number of previous siblings by 1", %{z_with_siblings: z} do

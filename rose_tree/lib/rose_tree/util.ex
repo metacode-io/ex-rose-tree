@@ -164,14 +164,21 @@ defmodule RoseTree.Util do
   end
 
   @doc """
-  Similar to `Enum.split/2` but is optimized to return the
-  list of elements that come before the index in reverse order.
-  This is ideal for the context-aware nature of Zippers.
+  Similar to `Enum.split/2` but with specialized behavior. It is
+  optimized to return the list of elements that come before the
+  index in reverse order. This is ideal for the context-aware nature
+  of Zippers. Also unlike `Enum.split/2`, if given an index that
+  is greater than or equal to the total elements in the given list or
+  if given a negative index, this function will _not_ perform a split,
+  and will return two empty lists.
 
   ## Examples
 
       iex> RoseTree.Util.split_at([1,2,3,4,5], 2)
       {[2, 1], [3, 4, 5]}
+
+      iex> RoseTree.Util.split_at([1,2,3,4,5], 10)
+      {[], []}
 
   """
   @spec split_at(list(), non_neg_integer()) :: {[term()], [term()]}

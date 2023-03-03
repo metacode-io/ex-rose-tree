@@ -1,21 +1,6 @@
 defmodule RoseTree.Zipper.PiblingTest do
   use ExUnit.Case, async: true
-
-  alias RoseTree.Support.Zippers
-  alias RoseTree.Zipper
-
-  setup_all do
-    %{
-      simple_z: Zippers.simple_z(),
-      z_with_parent: Zippers.z_with_parent(),
-      z_with_grandparent: Zippers.z_with_grandparent(),
-      z_with_piblings: Zippers.z_with_piblings(),
-      z_with_grandpiblings: Zippers.z_with_grandpiblings(),
-      z_with_ancestral_piblings: Zippers.z_with_ancestral_piblings(),
-      z_with_no_ancestral_piblings: Zippers.z_with_no_ancestral_piblings(),
-      z_with_extended_cousins: Zippers.z_with_extended_cousins()
-    }
-  end
+  use ZipperCase
 
   describe "first_pibling/2" do
     test "should return nil if no parent found", %{simple_z: z} do

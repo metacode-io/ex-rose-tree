@@ -1,22 +1,6 @@
 defmodule RoseTree.Zipper.ExtendedCousinTest do
   use ExUnit.Case, async: true
-
-  alias RoseTree.Support.Zippers
-  alias RoseTree.Zipper
-
-  setup_all do
-    %{
-      simple_z: Zippers.simple_z(),
-      z_with_parent: Zippers.z_with_parent(),
-      z_with_grandparent: Zippers.z_with_grandparent(),
-      z_with_piblings: Zippers.z_with_piblings(),
-      z_with_1st_cousins: Zippers.z_with_1st_cousins(),
-      z_with_grandpiblings: Zippers.z_with_grandpiblings(),
-      z_with_2nd_cousins: Zippers.z_with_2nd_cousins(),
-      z_with_extended_cousins: Zippers.z_with_extended_cousins(),
-      z_with_extended_cousins_2: Zippers.z_with_extended_cousins_2()
-    }
-  end
+  use ZipperCase
 
   describe "first_extended_cousin/2" do
     test "should return nil if no parent found", %{simple_z: z} do

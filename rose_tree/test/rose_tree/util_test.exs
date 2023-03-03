@@ -273,4 +273,36 @@ defmodule RoseTree.UtilTest do
       assert {:success_2, @arg1, @arg2} == Util.first_of_with_args(:anything, functions_2, @args)
     end
   end
+
+  describe "split_at/2" do
+    test "should return two empty lists if given an empty list" do
+      random_idx = Enum.random(1..100)
+      assert {[], []} = Util.split_at([], random_idx)
+    end
+
+    test "should return two empty lists if given index greater than list count" do
+      assert {[], []} = Util.split_at([1,2,3,4,5], 10)
+    end
+
+    test "should return two empty lists if given index equal to the list count" do
+      assert {[], []} = Util.split_at([1,2,3,4,5], 5)
+    end
+
+    test "should return two empty lists if given a negative index" do
+      random_idx = Enum.random(-1..-100)
+      assert {[], []} = Util.split_at([1,2,3,4,5], random_idx)
+    end
+
+    test "should return empty list and in-order list when index = 0" do
+      list = [1,2,3,4,5]
+      assert{[], ^list} = Util.split_at(list, 0)
+    end
+
+    test "should return reverse partition and in-order partition when index is in-bounds and not at border" do
+      list = [1,2,3,4,5,6,7,8,9,10]
+      expected_1 = [5,4,3,2,1]
+      expected_2 = [6,7,8,9,10]
+      assert {^expected_1, ^expected_2} = Util.split_at(list, 5)
+    end
+  end
 end

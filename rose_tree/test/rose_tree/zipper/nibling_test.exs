@@ -1,22 +1,6 @@
 defmodule RoseTree.Zipper.Zipper.NiblingTest do
   use ExUnit.Case, async: true
-
-  alias RoseTree.Support.Zippers
-  alias RoseTree.Zipper
-
-  setup_all do
-    %{
-      simple_z: Zippers.simple_z(),
-      z_with_parent: Zippers.z_with_parent(),
-      z_with_grandparent: Zippers.z_with_grandparent(),
-      z_with_grandpiblings: Zippers.z_with_grandpiblings(),
-      z_with_siblings: Zippers.z_with_siblings(),
-      z_with_niblings: Zippers.z_with_niblings(),
-      z_with_grand_niblings: Zippers.z_with_grand_niblings(),
-      z_with_descendant_niblings: Zippers.z_with_descendant_niblings(),
-      z_with_extended_niblings: Zippers.z_with_extended_niblings()
-    }
-  end
+  use ZipperCase
 
   describe "first_nibling/2" do
     test "should return nil if no siblings found", %{simple_z: z} do

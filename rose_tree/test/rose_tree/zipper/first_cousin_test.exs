@@ -1,17 +1,6 @@
 defmodule RoseTree.Zipper.FirstCousinTest do
   use ExUnit.Case, async: true
-
-  alias RoseTree.Support.Zippers
-  alias RoseTree.Zipper
-
-  setup_all do
-    %{
-      simple_z: Zippers.simple_z(),
-      z_with_parent: Zippers.z_with_parent(),
-      z_with_piblings: Zippers.z_with_piblings(),
-      z_with_1st_cousins: Zippers.z_with_1st_cousins()
-    }
-  end
+  use ZipperCase
 
   describe "first_first_cousin/2" do
     test "should return nil if no parent found", %{simple_z: z} do
