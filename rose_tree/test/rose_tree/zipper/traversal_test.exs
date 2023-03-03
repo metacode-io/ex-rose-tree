@@ -1698,6 +1698,39 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "descend_find/2" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert nil == Zipper.descend_find(z, not_a_predicate)
+    end
+
+    test "should return nil when no depth-first descendants", %{leaf_z: z} do
+      assert nil == Zipper.descend_find(z, &Util.never/1)
+    end
+
+    test "should return nil if predicate never matches", %{z_depth_first_siblings: z} do
+      predicate = &(&1.focus.term == :no_match)
+
+      assert nil == Zipper.descend_find(z, predicate)
+    end
+
+    test "should return unmoved if predicate matches at starting focus", %{z_depth_first_siblings: z} do
+      predicate = &(&1.focus.term == 0)
+
+      assert z == Zipper.descend_find(z, predicate)
+    end
+
+    test "should move until the predicate matches if match isn't found at starting focus", %{z_depth_first_siblings: z} do
+      predicate = &(&1.focus.term == 30)
+
+      assert %Zipper{focus: actual} = Zipper.descend_find(z, predicate)
+      assert actual.term == 30
+    end
+  end
+
+  ## Ascend Traversal
+
   describe "ascend/1" do
     test "should return nil if given a Zipper with no parents or siblings", %{simple_z: z} do
       assert Zipper.ascend(z) == nil
