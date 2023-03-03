@@ -245,21 +245,4 @@ defmodule RoseTree.Util do
       do_split_when([head | acc], tail, predicate)
     end
   end
-
-  @doc """
-  A combination of `Enum.split/2` and `Enum.take_random/2`, `split_random/2` takes
-  a random selection of elements from the list up to the given number, and returns
-  two lists: the first is the randomly selected elements, and the latter is the
-  remainder from the original list. An important note is that the remainder list
-  does not preserve the original order of the list.
-  """
-  @spec split_random(list(), take :: non_neg_integer()) ::
-          {[taken :: term()], [remainder :: term()]}
-  def split_random([], _), do: {[], []}
-
-  def split_random(list, take) when is_list(list) and is_integer(take) and take >= 0 do
-    list
-    |> Enum.shuffle()
-    |> Enum.split(take)
-  end
 end
