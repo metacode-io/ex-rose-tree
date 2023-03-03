@@ -2632,19 +2632,22 @@ defmodule RoseTree.Zipper do
   ### EXTENDED COUSINS
   ###
 
-  @typep path_details() :: %{
-    term: term(),
-    index: non_neg_integer(),
-    num_next: non_neg_integer(),
-    depth: non_neg_integer()
-  } | %{
-    term: term(),
-    index: non_neg_integer(),
-    depth: non_neg_integer()
-  } | %{
-    index: non_neg_integer(),
-    depth: non_neg_integer()
-  }
+  @typep path_details() ::
+           %{
+             term: term(),
+             index: non_neg_integer(),
+             num_next: non_neg_integer(),
+             depth: non_neg_integer()
+           }
+           | %{
+               term: term(),
+               index: non_neg_integer(),
+               depth: non_neg_integer()
+             }
+           | %{
+               index: non_neg_integer(),
+               depth: non_neg_integer()
+             }
 
   @doc """
   Searches for the first extended cousin or the first first-cousin of the focused tree.
@@ -2765,7 +2768,13 @@ defmodule RoseTree.Zipper do
     {z, path_details}
   end
 
-  @spec do_first_extended_cousin(t(), path_details(), [path_details()], non_neg_integer(), predicate()) ::
+  @spec do_first_extended_cousin(
+          t(),
+          path_details(),
+          [path_details()],
+          non_neg_integer(),
+          predicate()
+        ) ::
           t() | nil
   # Path Details have been exhausted, thus no match
   defp do_first_extended_cousin(
@@ -3098,7 +3107,13 @@ defmodule RoseTree.Zipper do
     {z, path_details}
   end
 
-  @spec do_last_extended_cousin(t(), path_details(), [path_details()], non_neg_integer(), predicate()) ::
+  @spec do_last_extended_cousin(
+          t(),
+          path_details(),
+          [path_details()],
+          non_neg_integer(),
+          predicate()
+        ) ::
           t() | nil
   # Path Details have been exhausted, thus no match
   defp do_last_extended_cousin(
