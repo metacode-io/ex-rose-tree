@@ -596,16 +596,14 @@ defmodule RoseTree.Zipper do
   """
   @doc section: :ancestors
   @spec parent(t()) :: t() | nil
-  def parent(%__MODULE__{path: []}), do: nil
-
-  def parent(%__MODULE__{path: [_parent | _g_parents]} = z) do
+  def parent(%__MODULE__{} = z) do
     combined_siblings = Enum.reverse(z.prev) ++ [z.focus | z.next]
 
     z
     |> do_parental_shift(combined_siblings)
   end
 
-  @spec do_parental_shift(t(), [RoseTree.t()]) :: t()
+  @spec do_parental_shift(t(), [RoseTree.t()]) :: t() | nil
   defp do_parental_shift(%__MODULE__{path: []}, _combined_siblings), do: nil
 
   defp do_parental_shift(%__MODULE__{path: [parent | g_parents]} = z, combined_siblings)
@@ -2634,6 +2632,20 @@ defmodule RoseTree.Zipper do
   ### EXTENDED COUSINS
   ###
 
+  @typep path_details() :: %{
+    term: term(),
+    index: non_neg_integer(),
+    num_next: non_neg_integer(),
+    depth: non_neg_integer()
+  } | %{
+    term: term(),
+    index: non_neg_integer(),
+    depth: non_neg_integer()
+  } | %{
+    index: non_neg_integer(),
+    depth: non_neg_integer()
+  }
+
   @doc """
   Searches for the first extended cousin or the first first-cousin of the focused tree.
 
@@ -2681,7 +2693,7 @@ defmodule RoseTree.Zipper do
     end
   end
 
-  @spec first_extended_cousin_starting_point(t()) :: {t() | nil, [map()]}
+  @spec first_extended_cousin_starting_point(t()) :: {t() | nil, [path_details()]}
   defp first_extended_cousin_starting_point(%__MODULE__{} = z) do
     {_root, {candidate_depth, candidate_z, path_details}} =
       rewind_accumulate(z, {0, nil, []}, fn
@@ -2716,7 +2728,7 @@ defmodule RoseTree.Zipper do
     {candidate_z, pruned_path_details}
   end
 
-  @spec first_extended_cousin_descend_path(t(), [map()]) :: {t(), [map()]}
+  @spec first_extended_cousin_descend_path(t(), [path_details()]) :: {t(), [path_details()]}
   defp first_extended_cousin_descend_path(%__MODULE__{} = z, []), do: {z, []}
 
   defp first_extended_cousin_descend_path(%__MODULE__{} = z, [
@@ -2731,8 +2743,8 @@ defmodule RoseTree.Zipper do
     {child_at(z, index), path_details}
   end
 
-  @spec do_first_extended_cousin_descend_path(t(), map(), [map()]) ::
-          {t(), [map()]}
+  @spec do_first_extended_cousin_descend_path(t(), path_details(), [path_details()]) ::
+          {t(), [path_details()]}
   defp do_first_extended_cousin_descend_path(%__MODULE__{} = z, %{index: 0}, [
          %{index: 0} = loc_details | path_details
        ]) do
@@ -2753,7 +2765,7 @@ defmodule RoseTree.Zipper do
     {z, path_details}
   end
 
-  @spec do_first_extended_cousin(t(), map(), [map()], non_neg_integer(), predicate()) ::
+  @spec do_first_extended_cousin(t(), path_details(), [path_details()], non_neg_integer(), predicate()) ::
           t() | nil
   # Path Details have been exhausted, thus no match
   defp do_first_extended_cousin(
@@ -3012,7 +3024,7 @@ defmodule RoseTree.Zipper do
     end
   end
 
-  @spec last_extended_cousin_starting_point(t()) :: {t() | nil, [map()]}
+  @spec last_extended_cousin_starting_point(t()) :: {t() | nil, [path_details()]}
   defp last_extended_cousin_starting_point(%__MODULE__{} = z) do
     {_root, {candidate_depth, candidate_z, path_details}} =
       rewind_accumulate(z, {0, nil, []}, fn
@@ -3049,7 +3061,7 @@ defmodule RoseTree.Zipper do
     {candidate_z, pruned_path_details}
   end
 
-  @spec last_extended_cousin_descend_path(t(), [map()]) :: {t(), [map()]}
+  @spec last_extended_cousin_descend_path(t(), [path_details()]) :: {t(), [path_details()]}
   defp last_extended_cousin_descend_path(%__MODULE__{} = z, []), do: {z, []}
 
   defp last_extended_cousin_descend_path(%__MODULE__{} = z, [
@@ -3064,8 +3076,8 @@ defmodule RoseTree.Zipper do
     {child_at(z, index), path_details}
   end
 
-  @spec do_last_extended_cousin_descend_path(t(), map(), [map()]) ::
-          {t(), [map()]}
+  @spec do_last_extended_cousin_descend_path(t(), path_details(), [path_details()]) ::
+          {t(), [path_details()]}
   defp do_last_extended_cousin_descend_path(%__MODULE__{} = z, %{num_next: 0}, [
          %{num_next: 0} = loc_details | path_details
        ]) do
@@ -3086,7 +3098,7 @@ defmodule RoseTree.Zipper do
     {z, path_details}
   end
 
-  @spec do_last_extended_cousin(t(), map(), [map()], non_neg_integer(), predicate()) ::
+  @spec do_last_extended_cousin(t(), path_details(), [path_details()], non_neg_integer(), predicate()) ::
           t() | nil
   # Path Details have been exhausted, thus no match
   defp do_last_extended_cousin(
