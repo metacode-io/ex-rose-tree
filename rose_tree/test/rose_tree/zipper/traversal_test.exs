@@ -1858,6 +1858,48 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "descend_accumulate/3" do
+    test "should return the empty Zipper and accumulator if given an empty zipper with valid acc_fn", %{empty_z: z} do
+      accumulate_terms = fn next_z, acc ->
+        case next_z.focus.term do
+          nil ->
+            acc
+
+          term ->
+            [term | acc]
+          end
+        end
+
+      assert {^z, []} = Zipper.descend_accumulate(z, [], accumulate_terms)
+    end
+
+    test "should return unmoved Zipper and accumulator if no depth-first descendants",
+         %{leaf_z: z} do
+      acc_fn = fn next_z, acc ->
+        case next_z.focus.term do
+          nil ->
+            acc
+
+          term ->
+            [term * 2 | acc]
+        end
+      end
+
+      assert {^z, [2]} = Zipper.descend_accumulate(z, [], acc_fn)
+    end
+
+    test "should accumulate every node of the Zipper that lies along the path, ending with a focus on last node visited and the accumulated value",
+         %{z_depth_first_siblings: z, z_depth_first_siblings_at_end: z_at_end} do
+      acc_fn = fn next_z, acc ->
+        [next_z.focus.term | acc]
+      end
+
+      expected_acc = Enum.to_list(0..41) |> Enum.reverse()
+
+      assert {^z_at_end, ^expected_acc} = Zipper.descend_accumulate(z, [], acc_fn)
+    end
+  end
+
   ## Ascend Traversal
 
   describe "ascend/1" do
