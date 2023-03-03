@@ -763,7 +763,7 @@ defmodule RoseTree.Zipper.ZipperTest do
 
   describe "forward_to_last/1" do
     test "should return the current Zipper if already at the last breadth-first descendant", %{leaf_z: z} do
-      assert ^z = Zipper.rewind_to_root(z)
+      assert ^z = Zipper.forward_to_last(z)
     end
 
     test "should move forward through the Zipper breadth-first until the last node is reached", %{
@@ -1686,6 +1686,10 @@ defmodule RoseTree.Zipper.ZipperTest do
   end
 
   describe "descend_to_last/1" do
+    test "should return the current Zipper if already at the last depth-first descendant", %{leaf_z: z} do
+      assert ^z = Zipper.descend_to_last(z)
+    end
+
     test "should descend the Zipper depth-first until the last node is reached", %{
       z_depth_first_siblings: z
     } do
