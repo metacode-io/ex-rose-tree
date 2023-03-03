@@ -214,11 +214,12 @@ defmodule RoseTree.Util do
       do: {[], []}
 
   @doc """
-  Similar to `Enum.split/2`, `Enum.split_while/2`, and `Enum.split_with/2`, `split_when/2`
-  instead takes a list of elements and a predicate to apply to each element. The first
-  element that passes the predicate is where the list of elements will be split, with
-  the target element as the head of the second list in the return value. Like
-  with `split_at/2`, the first list of elements are returned in reverse order.
+  Similar to `Enum.split/2`, `Enum.split_while/2`, and `Enum.split_with/2`,
+  `split_when/2` instead takes a list of elements and a predicate to apply
+  to each element. The first element that passes the predicate is where
+  the list of elements will be split, with the target element as the head
+  of the second list in the return value. Like with `split_at/2`, the first
+  list of elements are returned in reverse order.
 
   ## Examples
 
@@ -238,7 +239,7 @@ defmodule RoseTree.Util do
   defp do_split_when(_acc, [] = _remaining, _predicate), do: {[], []}
 
   defp do_split_when(acc, [head | tail] = remaining, predicate) do
-    if predicate.(head) do
+    if predicate.(head) == true do
       {acc, remaining}
     else
       do_split_when([head | acc], tail, predicate)

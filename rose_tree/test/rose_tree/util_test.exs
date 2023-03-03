@@ -305,4 +305,32 @@ defmodule RoseTree.UtilTest do
       assert {^expected_1, ^expected_2} = Util.split_at(list, 5)
     end
   end
+
+  describe "split_when/2" do
+    test "should return two empty lists if given an empty list" do
+      random_idx = Enum.random(1..100)
+      predicate = &(&1 == random_idx)
+      assert {[], []} = Util.split_when([], predicate)
+    end
+
+    test "should return two empty lists if predicate never matches" do
+      assert {[], []} = Util.split_when([1,2,3,4,5], &Util.never/1)
+    end
+
+    test "should return two empty lists if given a bad predicate" do
+      assert {[], []} = Util.split_when([1,2,3,4,5], fn _ -> :bad end)
+    end
+
+    test "should return empty list and in-order list when predicate matches on first element" do
+      list = [1,2,3,4,5]
+      assert{[], ^list} = Util.split_when(list, &(&1 == 1))
+    end
+
+    test "should return reverse partition and in-order partition when index is in-bounds and not at border" do
+      list = [1,2,3,4,5,6,7,8,9,10]
+      expected_1 = [5,4,3,2,1]
+      expected_2 = [6,7,8,9,10]
+      assert {^expected_1, ^expected_2} = Util.split_when(list, &(&1 == 6))
+    end
+  end
 end
