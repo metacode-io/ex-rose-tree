@@ -370,6 +370,31 @@ defmodule RoseTree.Zipper.ZipperTest do
     end
   end
 
+  describe "rewind_until/3" do
+    test "should return nil when given a bad predicate", %{simple_z: z} do
+      not_a_predicate = fn _ -> :anti_boolean end
+
+      assert nil == Zipper.rewind_until(z, not_a_predicate)
+    end
+
+    test "should return nil when no parents to rewind", %{simple_z: z} do
+      assert nil == Zipper.rewind_until(z, &Util.always/1)
+    end
+
+    test "should return nil if predicate never matches", %{z_with_parent: z} do
+      predicate = &(&1.focus.term == :no_match)
+
+      assert nil == Zipper.rewind_until(z, predicate)
+    end
+
+    test "should move the focus if the predicate does match", %{z_with_great_grandparent: z} do
+      predicate = &(&1.focus.term == 1)
+
+      assert %Zipper{focus: actual} = Zipper.rewind_until(z, predicate)
+      assert actual.term == 1
+    end
+  end
+
   describe "rewind_to_root/1" do
     test "should return the current Zipper if already at the root" do
       root = %Zipper{focus: "root"}
@@ -394,6 +419,8 @@ defmodule RoseTree.Zipper.ZipperTest do
       end
     end
   end
+
+  ## Forward Traversal
 
   describe "forward/1" do
     test "should return nil if given an empty Zipper with no siblings", %{empty_z: z} do
