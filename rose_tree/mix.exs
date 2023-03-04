@@ -1,58 +1,23 @@
 defmodule RoseTree.MixProject do
   use Mix.Project
 
+  @source_url "https://github.com/StoatPower/ex-rose-tree"
+
+  @version "0.1.0"
+
   def project do
     [
       app: :rose_tree,
       name: "Rose Tree with Zipper",
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      docs: docs(),
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         coveralls: :test
-      ],
-      docs: [
-        main: "RoseTree",
-        groups_for_modules: [
-          Tree: [
-            RoseTree
-          ],
-          Zipper: [
-            RoseTree.Zipper,
-            RoseTree.Zipper.Location
-          ],
-          Util: [
-            RoseTree.Util
-          ],
-          "Dev Support": [
-            RoseTree.Support.Generators,
-            RoseTree.Support.Trees,
-            RoseTree.Support.Zippers
-          ]
-        ],
-        groups_for_docs: [
-          Guards: &(&1[:section] == :guards),
-          "Basic Functionality": &(&1[:section] == :basic),
-          Term: &(&1[:section] == :term),
-          Children: &(&1[:section] == :children),
-          "Common Traversal": &(&1[:section] == :traversal),
-          "Path Traversal": &(&1[:section] == :path_traversal),
-          "Breadth-first Traversal": &(&1[:section] == :breadth_first),
-          "Depth-first Traversal": &(&1[:section] == :depth_first),
-          "Direct Ancestors": &(&1[:section] == :ancestors),
-          "Direct Descendants": &(&1[:section] == :descendants),
-          Siblings: &(&1[:section] == :siblings),
-          "Niblings: Nieces & Nephews": &(&1[:section] == :niblings),
-          "Piblings: Aunts & Uncles": &(&1[:section] == :piblings),
-          "First Cousins": &(&1[:section] == :first_cousins),
-          "Second Cousins": &(&1[:section] == :second_cousins),
-          "Extended Cousins": &(&1[:section] == :extended_cousins),
-          Special: &(&1[:section] == :special)
-        ],
-        extras: []
       ]
     ]
   end
@@ -80,4 +45,51 @@ defmodule RoseTree.MixProject do
   defp elixirc_paths(:test), do: ["lib", "dev", "test/support"]
   defp elixirc_paths(:dev), do: ["lib", "dev"]
   defp elixirc_paths(_env), do: ["lib"]
+
+  defp docs() do
+    [
+      source_url: @source_url,
+      source_ref: "v#{@version}",
+      language: "en",
+      formatters: ["html"],
+      main: "RoseTree",
+      groups_for_modules: [
+        Tree: [
+          RoseTree
+        ],
+        Zipper: [
+          RoseTree.Zipper,
+          RoseTree.Zipper.Location
+        ],
+        Util: [
+          RoseTree.Util
+        ],
+        "Dev Support": [
+          RoseTree.Support.Generators,
+          RoseTree.Support.Trees,
+          RoseTree.Support.Zippers
+        ]
+      ],
+      groups_for_docs: [
+        Guards: &(&1[:section] == :guards),
+        "Basic Functionality": &(&1[:section] == :basic),
+        Term: &(&1[:section] == :term),
+        Children: &(&1[:section] == :children),
+        "Common Traversal": &(&1[:section] == :traversal),
+        "Path Traversal": &(&1[:section] == :path_traversal),
+        "Breadth-first Traversal": &(&1[:section] == :breadth_first),
+        "Depth-first Traversal": &(&1[:section] == :depth_first),
+        "Direct Ancestors": &(&1[:section] == :ancestors),
+        "Direct Descendants": &(&1[:section] == :descendants),
+        Siblings: &(&1[:section] == :siblings),
+        "Niblings: Nieces & Nephews": &(&1[:section] == :niblings),
+        "Piblings: Aunts & Uncles": &(&1[:section] == :piblings),
+        "First Cousins": &(&1[:section] == :first_cousins),
+        "Second Cousins": &(&1[:section] == :second_cousins),
+        "Extended Cousins": &(&1[:section] == :extended_cousins),
+        Special: &(&1[:section] == :special)
+      ],
+      extras: []
+    ]
+  end
 end
