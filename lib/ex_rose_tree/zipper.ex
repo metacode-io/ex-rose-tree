@@ -2,6 +2,37 @@ defmodule ExRoseTree.Zipper do
   @moduledoc """
   Includes both basic and highly specialized functionality for both manipulation
   of a Zipper's current context and traversal across the data.
+
+  Accompanying the Zipper are a large number of both navigation primitives and more complex
+  traversal functions built out of said primitives. An attempt has been made at providing
+  semantically meaningful names for these primitives, drawing from gender-neutral, familial
+  taxonomy (with a few liberties taken in creating neolisms to better suit the domain here),
+  with the aim of establishing a sort of _navigational pattern language_.
+
+  The words `first`, `last`, `next`, and `previous` are ubiquitous and commonly paired with
+  the likes of `child`, `sibling`, `pibling` (non-binary form of aunt/uncle), `nibling`
+  (non-binary form of niece/nephew), and `cousin` to label specific navigation primitives.
+  Other, less common words used for more specialized navigations include `ancestral`, `descendant`,
+  and `extended`.
+
+  Care has been taken to make naming conventions reflect the expected operations as closely as
+  possible, though there are a few cases where it might not be entirely obvious, particularly
+  for some of the more specialized operations, so be sure to read the documentation closely and
+  test for your use case when using a navigational function for the first time.
+
+  Many of these functions take an optional `predicate()` function which can be used to perform a
+  navigational function until said predicate is satisfied. For example, `ExRoseTree.Zipper.first_sibling(zipper, &(&1.term == 5))`
+  will search, starting from the 0-th (first) index, the list of siblings that occur _before but not after_
+  the current context for the first occurrence of a sibling with a `term` value equal to `5`. If
+  none are found, the context will not have been moved, and the function returns `nil`. Note, the
+  predicate function will default to `Util.always/1`, which always returns true. When using the default
+  predicate (in essence, not using a predicate) with this example, `ExRoseTree.Zipper.first_sibling(zipper)`,
+  the function will simply move the context to the first sibling of the initial context. If the are no
+  previous siblings, it will return `nil`.
+
+  In general, most of the navigation primitives take constant time, while mutation is done at the
+  current position and is a local operation.
+
   """
 
   require Logger
