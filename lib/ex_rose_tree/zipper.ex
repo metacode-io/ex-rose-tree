@@ -145,6 +145,13 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Returns a new `Zipper` with its focus on the given `ExRoseTree`.
+  Optionally take a list of previous and next sibling trees when
+  using the `:prev` and `:next` keyword options.
+
+  > Note that a zipper maintains the list of previous siblings in
+  > reverse order internally, and this function performs that reversal
+  > itself, so do not pre-reverse your list of previous siblings when
+  > using that option!
 
   ## Examples
 
@@ -157,7 +164,7 @@ defmodule ExRoseTree.Zipper do
         path: []
       }
 
-      iex> prev = for n <- [4,3,2,1], do: ExRoseTree.new(n)
+      iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
       ...> tree = ExRoseTree.new(5)
       ...> ExRoseTree.Zipper.new(tree, prev: prev)
       %ExRoseTree.Zipper{
@@ -213,7 +220,7 @@ defmodule ExRoseTree.Zipper do
       {true, true, true} ->
         %__MODULE__{
           focus: focus,
-          prev: prev,
+          prev: Enum.reverse(prev),
           next: next,
           path: path
         }
@@ -227,6 +234,67 @@ defmodule ExRoseTree.Zipper do
       {false, _, _} ->
         raise ArgumentError, message: "invalid element in prev"
     end
+  end
+
+  @doc """
+  Moves a Zipper back to the root and returns the current focus, the root `ExRoseTree`.
+
+  ## Examples
+
+      iex> tree = ExRoseTree.new(5, [1,2,3,4])
+      ...> z = ExRoseTree.Zipper.new(tree)
+      ...> z = Zipper.last_child(z)
+      ...> Zipper.to_tree(z)
+      %ExRoseTree{
+        term: 5,
+        children: [
+          %ExRoseTree{term: 1, children: []},
+          %ExRoseTree{term: 2, children: []},
+          %ExRoseTree{term: 3, children: []},
+          %ExRoseTree{term: 4, children: []},
+        ]
+      }
+
+  """
+  @doc section: :basic
+  @spec to_tree(t()) :: ExRoseTree.t()
+  def to_tree(%__MODULE__{} = z) do
+    %__MODULE__{focus: root} = rewind_to_root(z)
+
+    root
+  end
+
+  @doc """
+  Moves a Zipper back to the root and returns a 2-tuple containing first, a
+  list containing the previous siblings to the original root and second, a list
+  containing the original root followed by its next siblings.
+
+  ## Examples
+
+      iex> tree = ExRoseTree.new(3, [6])
+      ...> prev_trees = for t <- [1,2], do: ExRoseTree.new(t)
+      ...> next_trees = for t <- [4,5], do: ExRoseTree.new(t)
+      ...> z = ExRoseTree.Zipper.new(tree, prev: prev_trees, next: next_trees)
+      ...> z = Zipper.last_child(z)
+      ...> Zipper.to_forest(z)
+      {
+        [
+          %ExRoseTree{term: 1, children: []},
+          %ExRoseTree{term: 2, children: []}
+        ],
+        [
+          %ExRoseTree{term: 3, children: [%ExRoseTree{term: 6, children: []}]},
+          %ExRoseTree{term: 4, children: []},
+          %ExRoseTree{term: 5, children: []}
+        ]
+      }
+  """
+  @doc section: :basic
+  @spec to_forest(t()) :: {[ExRoseTree.t()], [ExRoseTree.t()]}
+  def to_forest(%__MODULE__{} = z) do
+    %__MODULE__{focus: root, prev: prev, next: next} = rewind_to_root(z)
+
+    {Enum.reverse(prev), [root | next]}
   end
 
   @doc """
@@ -285,7 +353,7 @@ defmodule ExRoseTree.Zipper do
 
   ## Examples
 
-      iex> prev = for n <- [4,3,2,1], do: ExRoseTree.new(n)
+      iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
       ...> tree = ExRoseTree.new(5)
       ...> z = ExRoseTree.Zipper.new(tree, prev: prev)
       ...> ExRoseTree.Zipper.index_of_focus(z)
@@ -362,7 +430,7 @@ defmodule ExRoseTree.Zipper do
   ## Examples
 
       iex> tree = ExRoseTree.new(5)
-      ...> prev_siblings = for n <- [4,3], do: ExRoseTree.new(n)
+      ...> prev_siblings = for n <- [3,4], do: ExRoseTree.new(n)
       ...> next_siblings = for n <- [6,7], do: ExRoseTree.new(n)
       ...> z = ExRoseTree.Zipper.new(tree, prev: prev_siblings, next: next_siblings)
       ...> ExRoseTree.Zipper.remove_focus(z)
@@ -604,7 +672,7 @@ defmodule ExRoseTree.Zipper do
 
   ## Examples
 
-      iex> prev = for n <- [4,3], do: ExRoseTree.new(n)
+      iex> prev = for n <- [3,4], do: ExRoseTree.new(n)
       ...> loc_trees = for n <- [2,1], do: ExRoseTree.new(n)
       ...> locs = for n <- loc_trees, do: ExRoseTree.Zipper.Location.new(n)
       ...> tree = ExRoseTree.new(5)
@@ -688,14 +756,14 @@ defmodule ExRoseTree.Zipper do
 
   ## Examples
 
-      iex> tree = ExRoseTree.new(5, [4,3,2,1])
+      iex> tree = ExRoseTree.new(5, [1,2,3,4])
       ...> z = ExRoseTree.Zipper.new(tree)
       ...> ExRoseTree.Zipper.children(z)
       [
-        %ExRoseTree{term: 4, children: []},
-        %ExRoseTree{term: 3, children: []},
+        %ExRoseTree{term: 1, children: []},
         %ExRoseTree{term: 2, children: []},
-        %ExRoseTree{term: 1, children: []}
+        %ExRoseTree{term: 3, children: []},
+        %ExRoseTree{term: 4, children: []}
       ]
 
   """
@@ -1102,10 +1170,10 @@ defmodule ExRoseTree.Zipper do
       ...> z = ExRoseTree.Zipper.new(tree, prev: prev)
       ...> ExRoseTree.Zipper.previous_siblings(z)
       [
-        %ExRoseTree{term: 4, children: []},
-        %ExRoseTree{term: 3, children: []},
+        %ExRoseTree{term: 1, children: []},
         %ExRoseTree{term: 2, children: []},
-        %ExRoseTree{term: 1, children: []}
+        %ExRoseTree{term: 3, children: []},
+        %ExRoseTree{term: 4, children: []}
       ]
 
   """
@@ -1142,7 +1210,7 @@ defmodule ExRoseTree.Zipper do
 
   ## Examples
 
-      iex> prev = for n <- [4,3,2,1], do: ExRoseTree.new(n)
+      iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
       ...> tree = ExRoseTree.new(5)
       ...> z = ExRoseTree.Zipper.new(tree, prev: prev)
       ...> map_fn = &ExRoseTree.map_term(&1, fn term -> term * 2 end)
@@ -1413,7 +1481,7 @@ defmodule ExRoseTree.Zipper do
 
   ## Examples
 
-    iex> prev = for n <- [4,3,2,1], do: ExRoseTree.new(n)
+    iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
     ...> next = for n <- [6,7,8,9], do: ExRoseTree.new(n)
     ...> tree = ExRoseTree.new(5)
     ...> z = ExRoseTree.Zipper.new(tree, prev: prev, next: next)
@@ -1465,7 +1533,7 @@ defmodule ExRoseTree.Zipper do
 
   ## Examples
 
-    iex> prev = for n <- [4,3,2,1], do: ExRoseTree.new(n)
+    iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
     ...> next = for n <- [6,7,8,9], do: ExRoseTree.new(n)
     ...> tree = ExRoseTree.new(5)
     ...> z = ExRoseTree.Zipper.new(tree, prev: prev, next: next)
@@ -1516,7 +1584,7 @@ defmodule ExRoseTree.Zipper do
 
   ## Examples
 
-    iex> prev = for n <- [4,3,2,1], do: ExRoseTree.new(n)
+    iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
     ...> next = for n <- [6,7,8,9], do: ExRoseTree.new(n)
     ...> tree = ExRoseTree.new(5)
     ...> z = ExRoseTree.Zipper.new(tree, prev: prev, next: next)
@@ -1568,7 +1636,7 @@ defmodule ExRoseTree.Zipper do
 
   ## Examples
 
-    iex> prev = for n <- [4,3,2,1], do: ExRoseTree.new(n)
+    iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
     ...> next = for n <- [6,7,8,9], do: ExRoseTree.new(n)
     ...> tree = ExRoseTree.new(5)
     ...> z = ExRoseTree.Zipper.new(tree, prev: prev, next: next)
@@ -1620,7 +1688,7 @@ defmodule ExRoseTree.Zipper do
 
   ## Examples
 
-      iex> prev = for n <- [4,3,2,1], do: ExRoseTree.new(n)
+      iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
       ...> next = for n <- [6,7,8,9], do: ExRoseTree.new(n)
       ...> tree = ExRoseTree.new(5)
       ...> z = ExRoseTree.Zipper.new(tree, prev: prev, next: next)

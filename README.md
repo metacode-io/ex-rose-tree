@@ -126,6 +126,35 @@ zipper = Zipper.backward(zipper)
 #   next: [%ExRoseTree{term: 5, children: []}],
 #   path: [%ExRoseTree.Zipper.Location{prev: [], term: 1, next: []}]
 # }
+
+zipper = Zipper.rewind_map(zipper, &Tree.map_term(&1, fn t -> t * 10 end))
+# %ExRoseTree.Zipper{
+#   focus: %ExRoseTree{
+#     term: 10,
+#     children: [
+#       %ExRoseTree{term: 1, children: []},
+#       %ExRoseTree{term: 2, children: []},
+#       %ExRoseTree{term: 3, children: []},
+#       %ExRoseTree{term: 40, children: []},
+#       %ExRoseTree{term: 5, children: []}
+#     ]
+#   },
+#   prev: [],
+#   next: [],
+#   path: []
+# }
+
+Zipper.to_tree(zipper)
+# %ExRoseTree{
+#   term: 10,
+#   children: [
+#     %ExRoseTree{term: 1, children: []},
+#     %ExRoseTree{term: 2, children: []},
+#     %ExRoseTree{term: 3, children: []},
+#     %ExRoseTree{term: 40, children: []},
+#     %ExRoseTree{term: 5, children: []}
+#   ]
+# }
 ```
 
 ## Testing
@@ -142,7 +171,7 @@ contexts on a Zipper), LiveBook examples, visualizations of the many traversal f
 
 Copyright (c) 2022-present, Matthew Caldwell.
 
-ExRoseTree source code is licensed under the [MIT License](LICENSE.md).
+ExRoseTree source code is licensed under the [MIT License](./LICENSE.md).
 
 <!-- README END -->
 
