@@ -7,7 +7,7 @@ defmodule ExRoseTree.MixProject do
 
   def project do
     [
-      app: :rose_tree,
+      app: :ex_rose_tree,
       name: "Rose Tree with Zipper",
       version: @version,
       elixir: "~> 1.14",

@@ -99,7 +99,7 @@ zipper = Zipper.new(tree)
 #   path: []
 # }
 
-Zipper.last_child(zipper)
+zipper = Zipper.last_child(zipper)
 # %ExRoseTree.Zipper{
 #   focus: %ExRoseTree{term: 5, children: []},
 #   prev: [
@@ -108,6 +108,18 @@ Zipper.last_child(zipper)
 #     %ExRoseTree{term: 2, children: []}
 #   ],
 #   next: [],
+#   path: [%ExRoseTree.Zipper.Location{prev: [], term: 1, next: []}]
+# }
+
+zipper = Zipper.backward(zipper)
+
+# %ExRoseTree.Zipper{
+#   focus: %ExRoseTree{term: 4, children: []},
+#   prev: [
+#     %ExRoseTree{term: 3, children: []}, 
+#     %ExRoseTree{term: 2, children: []}
+#   ],
+#   next: [%ExRoseTree{term: 5, children: []}],
 #   path: [%ExRoseTree.Zipper.Location{prev: [], term: 1, next: []}]
 # }
 ```
@@ -121,6 +133,12 @@ is not yet used in a production setting.
 
 Additional functionality may be useful to add, including diffing algorithms, multiple cursor support (ie: multiple, concurrent
 contexts on a Zipper), LiveBook examples, visualizations of the many traversal functions, improvements to the generators, more unit tests, performance improvements, and so on. I'm open to any and all ideas and contribution here, so don't hesitate to pipe in.
+
+## Copyright and License
+
+Copyright (c) 2022-present, Matthew Caldwell.
+
+ExRoseTree source code is licensed under the [MIT License](LICENSE.md).
 
 <!-- README END -->
 
