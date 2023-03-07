@@ -68,47 +68,49 @@ end
 
 ## Example Usage
 
-    iex> ExRoseTree.new(1)
-    %ExRoseTree{term: 1, children: []}
+```elixir
+alias ExRoseTree, as: Tree
+alias ExRoseTree.Zipper    
+    
+Tree.new(1)
+# %ExRoseTree{term: 1, children: []}
 
-    iex> ExRoseTree.new(1, [2,3,4,5])
-    %ExRoseTree{term: 1, children: [
-      %ExRoseTree{term: 2, children: []},
-      %ExRoseTree{term: 3, children: []},
-      %ExRoseTree{term: 4, children: []},
-      %ExRoseTree{term: 5, children: []},
-    ]}
+tree = Tree.new(1, [2,3,4,5])
+# %ExRoseTree{term: 1, children: [
+#   %ExRoseTree{term: 2, children: []},
+#   %ExRoseTree{term: 3, children: []},
+#   %ExRoseTree{term: 4, children: []},
+#   %ExRoseTree{term: 5, children: []},
+# ]}
 
-    iex> tree = ExRoseTree.new(1, [2,3,4,5])
-    ...> Zipper.new(tree)
-    %ExRoseTree.Zipper{
-      focus: %ExRoseTree{
-        term: 1,
-        children: [
-          %ExRoseTree{term: 2, children: []},
-          %ExRoseTree{term: 3, children: []},
-          %ExRoseTree{term: 4, children: []},
-          %ExRoseTree{term: 5, children: []}
-        ]
-      },
-      prev: [],
-      next: [],
-      path: []
-    }
+zipper = Zipper.new(tree)
+# %ExRoseTree.Zipper{
+#   focus: %ExRoseTree{
+#     term: 1,
+#     children: [
+#       %ExRoseTree{term: 2, children: []},
+#       %ExRoseTree{term: 3, children: []},
+#       %ExRoseTree{term: 4, children: []},
+#       %ExRoseTree{term: 5, children: []}
+#     ]
+#   },
+#   prev: [],
+#   next: [],
+#   path: []
+# }
 
-    iex> tree = ExRoseTree.new(1, [2,3,4,5])
-    ...> zipper = Zipper.new(tree)
-    ...> Zipper.last_child(zipper)
-    %ExRoseTree.Zipper{
-      focus: %ExRoseTree{term: 5, children: []},
-      prev: [
-        %ExRoseTree{term: 4, children: []},
-        %ExRoseTree{term: 3, children: []},
-        %ExRoseTree{term: 2, children: []}
-      ],
-      next: [],
-      path: [%ExRoseTree.Zipper.Location{prev: [], term: 1, next: []}]
-    }
+Zipper.last_child(zipper)
+# %ExRoseTree.Zipper{
+#   focus: %ExRoseTree{term: 5, children: []},
+#   prev: [
+#     %ExRoseTree{term: 4, children: []},
+#     %ExRoseTree{term: 3, children: []},
+#     %ExRoseTree{term: 2, children: []}
+#   ],
+#   next: [],
+#   path: [%ExRoseTree.Zipper.Location{prev: [], term: 1, next: []}]
+# }
+```
 
 ## Testing
 
