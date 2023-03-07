@@ -171,7 +171,7 @@ contexts on a Zipper), LiveBook examples, visualizations of the many traversal f
 
 Copyright (c) 2022-present, Paraclade, LLC.
 
-ExRoseTree source code is licensed under the [Apache License 2.0](./LICENSE.md).
+ExRoseTree source code is licensed under the [Apache License 2.0](./LICENSE).
 
 <!-- README END -->
 

@@ -1,20 +1,23 @@
 defmodule ExRoseTree.MixProject do
   use Mix.Project
 
+  @description "A Rose Tree (Multiway-tree) implementation with Zipper in Elixir."
   @source_url "https://github.com/metacode-io/ex-rose-tree"
-
   @version "0.1.0"
 
   def project do
     [
       app: :ex_rose_tree,
-      name: "Rose Tree with Zipper",
       version: @version,
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
+      name: "ExRoseTree",
+      description: @description,
+      package: package(),
       deps: deps(),
       docs: docs(),
+      source_url: @source_url,
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         coveralls: :test
@@ -26,19 +29,6 @@ defmodule ExRoseTree.MixProject do
   def application do
     [
       extra_applications: [:logger]
-    ]
-  end
-
-  # Run "mix help deps" to learn about dependencies.
-  defp deps do
-    [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
-      {:credo, "~> 1.6.4", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:excoveralls, "~> 0.14.5", only: :test},
-      {:ex_doc, "~> 0.29", only: :dev, runtime: false},
-      {:benchee, "~> 1.1", only: :dev}
     ]
   end
 
@@ -92,4 +82,28 @@ defmodule ExRoseTree.MixProject do
       extras: []
     ]
   end
+
+  defp package() do
+    [
+      maintainers: ["Matthew Caldwell"],
+      organization: "Metacode",
+      licenses: ["Apache-2.0"],
+      files: ~w(CHANGELOG.md CODE_OF_CONDUCT.md Cheatsheet.cheatmd formatters lib dev LICENSE* mix.exs README.md),
+      links: %{"GitHub" => @source_url}
+    ]
+  end
+
+  # Run "mix help deps" to learn about dependencies.
+  defp deps do
+    [
+      # {:dep_from_hexpm, "~> 0.3.0"},
+      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:credo, "~> 1.6.4", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:excoveralls, "~> 0.14.5", only: :test},
+      {:ex_doc, "~> 0.29", only: :dev, runtime: false},
+      {:benchee, "~> 1.1", only: :dev}
+    ]
+  end
+
 end
