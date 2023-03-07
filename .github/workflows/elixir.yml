@@ -24,7 +24,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - elixir: 1.14
+          - elixir: 1.14.2
             otp: 25.1
             lint: true
             installer: true
