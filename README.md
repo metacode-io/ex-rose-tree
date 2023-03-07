@@ -2,7 +2,7 @@
 
 ## ExRoseTree :: A Rose Tree with Functional Zipper in Elixir
 
-[![Build Status](https://github.com/StoatPower/ex-rose-tree/workflows/elixir/badge.svg)](https://github.com/StoatPower/ex-rose-tree/actions/workflows/elixir.yml)
+[![Build Status](https://github.com/StoatPower/ex-rose-tree/workflows/CI/badge.svg)](https://github.com/StoatPower/ex-rose-tree/actions/workflows/elixir.yml)
 
 ### What's a Rose Tree?
 
