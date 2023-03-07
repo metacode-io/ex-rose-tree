@@ -37,8 +37,8 @@ enhances the usefulness of the standard Rose Tree.
 ### So what's a Zipper? 
 
 A [Zipper](https://en.wikipedia.org/wiki/Zipper_(data_structure)) of a given data structure can 
-be thought of as taking the derivative of that data structure. It provides a context-aware approach to 
-traversing and manipulating the contents of the Rose Tree.
+be thought of as taking the derivative of that data structure. It provides an efficient, context-aware 
+approach to traversing and manipulating the contents of the Rose Tree.
 
 In his foundational [paper](https://www.st.cs.uni-saarland.de/edu/seminare/2005/advanced-fp/docs/huet-zipper.pdf) 
 formalizing the idea, Gerard Huet perhaps describes it best:
@@ -52,7 +52,7 @@ formalizing the idea, Gerard Huet perhaps describes it best:
 
 ### And what's a Zipper of a Rose Tree good for?
 
-In practice, `ExRoseTree.Zipper` can be used as an efficient means of representing everything from a cursor
+In practice, `ExRoseTree.Zipper` can be used as an effective means of representing everything from a cursor
 in a text editor to a selected item in a nested sidebar/dropdown menu in a UI which needs to maintain persistent
 focus. Essentially, anything that has an arbitrary hierarchy and would necessitate or benefit from the capability of
 being context-aware could be a candidate for a Rose Tree with Zipper.
