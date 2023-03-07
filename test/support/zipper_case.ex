@@ -8,7 +8,6 @@ defmodule ZipperCase do
   use ExUnit.CaseTemplate
 
   alias ExRoseTree.Zipper
-  alias ExRoseTree.Zipper.Location
   alias ExRoseTree.Support.Zippers
 
   using do
