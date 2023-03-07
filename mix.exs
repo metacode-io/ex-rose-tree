@@ -1,7 +1,7 @@
 defmodule ExRoseTree.MixProject do
   use Mix.Project
 
-  @source_url "https://github.com/StoatPower/ex-rose-tree"
+  @source_url "https://github.com/metacode-io/ex-rose-tree"
 
   @version "0.1.0"
 

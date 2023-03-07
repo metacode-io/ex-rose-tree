@@ -169,7 +169,7 @@ contexts on a Zipper), LiveBook examples, visualizations of the many traversal f
 
 ## Copyright and License
 
-Copyright (c) 2022-present, Matthew Caldwell.
+Copyright (c) 2022-present, Paraclade, LLC.
 
 ExRoseTree source code is licensed under the [MIT License](./LICENSE.md).
 
