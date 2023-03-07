@@ -1,7 +1,5 @@
 <!-- README START -->
 
-# ExRoseTree
-
 ### What's a Rose Tree?
 
 A [Rose Tree](https://en.wikipedia.org/wiki/Rose_tree), also known as a multi-way or m-way tree
@@ -11,7 +9,7 @@ an arbitrary value and an arbitrary number of children. Each child is, itself, a
 ExRoseTree is implemented as a very simple struct `defstruct ~w(term children)a` with an equally
 simple typespec:
 
-```
+```elixir
 @type t() :: %__MODULE__{
         term: term(),
         children: [t()]
@@ -24,7 +22,7 @@ Practically speaking, a few good use cases for Rose Trees could be:
 
 * outlines
 * file systems
-* HTML/XML documents
+* parsing HTML/XML documents
 * [abstract syntax trees](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
 * decision trees
 * data visualization (org chargs, family trees, taxonomies, nested menus)
@@ -55,15 +53,6 @@ in a text editor to a selected item in a nested sidebar/dropdown menu in a UI wh
 focus. Essentially, anything that has an arbitrary hierarchy and would necessitate or benefit from the capability of
 being context-aware could be a candidate for a Rose Tree with Zipper.
 
-Finally, while great pains have been taken to provide extensive test coverage, this library is still in its infancy and
-is not yet used in a production setting. Feedback and contributions are more than welcome in all regards, but particularly
-in the realms of making the documentation more friendly and comprehensive, the testing ever more thorough, and the
-performance analysed for improvements.
-
-Additional functionality may be useful to add, including diffing algorithms, multiple cursor support (ie: multiple, concurrent
-contexts on a Zipper), LiveBook examples, visualizations of the many traversal functions, and so on. I'm open to any and all
-ideas and contribution here, so don't hesitate to pipe in.
-
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
@@ -76,6 +65,60 @@ def deps do
   ]
 end
 ```
+
+## Example Usage
+
+    iex> ExRoseTree.new(1)
+    %ExRoseTree{term: 1, children: []}
+
+    iex> ExRoseTree.new(1, [2,3,4,5])
+    %ExRoseTree{term: 1, children: [
+      %ExRoseTree{term: 2, children: []},
+      %ExRoseTree{term: 3, children: []},
+      %ExRoseTree{term: 4, children: []},
+      %ExRoseTree{term: 5, children: []},
+    ]}
+
+    iex> tree = ExRoseTree.new(1, [2,3,4,5])
+    ...> Zipper.new(tree)
+    %ExRoseTree.Zipper{
+      focus: %ExRoseTree{
+        term: 1,
+        children: [
+          %ExRoseTree{term: 2, children: []},
+          %ExRoseTree{term: 3, children: []},
+          %ExRoseTree{term: 4, children: []},
+          %ExRoseTree{term: 5, children: []}
+        ]
+      },
+      prev: [],
+      next: [],
+      path: []
+    }
+
+    iex> tree = ExRoseTree.new(1, [2,3,4,5])
+    ...> zipper = Zipper.new(tree)
+    ...> Zipper.last_child(zipper)
+    %ExRoseTree.Zipper{
+      focus: %ExRoseTree{term: 5, children: []},
+      prev: [
+        %ExRoseTree{term: 4, children: []},
+        %ExRoseTree{term: 3, children: []},
+        %ExRoseTree{term: 2, children: []}
+      ],
+      next: [],
+      path: [%ExRoseTree.Zipper.Location{prev: [], term: 1, next: []}]
+    }
+
+## Testing
+
+While great pains have been taken to provide extensive test coverage--over 800 tests at present, this library is still in its infancy and
+is not yet used in a production setting. 
+
+## Contributions & Further Development
+
+Additional functionality may be useful to add, including diffing algorithms, multiple cursor support (ie: multiple, concurrent
+contexts on a Zipper), LiveBook examples, visualizations of the many traversal functions, improvements to the generators, more unit tests, performance improvements, and so on. I'm open to any and all ideas and contribution here, so don't hesitate to pipe in.
 
 <!-- README END -->
 
