@@ -1,5 +1,9 @@
 <!-- README START -->
 
+## ExRoseTree :: A Rose Tree with Functional Zipper in Elixir
+
+[![Build Status](https://github.com/StoatPower/ex-rose-tree/workflows/elixir/badge.svg)](https://github.com/StoatPower/ex-rose-tree/actions/workflows/elixir.yml)
+
 ### What's a Rose Tree?
 
 A [Rose Tree](https://en.wikipedia.org/wiki/Rose_tree), also known as a multi-way or m-way tree
