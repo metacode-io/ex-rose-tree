@@ -156,7 +156,7 @@ defmodule ExRoseTree.Util do
   """
   @spec maybe(term(), (term() -> boolean())) :: term() | nil
   def maybe(value, predicate) when is_function(predicate) do
-    if predicate.(value) do
+    if predicate.(value) == true do
       value
     else
       nil

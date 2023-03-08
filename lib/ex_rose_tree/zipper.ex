@@ -1104,7 +1104,7 @@ defmodule ExRoseTree.Zipper do
         z
 
       %__MODULE__{} = last_child ->
-        if predicate.(last_child) do
+        if predicate.(last_child) == true do
           last_child
         else
           do_rightmost_descendant_until(last_child, predicate)
@@ -1148,7 +1148,7 @@ defmodule ExRoseTree.Zipper do
         z
 
       %__MODULE__{} = first_child ->
-        if predicate.(first_child) do
+        if predicate.(first_child) == true do
           first_child
         else
           do_leftmost_descendant_until(first_child, predicate)
@@ -1928,7 +1928,7 @@ defmodule ExRoseTree.Zipper do
 
       %__MODULE__{} = first_child ->
         last_match =
-          if predicate.(first_child) do
+          if predicate.(first_child) == true do
             first_child
           else
             last_match
@@ -1965,7 +1965,7 @@ defmodule ExRoseTree.Zipper do
 
       %__MODULE__{} = last_child ->
         last_match =
-          if predicate.(last_child) do
+          if predicate.(last_child) == true do
             last_child
           else
             last_match
@@ -2002,7 +2002,7 @@ defmodule ExRoseTree.Zipper do
 
       %__MODULE__{} = last_child ->
         last_match =
-          if predicate.(last_child) do
+          if predicate.(last_child) == true do
             last_child
           else
             last_match
@@ -2039,7 +2039,7 @@ defmodule ExRoseTree.Zipper do
 
       %__MODULE__{} = first_child ->
         last_match =
-          if predicate.(first_child) do
+          if predicate.(first_child) == true do
             first_child
           else
             last_match
@@ -2925,7 +2925,7 @@ defmodule ExRoseTree.Zipper do
          predicate
        )
        when current_details.depth == target_depth do
-    if predicate.(z.focus) do
+    if predicate.(z.focus) == true do
       z
     else
       case next_ancestral_pibling(z) do
@@ -2960,7 +2960,7 @@ defmodule ExRoseTree.Zipper do
          predicate
        )
        when current_details.depth == target_depth do
-    if predicate.(z.focus) do
+    if predicate.(z.focus) == true do
       z
     else
       new_details = %{current_details | index: current_details.index + 1}
@@ -3264,7 +3264,7 @@ defmodule ExRoseTree.Zipper do
          predicate
        )
        when current_details.depth == target_depth do
-    if predicate.(z.focus) do
+    if predicate.(z.focus) == true do
       z
     else
       case previous_ancestral_pibling(z) do
@@ -3299,7 +3299,7 @@ defmodule ExRoseTree.Zipper do
          predicate
        )
        when current_details.depth == target_depth do
-    if predicate.(z.focus) do
+    if predicate.(z.focus) == true do
       z
     else
       new_details = %{current_details | index: current_details.index - 1}
@@ -3476,7 +3476,7 @@ defmodule ExRoseTree.Zipper do
          predicate
        )
        when current_depth == target_depth do
-    if predicate.(z.focus) do
+    if predicate.(z.focus) == true do
       z
     else
       nil
@@ -3490,7 +3490,7 @@ defmodule ExRoseTree.Zipper do
          predicate
        )
        when current_depth == target_depth do
-    if predicate.(z.focus) do
+    if predicate.(z.focus) == true do
       z
     else
       find_previous_extended_cousin(z, target_depth, predicate)
@@ -3504,7 +3504,7 @@ defmodule ExRoseTree.Zipper do
          predicate
        )
        when current_depth == target_depth do
-    if predicate.(z.focus) do
+    if predicate.(z.focus) == true do
       z
     else
       z
@@ -3602,7 +3602,7 @@ defmodule ExRoseTree.Zipper do
          predicate
        )
        when current_depth == target_depth do
-    if predicate.(z.focus) do
+    if predicate.(z.focus) == true do
       z
     else
       nil
@@ -3616,7 +3616,7 @@ defmodule ExRoseTree.Zipper do
          predicate
        )
        when current_depth == target_depth do
-    if predicate.(z.focus) do
+    if predicate.(z.focus) == true do
       z
     else
       find_next_extended_cousin(z, target_depth, predicate)
@@ -3630,7 +3630,7 @@ defmodule ExRoseTree.Zipper do
          predicate
        )
        when current_depth == target_depth do
-    if predicate.(z.focus) do
+    if predicate.(z.focus) == true do
       z
     else
       z
