@@ -1,5 +1,4 @@
 defmodule ExRoseTree do
-
   @moduledoc File.read!(Path.expand("README.md"))
              |> String.split("<!-- README START -->")
              |> Enum.at(1)
