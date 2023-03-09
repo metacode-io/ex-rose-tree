@@ -501,7 +501,7 @@ defmodule ExRoseTree do
   @typedoc """
   A function that takes a seed value and returns a new ExRoseTree and a
   list of new seeds to use for children. Care must be taken that you
-  don't create an function that infinitely creates new seeds, in
+  don't create a function that infinitely creates new seeds, in
   other words, the function should have a terminating base case.
   """
   @type unfold_fn() :: (seed :: term() -> {term(), [seed :: term()]})

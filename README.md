@@ -33,7 +33,7 @@ Practically speaking, a few good use cases for Rose Trees could be:
 * parsing HTML/XML documents
 * [abstract syntax trees](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
 * decision trees
-* data visualization (org chargs, family trees, taxonomies, nested menus)
+* data visualization (org charts, family trees, taxonomies, nested menus)
 
 This implementation also comes with a companion `ExRoseTree.Zipper` data structure, and greatly
 enhances the usefulness of the standard Rose Tree. 
@@ -195,7 +195,7 @@ $ MIX_ENV=test mix coveralls.html
 Additional functionality and work to explore adding include:
 
 * Tree diffing and merging algorithms
-* Multiple cursor support (ie: multiple, concurrent contexts on a Zipper)
+* Multiple cursor support (i.e.: multiple, concurrent contexts on a Zipper)
 * LiveBook examples
 * Visualizations of the many traversal functions
 * Improvements to the generators
