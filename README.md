@@ -8,6 +8,8 @@ API documentation is available at https://hexdocs.pm/ex_rose_tree.
 
 <!-- README START -->
 
+A Rose Tree with Functional Zipper in Elixir
+
 ### What's a Rose Tree?
 
 A [Rose Tree](https://en.wikipedia.org/wiki/Rose_tree), also known as a multi-way or m-way tree
