@@ -54,7 +54,7 @@ defmodule ExRoseTree do
   def empty(), do: %__MODULE__{term: nil, children: []}
 
   @doc """
-  Initializes a new tree with the given term.
+  Initializes a new tree with the given `term`.
 
   ## Examples
 
@@ -114,8 +114,8 @@ defmodule ExRoseTree do
   end
 
   @doc """
-  Returns whether a list of values are all ExRoseTrees or not. Will return
-  true if passed an empty list.
+  Returns whether a list of values are all `ExRoseTree`s or not. Will return
+  `true` if passed an empty list.
 
   ## Examples
 
@@ -135,7 +135,7 @@ defmodule ExRoseTree do
   ###
 
   @doc """
-  Returns the inner term of a ExRoseTree.
+  Returns the inner `term` of a `ExRoseTree`.
 
   ## Examples
 
@@ -149,7 +149,7 @@ defmodule ExRoseTree do
   def get_term(tree) when rose_tree?(tree), do: tree.term
 
   @doc """
-  Sets the tree term to the given term.
+  Sets the tree `term` to the given `term`.
 
   ## Examples
 
@@ -165,7 +165,7 @@ defmodule ExRoseTree do
   end
 
   @doc """
-  Applies the given function to the tree term.
+  Applies the given function to the tree `term`.
 
   ## Examples
 
@@ -188,7 +188,7 @@ defmodule ExRoseTree do
   ###
 
   @doc """
-  Returns whether or not the current tree has a child that matches the predicate.
+  Returns whether or not the current `tree` has a child that matches the `predicate`.
 
   ## Examples
 
@@ -199,12 +199,12 @@ defmodule ExRoseTree do
   """
   @doc section: :children
   @spec has_child?(t(), (t() -> boolean())) :: boolean()
-  def has_child?(%__MODULE__{children: children}, predicate) when is_function(predicate) do
+  def has_child?(%__MODULE__{children: children} = _tree, predicate) when is_function(predicate) do
     Enum.any?(children, predicate)
   end
 
   @doc """
-  Returns the children of a ExRoseTree.
+  Returns the children of a `ExRoseTree`.
 
   ## Examples
 
@@ -223,7 +223,7 @@ defmodule ExRoseTree do
   def get_children(tree) when rose_tree?(tree), do: tree.children
 
   @doc """
-  Sets the tree children to the given list of children.
+  Sets the `tree` children to the given list of `children`.
 
   ## Examples
 
@@ -293,7 +293,7 @@ defmodule ExRoseTree do
   end
 
   @doc """
-  Prepends the given child to the tree's children.
+  Prepends the given `child` to the `tree`'s children.
 
   ## Examples
 
@@ -323,7 +323,7 @@ defmodule ExRoseTree do
   end
 
   @doc """
-  Removes the first child of the tree's children.
+  Removes the first child of the `tree`'s children.
 
   ## Examples
 
@@ -350,7 +350,7 @@ defmodule ExRoseTree do
   end
 
   @doc """
-  Appends the given child to the tree's children.
+  Appends the given `child` to the `tree`'s children.
 
   ## Examples
 
@@ -380,7 +380,7 @@ defmodule ExRoseTree do
   end
 
   @doc """
-  Removes the last child of the tree's children.
+  Removes the last child of the `tree`'s children.
 
   ## Examples
 
@@ -408,7 +408,7 @@ defmodule ExRoseTree do
   end
 
   @doc """
-  Inserts a new child into the tree's children at the given index.
+  Inserts a new `child` into the `tree`'s children at the given `index`.
 
   ## Examples
 
@@ -443,7 +443,7 @@ defmodule ExRoseTree do
   end
 
   @doc """
-  Removes a child from the tree's children at the given index.
+  Removes a child from the `tree`'s children at the given `index`.
 
   ## Examples
 
@@ -499,7 +499,7 @@ defmodule ExRoseTree do
          }
 
   @typedoc """
-  A function that takes a seed value and returns a new ExRoseTree and a
+  A function that takes a seed value and returns a new `ExRoseTree` and a
   list of new seeds to use for children. Care must be taken that you
   don't create a function that infinitely creates new seeds, in
   other words, the function should have a terminating base case.
@@ -507,7 +507,7 @@ defmodule ExRoseTree do
   @type unfold_fn() :: (seed :: term() -> {term(), [seed :: term()]})
 
   @doc """
-  Given a seed value and an `unfold_fn`, generates a new rose tree.
+  Given a `seed` value and an `unfold_fn`, generates a new rose tree.
 
   ## Examples
 
