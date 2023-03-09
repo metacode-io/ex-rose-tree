@@ -165,7 +165,7 @@ is not yet used in a production setting.
 ## Contributions & Further Development
 
 Additional functionality may be useful to add, including diffing algorithms, multiple cursor support (ie: multiple, concurrent
-contexts on a Zipper), LiveBook examples, visualizations of the many traversal functions, improvements to the generators, more unit tests, performance improvements, and so on. I'm open to any and all ideas and contribution here, so don't hesitate to pipe in.
+contexts on a Zipper), LiveBook examples, visualizations of the many traversal functions, improvements to the generators, more unit tests, performance improvements, and so on. I'm open to any and all ideas and contribution here, so don't hesitate to pipe in, and please be sure to follow our [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## Copyright and License
 
