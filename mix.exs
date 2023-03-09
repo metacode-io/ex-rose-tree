@@ -88,7 +88,8 @@ defmodule ExRoseTree.MixProject do
       maintainers: ["Matthew Caldwell"],
       organization: "Metacode",
       licenses: ["Apache-2.0"],
-      files: ~w(CHANGELOG.md CODE_OF_CONDUCT.md Cheatsheet.cheatmd formatters lib dev LICENSE* mix.exs README.md),
+      files:
+        ~w(CHANGELOG.md CODE_OF_CONDUCT.md Cheatsheet.cheatmd formatters lib dev LICENSE* mix.exs README.md),
       links: %{"GitHub" => @source_url}
     ]
   end
@@ -105,5 +106,4 @@ defmodule ExRoseTree.MixProject do
       {:benchee, "~> 1.1", only: :dev}
     ]
   end
-
 end

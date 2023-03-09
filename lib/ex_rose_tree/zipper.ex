@@ -331,6 +331,24 @@ defmodule ExRoseTree.Zipper do
     do: focus
 
   @doc """
+  Returns the term of the current focus of the Zipper.
+
+  A shortcut to using `ExRoseTree.get_term/1`.
+
+  ## Examples
+
+      iex> tree = ExRoseTree.new(5)
+      ...> z = ExRoseTree.Zipper.new(tree)
+      ...> ExRoseTree.Zipper.focused_term(z)
+      5
+
+  """
+  @doc section: :basic
+  @spec focused_term(t()) :: term()
+  def focused_term(%__MODULE__{focus: focus}),
+    do: ExRoseTree.get_term(focus)
+
+  @doc """
   Returns the depth (as zero-based index) of the current focus.
 
   ## Examples
@@ -383,10 +401,35 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :basic
   @spec set_focus(t(), ExRoseTree.t()) :: t()
-  def set_focus(z, new_focus)
-
   def set_focus(%__MODULE__{} = z, new_focus) when ExRoseTree.rose_tree?(new_focus),
     do: %{z | focus: new_focus}
+
+  @doc """
+  Sets the term of the current focus of the Zipper.
+
+  A shortcut to using `ExRoseTree.set_term/2` with `set_focus/2`.
+
+  ## Examples
+
+      iex> tree = ExRoseTree.new(5)
+      ...> z = ExRoseTree.Zipper.new(tree)
+      ...> ExRoseTree.Zipper.set_focused_term(z, 10)
+      %ExRoseTree.Zipper{
+        focus: %ExRoseTree{term: 10, children: []},
+        prev: [],
+        next: [],
+        path: []
+      }
+
+  """
+  @doc section: :basic
+  @spec set_focused_term(t(), term()) :: t()
+  def set_focused_term(%__MODULE__{} = z, new_term) do
+    with %ExRoseTree{} = new_focus <- ExRoseTree.set_term(z.focus, new_term),
+         %__MODULE__{} = new_zipper <- set_focus(z, new_focus) do
+      new_zipper
+    end
+  end
 
   @doc """
   Applies the given function to the current focus.
@@ -395,10 +438,15 @@ defmodule ExRoseTree.Zipper do
 
       iex> tree = ExRoseTree.new(5)
       ...> z = ExRoseTree.Zipper.new(tree)
-      ...> map_fn = &ExRoseTree.map_term(&1, fn term -> term * 2 end)
+      ...> map_fn = &ExRoseTree.set_children(&1, [6,7,8,9])
       ...> ExRoseTree.Zipper.map_focus(z, &map_fn.(&1))
       %ExRoseTree.Zipper{
-        focus: %ExRoseTree{term: 10, children: []},
+        focus: %ExRoseTree{term: 5, children: [
+          %ExRoseTree{term: 6, children: []},
+          %ExRoseTree{term: 7, children: []},
+          %ExRoseTree{term: 8, children: []},
+          %ExRoseTree{term: 9, children: []},
+        ]},
         prev: [],
         next: [],
         path: []
@@ -414,6 +462,34 @@ defmodule ExRoseTree.Zipper do
 
       _ ->
         raise ArgumentError, "map_fn must return a valid ExRoseTree struct"
+    end
+  end
+
+  @doc """
+  Applies the given function to the term of the current focus.
+
+  A shortcut to using `ExRoseTree.map_term/2` with `set_focus/2`.
+
+  ## Examples
+
+      iex> tree = ExRoseTree.new(5)
+      ...> z = ExRoseTree.Zipper.new(tree)
+      ...> map_fn = fn term -> term * 2 end
+      ...> ExRoseTree.Zipper.map_focused_term(z, &map_fn.(&1))
+      %ExRoseTree.Zipper{
+        focus: %ExRoseTree{term: 10, children: []},
+        prev: [],
+        next: [],
+        path: []
+      }
+
+  """
+  @doc section: :basic
+  @spec map_focused_term(t(), (term() -> term())) :: t()
+  def map_focused_term(%__MODULE__{} = z, map_fn) when is_function(map_fn) do
+    with %ExRoseTree{} = new_focus <- ExRoseTree.map_term(z.focus, map_fn),
+         %__MODULE__{} = new_zipper <- set_focus(z, new_focus) do
+      new_zipper
     end
   end
 
@@ -479,6 +555,95 @@ defmodule ExRoseTree.Zipper do
     }
 
     {shift_next, z.focus}
+  end
+
+  @doc """
+  Returns the children of the Zipper's current focus.
+
+  A shortcut to `ExRoseTree.get_children/1`.
+
+  ## Examples
+
+      iex> tree = ExRoseTree.new(5, [1,2,3,4])
+      ...> z = ExRoseTree.Zipper.new(tree)
+      ...> ExRoseTree.Zipper.focused_children(z)
+      [
+        %ExRoseTree{term: 1, children: []},
+        %ExRoseTree{term: 2, children: []},
+        %ExRoseTree{term: 3, children: []},
+        %ExRoseTree{term: 4, children: []}
+      ]
+
+  """
+  @doc section: :basic
+  @spec focused_children(t()) :: [ExRoseTree.t()]
+  def focused_children(%__MODULE__{focus: focus}),
+    do: ExRoseTree.get_children(focus)
+
+  @doc """
+  Sets the focused children to the given list of rose trees.
+
+  A shortcut to `ExRoseTree.set_children/2` and `set_focus/2`.
+
+  ## Examples
+
+      iex> tree = ExRoseTree.new(5, [1,2,3,4])
+      ...> z = ExRoseTree.Zipper.new(tree)
+      ...> new_children = for t <- [6,7,8,9], do: ExRoseTree.new(t)
+      ...> ExRoseTree.Zipper.set_focused_children(z, new_children)
+      %ExRoseTree.Zipper{
+        focus: %ExRoseTree{term: 5, children: [
+          %ExRoseTree{term: 6, children: []},
+          %ExRoseTree{term: 7, children: []},
+          %ExRoseTree{term: 8, children: []},
+          %ExRoseTree{term: 9, children: []}
+        ]},
+        prev: [],
+        next: [],
+        path: []
+      }
+
+  """
+  @doc section: :basic
+  @spec set_focused_children(t(), [ExRoseTree.t()]) :: t()
+  def set_focused_children(%__MODULE__{} = z, new_children) when is_list(new_children) do
+    with %ExRoseTree{} = new_focus <- ExRoseTree.set_children(z.focus, new_children),
+         %__MODULE__{} = new_zipper <- set_focus(z, new_focus) do
+      new_zipper
+    end
+  end
+
+  @doc """
+  Applies the given function to the focused children of the current focus.
+
+  A shortcut to `ExRoseTree.map_children/2` and `set_focus/2`.
+
+  ## Examples
+
+      iex> tree = ExRoseTree.new(5, [1,2,3,4])
+      ...> z = ExRoseTree.Zipper.new(tree)
+      ...> map_fn = &ExRoseTree.map_term(&1, fn x -> x * 2 end)
+      ...> ExRoseTree.Zipper.map_focused_children(z, map_fn)
+      %ExRoseTree.Zipper{
+        focus: %ExRoseTree{term: 5, children: [
+          %ExRoseTree{term: 2, children: []},
+          %ExRoseTree{term: 4, children: []},
+          %ExRoseTree{term: 6, children: []},
+          %ExRoseTree{term: 8, children: []}
+        ]},
+        prev: [],
+        next: [],
+        path: []
+      }
+
+  """
+  @doc section: :basic
+  @spec map_focused_children(t(), (ExRoseTree.t() -> ExRoseTree.t())) :: t()
+  def map_focused_children(%__MODULE__{} = z, map_fn) when is_function(map_fn) do
+    with %ExRoseTree{} = new_focus <- ExRoseTree.map_children(z.focus, map_fn),
+         %__MODULE__{} = new_zipper <- set_focus(z, new_focus) do
+      new_zipper
+    end
   end
 
   @doc """
@@ -752,27 +917,6 @@ defmodule ExRoseTree.Zipper do
   ###
 
   @doc """
-  Returns the children of the Zipper's current focus.
-
-  ## Examples
-
-      iex> tree = ExRoseTree.new(5, [1,2,3,4])
-      ...> z = ExRoseTree.Zipper.new(tree)
-      ...> ExRoseTree.Zipper.children(z)
-      [
-        %ExRoseTree{term: 1, children: []},
-        %ExRoseTree{term: 2, children: []},
-        %ExRoseTree{term: 3, children: []},
-        %ExRoseTree{term: 4, children: []}
-      ]
-
-  """
-  @doc section: :descendants
-  @spec children(t()) :: [ExRoseTree.t()]
-  def children(%__MODULE__{focus: focus}),
-    do: ExRoseTree.get_children(focus)
-
-  @doc """
   Moves focus to the first child. If there are no children, and this is
   a leaf, returns nil.
 
@@ -816,7 +960,7 @@ defmodule ExRoseTree.Zipper do
       do: nil
 
   def first_child(%__MODULE__{} = z, predicate) when is_function(predicate) do
-    children = children(z)
+    children = focused_children(z)
 
     case Util.split_when(children, predicate) do
       {[], []} ->
@@ -865,7 +1009,7 @@ defmodule ExRoseTree.Zipper do
   def last_child(%__MODULE__{} = z, predicate) when is_function(predicate) do
     children =
       z
-      |> children()
+      |> focused_children()
       |> Enum.reverse()
 
     case Util.split_when(children, predicate) do
@@ -910,7 +1054,7 @@ defmodule ExRoseTree.Zipper do
       do: nil
 
   def child_at(%__MODULE__{} = z, index) when is_integer(index) do
-    children = children(z)
+    children = focused_children(z)
 
     case Util.split_at(children, index) do
       {[], []} ->
