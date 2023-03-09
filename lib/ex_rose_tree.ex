@@ -139,9 +139,9 @@ defmodule ExRoseTree do
 
   ## Examples
 
-    iex> tree = ExRoseTree.new(5)
-    ...> ExRoseTree.get_term(tree)
-    5
+      iex> tree = ExRoseTree.new(5)
+      ...> ExRoseTree.get_term(tree)
+      5
 
   """
   @doc section: :term
@@ -153,9 +153,9 @@ defmodule ExRoseTree do
 
   ## Examples
 
-    iex> tree = ExRoseTree.new(5)
-    ...> ExRoseTree.set_term(tree, "five")
-    %ExRoseTree{term: "five", children: []}
+      iex> tree = ExRoseTree.new(5)
+      ...> ExRoseTree.set_term(tree, "five")
+      %ExRoseTree{term: "five", children: []}
 
   """
   @doc section: :term
@@ -208,14 +208,14 @@ defmodule ExRoseTree do
 
   ## Examples
 
-    iex> tree = ExRoseTree.new(5, [4,3,2,1])
-    ...> ExRoseTree.get_children(tree)
-    [
-      %ExRoseTree{term: 4, children: []},
-      %ExRoseTree{term: 3, children: []},
-      %ExRoseTree{term: 2, children: []},
-      %ExRoseTree{term: 1, children: []}
-    ]
+      iex> tree = ExRoseTree.new(5, [4,3,2,1])
+      ...> ExRoseTree.get_children(tree)
+      [
+        %ExRoseTree{term: 4, children: []},
+        %ExRoseTree{term: 3, children: []},
+        %ExRoseTree{term: 2, children: []},
+        %ExRoseTree{term: 1, children: []}
+      ]
 
   """
   @doc section: :children
