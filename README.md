@@ -4,6 +4,10 @@
 
 <!-- README START -->
 
+### Documentation
+
+API documentation is available at https://hexdocs.pm/ex_rose_tree
+
 ### What's a Rose Tree?
 
 A [Rose Tree](https://en.wikipedia.org/wiki/Rose_tree), also known as a multi-way or m-way tree
@@ -157,21 +161,63 @@ Zipper.to_tree(zipper)
 # }
 ```
 
-## Testing
+## Testing and Disclaimer
 
-While great pains have been taken to provide extensive test coverage--over 800 tests at present, this library is still in its infancy and
-is not yet used in a production setting. 
+While great pains have been taken to provide extensive test coverage--over 800 
+tests at present, this library is still pre-1.0, so be sure to do your due diligence 
+for your own use case. 
 
-## Contributions & Further Development
+To run the test suite:
 
-Additional functionality may be useful to add, including diffing algorithms, multiple cursor support (ie: multiple, concurrent
-contexts on a Zipper), LiveBook examples, visualizations of the many traversal functions, improvements to the generators, more unit tests, performance improvements, and so on. I'm open to any and all ideas and contribution here, so don't hesitate to pipe in, and please be sure to follow our [Code of Conduct](./CODE_OF_CONDUCT.md).
+```bash
+$ mix deps.get
+$ mix test
+```
+
+To run test coverage with [excoveralls](https://github.com/parroty/excoveralls):
+
+```bash
+$ mix deps.get
+$ mix coveralls
+```
+
+or for HTML output:
+
+```bash
+$ mix deps.get
+$ MIX_ENV=test mix coveralls.html
+```
+
+## Contributions, Issues, and Further Development
+
+Additional functionality and work to explore adding include:
+
+* Tree diffing and merging algorithms
+* Multiple cursor support (ie: multiple, concurrent contexts on a Zipper)
+* LiveBook examples
+* Visualizations of the many traversal functions
+* Improvements to the generators
+* Even more unit tests, including property tests
+* Performance improvements and benchmarks
+* Change tracking and pluggable backends for persistence
+* Documentation, guide, and example improvement, clarification, and cohesion
+
+We're open to any and all ideas and thoughtful [contribution](/CONTRIBUTING.md) here, 
+so don't hesitate to pipe in, but please be sure to follow our [Code of Conduct](/CODE_OF_CONDUCT.md). 
+If you find a bug or it doesn't quite meet your needs without feature X, consider 
+opening an issue in the issues tracker. 
+
+## Thanks
+
+A big thanks to [@zwilias](https://github.com/zwilias) and his Elm package 
+[elm-rosetree](https://github.com/zwilias/elm-rosetree/tree/1.5.0) for the 
+initial inspiration in building this library. 
 
 ## Copyright and License
 
 Copyright (c) 2022-present, Paraclade, LLC.
 
-ExRoseTree source code is licensed under the [Apache License 2.0](./LICENSE).
+ExRoseTree source code is licensed under the [Apache License 2.0](/LICENSE).
 
 <!-- README END -->
 

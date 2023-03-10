@@ -1,6 +1,6 @@
 defmodule ExRoseTree.Zipper.Location do
   @moduledoc """
-  A Location in the Path from the root of the ExRoseTree Zipper to its
+  A `Location` in the `path` from the root of the `ExRoseTree.Zipper` to its
   current context.
   """
 
@@ -9,9 +9,7 @@ defmodule ExRoseTree.Zipper.Location do
   defstruct ~w(prev term next)a
 
   @typedoc """
-  A `Location` is made up of three fields, the `term` of a `ExRoseTree`,
-  and `prev` siblings and `next` siblings, both of which are lists of
-  `ExRoseTree`.
+  A `Location` is made up of the `term` of an `ExRoseTree` with lists of `prev` and `next` siblings.
 
   * `term` is a `ExRoseTree` `term`.
   * `prev` is a list of `ExRoseTree`s. They are the siblings that

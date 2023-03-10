@@ -1,7 +1,6 @@
 defmodule ExRoseTree.Zipper do
   @moduledoc """
-  Includes both basic and highly specialized functionality for both manipulation
-  of a Zipper's current context and traversal across the data.
+  A context-aware zipper for advanced traversal and manipulation of an `ExRoseTree`.
 
   Accompanying the Zipper are a large number of both navigation primitives and more complex
   traversal functions built out of said primitives. An attempt has been made at providing
