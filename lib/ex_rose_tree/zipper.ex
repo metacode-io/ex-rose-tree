@@ -2,7 +2,7 @@ defmodule ExRoseTree.Zipper do
   @moduledoc """
   A context-aware zipper for advanced traversal and manipulation of an `ExRoseTree`.
 
-  Accompanying the Zipper are a large number of both navigation primitives and more complex
+  Accompanying the `Zipper` are a large number of both navigation primitives and more complex
   traversal functions built out of said primitives. An attempt has been made at providing
   semantically meaningful names for these primitives, drawing from gender-neutral, familial
   taxonomy (with a few liberties taken in creating neolisms to better suit the domain here),
@@ -24,7 +24,7 @@ defmodule ExRoseTree.Zipper do
   will search, starting from the 0-th (first) index, the list of siblings that occur _before but not after_
   the current context for the first occurrence of a sibling with a `term` value equal to `5`. If
   none are found, the context will not have been moved, and the function returns `nil`. Note, the
-  predicate function will default to `Util.always/1`, which always returns true. When using the default
+  predicate function will default to `Util.always/1`, which always returns `true`. When using the default
   predicate (in essence, not using a predicate) with this example, `ExRoseTree.Zipper.first_sibling(zipper)`,
   the function will simply move the context to the first sibling of the initial context. If the are no
   previous siblings, it will return `nil`.
@@ -51,7 +51,7 @@ defmodule ExRoseTree.Zipper do
   ]
 
   @typedoc """
-  The Zipper struct represents a contextual position within a `ExRoseTree`.
+  The `Zipper` struct represents a contextual position within a `ExRoseTree`.
 
   It includes the following important pieces:
   * `focus` - the current _focus_ or _context_ within the `ExRoseTree.Zipper`. Its
@@ -63,7 +63,7 @@ defmodule ExRoseTree.Zipper do
     `ExRoseTree`s and is maintained in standard order.
   * `path` - all direct ancestors of the the current `focus` back to the root node.
     It's type is a list of `ExRoseTree.Zipper.Location`s and is maintained in standard order.
-    If the `path` is an empty list, then the Zipper is focused at the root node.
+    If the `path` is an empty list, then the `Zipper` is focused at the root node.
   """
   @type t :: %__MODULE__{
           focus: ExRoseTree.t(),
@@ -118,7 +118,7 @@ defmodule ExRoseTree.Zipper do
   ###
 
   @doc """
-  Returns an empty Zipper.
+  Returns an empty `Zipper`.
 
   ## Examples
 
@@ -147,7 +147,7 @@ defmodule ExRoseTree.Zipper do
   Optionally take a list of previous and next sibling trees when
   using the `:prev` and `:next` keyword options.
 
-  > Note that a zipper maintains the list of previous siblings in
+  > Note that a `Zipper` maintains the list of previous siblings in
   > reverse order internally, and this function performs that reversal
   > itself, so do not pre-reverse your list of previous siblings when
   > using that option!
@@ -236,7 +236,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Moves a Zipper back to the root and returns the current focus, the root `ExRoseTree`.
+  Moves a `Zipper` back to the root and returns the current focus, the root `ExRoseTree`.
 
   ## Examples
 
@@ -264,9 +264,9 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Moves a Zipper back to the root and returns a 2-tuple containing first, a
+  Moves a `Zipper` back to the root and returns a 2-tuple containing first, a
   list containing the previous siblings to the original root and second, a list
-  containing the original root followed by its next siblings.
+  containing the original root followed by its `next` siblings.
 
   ## Examples
 
@@ -297,8 +297,8 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Returns whether or not the current Zipper is at the root of the tree.
-  A Zipper is considered at the root when it has no Locations in its path.
+  Returns whether or not the current `Zipper` is at the root of the tree.
+  A `Zipper` is considered at the root when it has no `Location`s in its path.
 
   ## Examples
 
@@ -314,7 +314,7 @@ defmodule ExRoseTree.Zipper do
   def root?(_), do: false
 
   @doc """
-  Returns the current focus of the Zipper.
+  Returns the current focus of the `Zipper`.
 
   ## Examples
 
@@ -330,7 +330,7 @@ defmodule ExRoseTree.Zipper do
     do: focus
 
   @doc """
-  Returns the term of the current focus of the Zipper.
+  Returns the `term` of the current focus of the `Zipper`.
 
   A shortcut to using `ExRoseTree.get_term/1`.
 
@@ -383,7 +383,7 @@ defmodule ExRoseTree.Zipper do
     do: Enum.count(prev)
 
   @doc """
-  Sets the current focus of the zipper to the given ExRoseTree.
+  Sets the current focus of the `Zipper` to the given `ExRoseTree`.
 
   ## Examples
 
@@ -404,7 +404,7 @@ defmodule ExRoseTree.Zipper do
     do: %{zipper | focus: new_focus}
 
   @doc """
-  Sets the term of the current focus of the Zipper.
+  Sets the `term` of the current focus of the `Zipper`.
 
   A shortcut to using `ExRoseTree.set_term/2` with `set_focus/2`.
 
@@ -465,7 +465,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Applies the given function to the term of the current focus.
+  Applies the given function to the `term` of the current focus.
 
   A shortcut to using `ExRoseTree.map_term/2` with `set_focus/2`.
 
@@ -498,8 +498,8 @@ defmodule ExRoseTree.Zipper do
   2. else the previous sibling, if one exists,
   3. else the parent, if one exists
 
-  If none of those conditions exist, it will return an empty zipper. In any case,
-  the new zipper will be returned as the first item in a tuple, while the removed
+  If none of those conditions exist, it will return an empty `Zipper`. In any case,
+  the new `Zipper` will be returned as the first item in a tuple, while the removed
   focus will be returned as the second item.
 
   ## Examples
@@ -557,7 +557,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Returns the children of the Zipper's current focus.
+  Returns the children of the `Zipper`'s current focus.
 
   A shortcut to `ExRoseTree.get_children/1`.
 
@@ -646,8 +646,8 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Applies the given function to path of locations from the current focus back to the root
-  without moving the zipper.
+  Applies the given function to path of `Location`s from the current focus back to the root
+  without moving the `Zipper`.
 
   ## Examples
 
@@ -683,7 +683,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Builds a new location out of the current zipper.
+  Builds a new `Location` out of the current `Zipper`.
 
   ## Examples
 
@@ -710,7 +710,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Builds a new Zipper from a list of Locations.
+  Builds a new `Zipper` from a list of `Location`s.
 
   ## Examples
 
@@ -750,7 +750,7 @@ defmodule ExRoseTree.Zipper do
   @doc """
   Returns the index (zero-based) of the current focus' parent with
   respect to any potentital siblings it may have. If the current
-  focus has no parent, returns nil.
+  focus has no parent, returns `nil`.
 
   ## Examples
 
@@ -772,7 +772,7 @@ defmodule ExRoseTree.Zipper do
   @doc """
   Returns the index (zero-based) of the current focus' grandparent with
   respect to any potentital siblings it may have. If the current
-  focus has no grandparent, returns nil.
+  focus has no grandparent, returns `nil`.
 
   ## Examples
 
@@ -795,7 +795,7 @@ defmodule ExRoseTree.Zipper do
     do: Location.index_of_term(grandparent)
 
   @doc """
-  Returns the current zipper's parent location.
+  Returns the current `Zipper`'s parent `Location`.
 
   ## Examples
       iex> loc_trees = for n <- [4,3,2,1], do: ExRoseTree.new(n)
@@ -813,7 +813,7 @@ defmodule ExRoseTree.Zipper do
   def parent_location(%__MODULE__{path: [parent | _]}), do: parent
 
   @doc """
-  Returns the term in the current zipper's parent location.
+  Returns the `term` in the current `Zipper`'s parent `Location`.
 
   ## Examples
       iex> loc_trees = for n <- [4,3,2,1], do: ExRoseTree.new(n)
@@ -831,8 +831,8 @@ defmodule ExRoseTree.Zipper do
   def parent_term(%__MODULE__{path: [parent | _]}), do: parent.term
 
   @doc """
-  Moves the focus to the parent Location. If at the root, thus no
-  parent, returns nil.
+  Moves the focus to the parent `Location`. If at the root, thus no
+  parent, returns `nil`.
 
   ## Examples
 
@@ -881,7 +881,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the grandparent -- the parent of the parent -- of
-  the focus, if possible. If there is no grandparent, returns nil.
+  the focus, if possible. If there is no grandparent, returns `nil`.
   """
   @doc section: :ancestors
   @spec grandparent(t()) :: t() | nil
@@ -897,7 +897,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the great-grandparent -- parent of the grand-parent -- of
-  the focus, if available. If there is no great-grandparent, returns nil.
+  the focus, if available. If there is no great-grandparent, returns `nil`.
   """
   @doc section: :ancestors
   @spec great_grandparent(t()) :: t() | nil
@@ -917,7 +917,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves focus to the first child. If there are no children, and this is
-  a leaf, returns nil.
+  a leaf, returns `nil`.
 
   ## Examples
 
@@ -978,7 +978,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves focus to the last child. If there are no children, and this is
-  a leaf, returns nil.
+  a leaf, returns `nil`.
 
   ## Examples
 
@@ -1028,7 +1028,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves focus to the child at the specified index. If there are no children,
-  or if the child does not exist at the index, returns nil.
+  or if the child does not exist at the index, returns `nil`.
 
   ## Examples
 
@@ -1074,7 +1074,7 @@ defmodule ExRoseTree.Zipper do
   first child -- of the focus. If there are no grandchildren, moves to
   the next sibling of the first child and looks for that tree's first
   child. This repeats until the first grandchild is found or it returns
-  nil if none are found.
+  `nil` if none are found.
   """
   @doc section: :descendants
   @spec first_grandchild(t(), predicate()) :: t() | nil
@@ -1109,7 +1109,7 @@ defmodule ExRoseTree.Zipper do
   last child -- of the focus. If there are no grandchildren, moves to
   the previous sibling of the last child and looks for that tree's last
   child. This repeats until the first grandchild is found or it returns
-  nil if none are found.
+  `nil` if none are found.
   """
   @doc section: :descendants
   @spec last_grandchild(t(), predicate()) :: t() | nil
@@ -1144,7 +1144,7 @@ defmodule ExRoseTree.Zipper do
   first grandchild -- of the focus. If there are no great-grandchildren, moves to
   the next sibling of the first grandchild and looks for that tree's first
   child. This repeats until the first great-grandchild is found or it returns
-  nil if none are found.
+  `nil` if none are found.
   """
   @doc section: :descendants
   @spec first_great_grandchild(t(), predicate()) :: t() | nil
@@ -1180,7 +1180,7 @@ defmodule ExRoseTree.Zipper do
   last grandchild -- of the focus. If there are no great-grandchildren,
   moves to the previous sibling of the last grandchild and looks for that tree's
   last child. This repeats until the last great-grandchild is found or it
-  returns nil if none are found.
+  returns `nil` if none are found.
   """
   @doc section: :descendants
   @spec last_great_grandchild(t(), predicate()) :: t() | nil
@@ -1349,7 +1349,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Applies the given function to all previous siblings of the current focus without
-  moving the zipper.
+  moving the `Zipper`.
 
   ## Examples
 
@@ -1386,8 +1386,8 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Applies the given function to all next siblings of the current focus without
-  moving the zipper.
+  Applies the given function to all `next` siblings of the current focus without
+  moving the `Zipper`.
 
   ## Examples
 
@@ -1435,7 +1435,7 @@ defmodule ExRoseTree.Zipper do
     do: %{z | prev: z.prev ++ [ExRoseTree.new(sibling)]}
 
   @doc """
-  Appends a new sibling to the Zipper's `next` siblings.
+  Appends a new sibling to the `Zipper`'s `next` siblings.
   """
   @doc section: :siblings
   @spec append_last_sibling(t(), term()) :: t()
@@ -1446,7 +1446,7 @@ defmodule ExRoseTree.Zipper do
     do: %{z | next: z.next ++ [ExRoseTree.new(sibling)]}
 
   @doc """
-  Appends a new sibling to the Zipper's `prev` siblings.
+  Appends a new sibling to the `Zipper`'s `prev` siblings.
   """
   @doc section: :siblings
   @spec append_previous_sibling(t(), term()) :: t()
@@ -1457,7 +1457,7 @@ defmodule ExRoseTree.Zipper do
     do: %{z | prev: [ExRoseTree.new(sibling) | z.prev]}
 
   @doc """
-  Prepends a new sibling to the Zipper's `next` siblings.
+  Prepends a new sibling to the `Zipper`'s `next` siblings.
   """
   @doc section: :siblings
   @spec prepend_next_sibling(t(), term()) :: t()
@@ -1468,7 +1468,7 @@ defmodule ExRoseTree.Zipper do
     do: %{z | next: [ExRoseTree.new(sibling) | z.next]}
 
   @doc """
-  Inserts a new sibling in the Zipper's `prev` siblings at the given index.
+  Inserts a new sibling in the `Zipper`'s `prev` siblings at the given index.
   """
   @doc section: :siblings
   @spec insert_previous_sibling_at(t(), term(), integer()) :: t()
@@ -1492,7 +1492,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Inserts a new sibling in the Zipper's `next` siblings at the given index.
+  Inserts a new sibling in the `Zipper`'s `next` siblings at the given index.
   """
   @doc section: :siblings
   @spec insert_next_sibling_at(t(), term(), integer()) :: t()
@@ -1511,7 +1511,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Removes the first sibling from the Zipper.
+  Removes the first sibling from the `Zipper`.
   """
   @doc section: :siblings
   @spec pop_first_sibling(t()) :: {t(), ExRoseTree.t() | nil}
@@ -1523,7 +1523,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Removes the previous sibling from the Zipper.
+  Removes the previous sibling from the `Zipper`.
   """
   @doc section: :siblings
   @spec pop_previous_sibling(t()) :: {t(), ExRoseTree.t() | nil}
@@ -1533,7 +1533,7 @@ defmodule ExRoseTree.Zipper do
     do: {%{z | prev: new_siblings}, previous}
 
   @doc """
-  Removes the last sibling from the Zipper.
+  Removes the last sibling from the `Zipper`.
   """
   @doc section: :siblings
   @spec pop_last_sibling(t()) :: {t(), ExRoseTree.t() | nil}
@@ -1545,7 +1545,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Removes the next sibling from the Zipper.
+  Removes the next sibling from the `Zipper`.
   """
   @doc section: :siblings
   @spec pop_next_sibling(t()) :: {t(), ExRoseTree.t() | nil}
@@ -1555,7 +1555,7 @@ defmodule ExRoseTree.Zipper do
     do: {%{z | next: new_siblings}, next}
 
   @doc """
-  Removes a sibling from the Zipper's `prev` siblings at the given index.
+  Removes a sibling from the `Zipper`'s `prev` siblings at the given index.
   """
   @doc section: :siblings
   @spec pop_previous_sibling_at(t(), integer()) :: {t(), ExRoseTree.t() | nil}
@@ -1587,7 +1587,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Removes a sibling from the Zipper's `next` siblings at the given index.
+  Removes a sibling from the `Zipper`'s `next` siblings at the given index.
   """
   @doc section: :siblings
   @spec pop_next_sibling_at(t(), integer()) :: {t(), ExRoseTree.t() | nil}
@@ -1620,7 +1620,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves focus to the first sibling from the current focus. If there are
-  no more siblings before the current focus, returns nil.
+  no more siblings before the current focus, returns `nil`.
 
   ## Examples
 
@@ -1672,7 +1672,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves focus to the previous sibling to the current focus. If there are
-  no more siblings before the current focus, returns nil.
+  no more siblings before the current focus, returns `nil`.
 
   ## Examples
 
@@ -1723,7 +1723,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves focus to the last sibling from the current focus. If there are
-  no more siblings after the current focus, returns nil.
+  no more siblings after the current focus, returns `nil`.
 
   ## Examples
 
@@ -1775,7 +1775,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves focus to the next sibling of the current focus. If there are
-  no more siblings after the current focus, returns nil.
+  no more siblings after the current focus, returns `nil`.
 
   ## Examples
 
@@ -1827,7 +1827,7 @@ defmodule ExRoseTree.Zipper do
   @doc """
   Moves focus to the sibling of the current focus at the given index.
   If no sibling is found at that index, or if the provided index
-  is the index for the current focus, returns nil.
+  is the index for the current focus, returns `nil`.
 
   ## Examples
 
@@ -1888,7 +1888,7 @@ defmodule ExRoseTree.Zipper do
   @doc """
   Moves the focus to the first nibling -- the first child of the
   first sibling with children -- before the current focus. If not
-  found, returns nil.
+  found, returns `nil`.
   """
   @doc section: :niblings
   @spec first_nibling(t(), predicate()) :: t() | nil
@@ -1905,7 +1905,7 @@ defmodule ExRoseTree.Zipper do
   @doc """
   Moves the focus to the last nibling -- the last child of the
   last sibling  with children -- before the current focus. If not
-  found, returns nil.
+  found, returns `nil`.
   """
   @doc section: :niblings
   @spec last_nibling(t(), predicate()) :: t() | nil
@@ -1922,7 +1922,7 @@ defmodule ExRoseTree.Zipper do
   @doc """
   Moves the focus to the previous nibling -- the last child of the
   first previous sibling with children -- before the current focus.
-  If not found, returns nil.
+  If not found, returns `nil`.
   """
   @doc section: :niblings
   @spec previous_nibling(t(), predicate()) :: t() | nil
@@ -1940,7 +1940,7 @@ defmodule ExRoseTree.Zipper do
   @doc """
   Moves the focus to the next nibling -- the first child of the
   first next sibling with children -- before the current focus.
-  If not found, returns nil.
+  If not found, returns `nil`.
   """
   @doc section: :niblings
   @spec next_nibling(t(), predicate()) :: t() | nil
@@ -1957,7 +1957,7 @@ defmodule ExRoseTree.Zipper do
   @doc """
   Moves the focus to the first nibling for a specific sibling -- the
   first child of the sibling at the given index -- of the current focus.
-  If not found, returns nil.
+  If not found, returns `nil`.
   """
   @doc section: :niblings
   @spec first_nibling_at_sibling(t(), non_neg_integer(), predicate()) :: t() | nil
@@ -1975,7 +1975,7 @@ defmodule ExRoseTree.Zipper do
   @doc """
   Moves the focus to the last nibling for a specific sibling -- the
   last child of the sibling at the given index -- of the current focus.
-  If not found, returns nil.
+  If not found, returns `nil`.
   """
   @doc section: :niblings
   @spec last_nibling_at_sibling(t(), non_neg_integer(), predicate()) :: t() | nil
@@ -1992,7 +1992,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the previous grand-nibling -- the last grandchild of
-  the previous sibling -- of the current focus. If not found, returns nil.
+  the previous sibling -- of the current focus. If not found, returns `nil`.
   """
   @doc section: :niblings
   @spec previous_grandnibling(t(), predicate()) :: t() | nil
@@ -2019,7 +2019,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the next grand-nibling -- the first grandchild of
-  the next sibling -- of the current focus. If not found, returns nil.
+  the next sibling -- of the current focus. If not found, returns `nil`.
   """
   @doc section: :niblings
   @spec next_grandnibling(t(), predicate()) :: t() | nil
@@ -2262,7 +2262,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the first pibling -- the first sibling of the parent --
-  of the current focus. If not found, returns nil.
+  of the current focus. If not found, returns `nil`.
   """
   @doc section: :piblings
   @spec first_pibling(t(), predicate()) :: t() | nil
@@ -2278,7 +2278,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the last pibling -- the last sibling of the parent --
-  of the current focus. If not found, returns nil.
+  of the current focus. If not found, returns `nil`.
   """
   @doc section: :piblings
   @spec last_pibling(t(), predicate()) :: t() | nil
@@ -2294,7 +2294,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the previous pibling -- the previous sibling of the parent --
-  of the current focus. If not found, returns nil.
+  of the current focus. If not found, returns `nil`.
   """
   @doc section: :piblings
   @spec previous_pibling(t(), predicate()) :: t() | nil
@@ -2311,7 +2311,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the next pibling -- the next sibling of the parent --
-  of the current focus. If not found, returns nil.
+  of the current focus. If not found, returns `nil`.
   """
   @doc section: :piblings
   @spec next_pibling(t(), predicate()) :: t() | nil
@@ -2327,7 +2327,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the pibling of the current focus at the given index.
-  If no pibling is found at that index, returns nil.
+  If no pibling is found at that index, returns `nil`.
   """
   @doc section: :piblings
   @spec pibling_at(t(), non_neg_integer()) :: t() | nil
@@ -2343,7 +2343,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the first grandpibling -- the first sibling of the grandparent --
-  of the current focus. If not found, returns nil.
+  of the current focus. If not found, returns `nil`.
   """
   @doc section: :piblings
   @spec first_grandpibling(t(), predicate()) :: t() | nil
@@ -2360,7 +2360,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the last grandpibling -- the last sibling of the grandparent --
-  of the current focus. If not found, returns nil.
+  of the current focus. If not found, returns `nil`.
   """
   @doc section: :piblings
   @spec last_grandpibling(t(), predicate()) :: t() | nil
@@ -2377,7 +2377,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the previous grandpibling -- the previous sibling of the grandparent --
-  of the current focus. If not found, returns nil.
+  of the current focus. If not found, returns `nil`.
   """
   @doc section: :piblings
   @spec previous_grandpibling(t(), predicate()) :: t() | nil
@@ -2394,7 +2394,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the next grandpibling -- the next sibling of the grandparent --
-  of the current focus. If not found, returns nil.
+  of the current focus. If not found, returns `nil`.
   """
   @doc section: :piblings
   @spec next_grandpibling(t(), predicate()) :: t() | nil
@@ -2486,7 +2486,7 @@ defmodule ExRoseTree.Zipper do
   if a first pibling is not found for the parent, it will search the grandparent. If
   one is not found for the grandparent, it will search the great-grandparent. And so on,
   until it reaches the root. If the root is reached and it does not have a first pibling,
-  the function returns nil.
+  the function returns `nil`.
   """
   @doc section: :piblings
   @spec first_ancestral_pibling(t(), predicate()) :: t() | nil
@@ -2512,7 +2512,7 @@ defmodule ExRoseTree.Zipper do
   if a previous pibling is not found for the parent, it will search the grandparent. If
   one is not found for the grandparent, it will search the great-grandparent. And so on,
   until it reaches the root. If the root is reached and it does not have a previous pibling,
-  the function returns nil.
+  the function returns `nil`.
   """
   @doc section: :piblings
   @spec previous_ancestral_pibling(t(), predicate()) :: t() | nil
@@ -2538,7 +2538,7 @@ defmodule ExRoseTree.Zipper do
   if a next pibling is not found for the parent, it will search the grandparent. If
   one is not found for the grandparent, it will search the great-grandparent. And so on,
   until it reaches the root. If the root is reached and it does not have a next pibling,
-  the function returns nil.
+  the function returns `nil`.
   """
   @doc section: :piblings
   @spec next_ancestral_pibling(t(), predicate()) :: t() | nil
@@ -2564,7 +2564,7 @@ defmodule ExRoseTree.Zipper do
   if a last pibling is not found for the parent, it will search the grandparent. If
   one is not found for the grandparent, it will search the great-grandparent. And so on,
   until it reaches the root. If the root is reached and it does not have a last pibling,
-  the function returns nil.
+  the function returns `nil`.
   """
   @doc section: :piblings
   @spec last_ancestral_pibling(t(), predicate()) :: t() | nil
@@ -2591,7 +2591,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the first first-cousin -- the first child of the first
-  pibling with children -- of the current focus. If not found, returns nil.
+  pibling with children -- of the current focus. If not found, returns `nil`.
   """
   @doc section: :first_cousins
   @spec first_first_cousin(t(), predicate()) :: t() | nil
@@ -2628,7 +2628,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the last first-cousin -- the last child of the last
-  pibling with children -- of the current focus. If not found, returns nil.
+  pibling with children -- of the current focus. If not found, returns `nil`.
   """
   @doc section: :first_cousins
   @spec last_first_cousin(t(), predicate()) :: t() | nil
@@ -2665,7 +2665,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the previous first-cousin -- the last child of the
-  previous pibling with children -- of the current focus. If not found, returns nil.
+  previous pibling with children -- of the current focus. If not found, returns `nil`.
   """
   @doc section: :first_cousins
   @spec previous_first_cousin(t(), predicate()) :: t() | nil
@@ -2697,7 +2697,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the next first-cousin -- the first child of the
-  next pibling with children -- of the current focus. If not found, returns nil.
+  next pibling with children -- of the current focus. If not found, returns `nil`.
   """
   @doc section: :first_cousins
   @spec next_first_cousin(t(), predicate()) :: t() | nil
@@ -2734,7 +2734,7 @@ defmodule ExRoseTree.Zipper do
   @doc """
   Moves the focus to the first second-cousin -- the first grandchild of
   the first grandpibling with grandchildren -- of the current focus. If not
-  found, returns nil.
+  found, returns `nil`.
   """
   @doc section: :second_cousins
   @spec first_second_cousin(t(), predicate()) :: t() | nil
@@ -2772,7 +2772,7 @@ defmodule ExRoseTree.Zipper do
   @doc """
   Moves the focus to the last second-cousin -- the last grandchild of
   the last grandpibling with grandchildren -- of the current focus. If not
-  found, returns nil.
+  found, returns `nil`.
   """
   @doc section: :second_cousins
   @spec last_second_cousin(t(), predicate()) :: t() | nil
@@ -2809,7 +2809,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the previous second-cousin -- the last grandchild of the
-  previous grandpibling with grandchildren -- of the current focus. If not found, returns nil.
+  previous grandpibling with grandchildren -- of the current focus. If not found, returns `nil`.
   """
   @doc section: :second_cousins
   @spec previous_second_cousin(t(), predicate()) :: t() | nil
@@ -2841,7 +2841,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves the focus to the next second-cousin -- the first grandchild of the
-  next grandpibling with grandchildren -- of the current focus. If not found, returns nil.
+  next grandpibling with grandchildren -- of the current focus. If not found, returns `nil`.
   """
   @doc section: :second_cousins
   @spec next_second_cousin(t(), predicate()) :: t() | nil
@@ -2897,13 +2897,13 @@ defmodule ExRoseTree.Zipper do
 
   High level steps:
 
-  1. Ascend `path` to find highest location with `prev` siblings.
+  1. Ascend `path` to find highest `Location` with `prev` siblings.
   2. Starting with the first sibling, check each subtree from left to right,
       and if you reach the target depth and find a tree that satisifies any
       given predicate, stop there. Otherwise, continue left to right.
-  3. If you return back to the starting Location, descend the `path` to next
-      deepest Location and set as starting Location. Goto step 2.
-  4. If you return back to starting Location, and it is also the ending Location,
+  3. If you return back to the starting `Location`, descend the `path` to next
+      deepest `Location` and set as starting `Location`. Goto step 2.
+  4. If you return back to starting `Location`, and it is also the ending `Location`,
       and you have not found a suitable note at the right depth, you will not find one.
   """
   @doc section: :extended_cousins
@@ -3871,9 +3871,9 @@ defmodule ExRoseTree.Zipper do
   def move_for(%__MODULE__{}, _move_fn, _reps), do: nil
 
   @doc """
-  Moves a direction in the Zipper, determined by the `move_fn()`, if
-  and only if the provided predicate function returns true when applied
-  to the next node. Otherwise, returns nil.
+  Moves a direction in the `Zipper`, determined by the `move_fn()`, if
+  and only if the provided predicate function returns `true` when applied
+  to the next node. Otherwise, returns `nil`.
   """
   @doc section: :traversal
   @spec move_if(t(), move_fn(), predicate()) :: t() | nil
@@ -3893,9 +3893,9 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Continuously moves a direction in the Zipper, determined by the `move_fn()`,
-  until the provided predicate function returns true when applied to the next
-  node. Otherwise, returns nil.
+  Continuously moves a direction in the `Zipper`, determined by the `move_fn()`,
+  until the provided predicate function returns `true` when applied to the next
+  node. Otherwise, returns `nil`.
   """
   @doc section: :traversal
   @spec move_until(t(), move_fn(), predicate()) :: t() | nil
@@ -3915,7 +3915,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Repeats the given `move_fn()` while the given predicate remains true.
+  Repeats the given `move_fn()` while the given predicate remains `true`.
   If no custom predicate is given, the `move_fn()` will repeat until it no
   longer can.
   """
@@ -3958,8 +3958,8 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Traverses the Zipper using the provided `move_fn()` and maps the `term`
-  at each node using the provided `map_fn()`. Returns the new Zipper with
+  Traverses the `Zipper` using the provided `move_fn()` and maps the `term`
+  at each node using the provided `map_fn()`. Returns the new `Zipper` with
   mapped values.
   """
   @doc section: :traversal
@@ -3979,7 +3979,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Accumulates an additional value using the provided `acc_fn` while traversing the
-  Zipper using the provided `move_fn()`. Returns a tuple including the new Zipper
+  `Zipper` using the provided `move_fn()`. Returns a tuple including the new `Zipper`
   context and the accumulated value.
   """
   @doc section: :traversal
@@ -4001,7 +4001,7 @@ defmodule ExRoseTree.Zipper do
   ###
 
   @doc """
-  Rewinds a Zipper along the `path` by the given number of `reps`.
+  Rewinds a `Zipper` along the `path` by the given number of `reps`.
   """
   @doc section: :path_traversal
   @spec rewind_for(t(), pos_integer()) :: t() | nil
@@ -4009,8 +4009,8 @@ defmodule ExRoseTree.Zipper do
     do: move_for(zipper, &parent/1, reps)
 
   @doc """
-  Rewinds a Zipper along the `path` if the provided predicate function
-  returns true when applied to the parent node. Otherwise, returns nil.
+  Rewinds a `Zipper` along the `path` if the provided predicate function
+  returns `true` when applied to the parent node. Otherwise, returns `nil`.
   """
   @doc section: :path_traversal
   @spec rewind_if(t(), predicate()) :: t() | nil
@@ -4018,8 +4018,8 @@ defmodule ExRoseTree.Zipper do
     do: move_if(zipper, &parent/1, predicate)
 
   @doc """
-  Rewinds a Zipper continuously until the provided predicate function
-  returns true when applied to the next parent node. Otherwise, returns nil.
+  Rewinds a `Zipper` continuously until the provided predicate function
+  returns `true` when applied to the next parent node. Otherwise, returns `nil`.
   """
   @doc section: :path_traversal
   @spec rewind_until(t(), predicate()) :: t() | nil
@@ -4027,7 +4027,7 @@ defmodule ExRoseTree.Zipper do
     do: move_until(zipper, &parent/1, predicate)
 
   @doc """
-  Rewinds a Zipper while the given predicate remains true. If no custom
+  Rewinds a `Zipper` while the given predicate remains `true`. If no custom
   predicate is given, `parent/1` will repeat until it reaches the root.
   """
   @doc section: :path_traversal
@@ -4036,7 +4036,7 @@ defmodule ExRoseTree.Zipper do
     do: move_while(zipper, &parent/1, predicate)
 
   @doc """
-  Rewinds a zipper back to the root.
+  Rewinds a `Zipper` back to the root.
 
   ## Examples
 
@@ -4055,8 +4055,8 @@ defmodule ExRoseTree.Zipper do
     do: rewind_while(zipper)
 
   @doc """
-  Searches for a predicate match by rewinding the path in the Zipper. If no match
-  is found, returns nil.
+  Searches for a predicate match by rewinding the path in the `Zipper`. If no match
+  is found, returns `nil`.
   """
   @doc section: :path_traversal
   @spec rewind_find(t(), predicate()) :: t() | nil
@@ -4064,8 +4064,8 @@ defmodule ExRoseTree.Zipper do
     do: find(zipper, &parent/1, predicate)
 
   @doc """
-  Rewinds the Zipper and maps the `term` at each node using the provided `map_fn()`.
-  Returns the new Zipper at the root with mapped values.
+  Rewinds the `Zipper` and maps the `term` at each node using the provided `map_fn()`.
+  Returns the new `Zipper` at the root with mapped values.
   """
   @doc section: :path_traversal
   @spec rewind_map(t(), map_fn()) :: t()
@@ -4073,8 +4073,8 @@ defmodule ExRoseTree.Zipper do
     do: map(zipper, &parent/1, map_fn)
 
   @doc """
-  Rewinds the Zipper and accumulates an additional value using the provided
-  `acc_fn`. Returns a tuple including the root Zipper and the accumulated value.
+  Rewinds the `Zipper` and accumulates an additional value using the provided
+  `acc_fn`. Returns a tuple including the root `Zipper` and the accumulated value.
   """
   @doc section: :path_traversal
   @spec rewind_accumulate(t(), term(), acc_fn()) ::
@@ -4087,7 +4087,7 @@ defmodule ExRoseTree.Zipper do
   ###
 
   @doc """
-  Traverses forward through the zipper in a breadth-first manner.
+  Traverses forward through the `Zipper` in a breadth-first manner.
   """
   @doc section: :breadth_first
   @spec forward(t()) :: t() | nil
@@ -4113,8 +4113,8 @@ defmodule ExRoseTree.Zipper do
     do: move_for(zipper, &forward/1, reps)
 
   @doc """
-  Moves forward in the Zipper if the provided predicate function
-  returns true when applied to the next node. Otherwise, returns nil.
+  Moves forward in the `Zipper` if the provided predicate function
+  returns `true` when applied to the next node. Otherwise, returns `nil`.
   """
   @doc section: :breadth_first
   @spec forward_if(t(), predicate()) :: t() | nil
@@ -4122,8 +4122,8 @@ defmodule ExRoseTree.Zipper do
     do: move_if(zipper, &forward/1, predicate)
 
   @doc """
-  Moves forward in the Zipper continuously until the provided predicate
-  function returns true when applied to the next node. Otherwise, returns nil.
+  Moves forward in the `Zipper` continuously until the provided predicate
+  function returns `true` when applied to the next node. Otherwise, returns `nil`.
   """
   @doc section: :breadth_first
   @spec forward_until(t(), predicate()) :: t() | nil
@@ -4131,7 +4131,7 @@ defmodule ExRoseTree.Zipper do
     do: move_until(zipper, &forward/1, predicate)
 
   @doc """
-  Moves forward in the Zipper while the given predicate remains true.
+  Moves forward in the `Zipper` while the given predicate remains `true`.
   If no custom predicate is given, `forward/1` will repeat until it no
   longer can.
   """
@@ -4141,7 +4141,7 @@ defmodule ExRoseTree.Zipper do
     do: move_while(zipper, &forward/1, predicate)
 
   @doc """
-  Moves forward through the Zipper until the last node of the tree
+  Moves forward through the `Zipper` until the last node of the tree
   has been reached.
   """
   @doc section: :breadth_first
@@ -4150,8 +4150,8 @@ defmodule ExRoseTree.Zipper do
     do: forward_while(zipper)
 
   @doc """
-  Searches for a predicate match by moving forward in the Zipper. If no match
-  is found, returns nil.
+  Searches for a predicate match by moving forward in the `Zipper`. If no match
+  is found, returns `nil`.
   """
   @doc section: :breadth_first
   @spec forward_find(t(), predicate()) :: t() | nil
@@ -4159,8 +4159,8 @@ defmodule ExRoseTree.Zipper do
     do: find(zipper, &forward/1, predicate)
 
   @doc """
-  Moves forward in the Zipper and maps the `term` at each node using the provided
-  `map_fn()`. Returns the new Zipper with mapped values.
+  Moves forward in the `Zipper` and maps the `term` at each node using the provided
+  `map_fn()`. Returns the new `Zipper` with mapped values.
   """
   @doc section: :breadth_first
   @spec forward_map(t(), map_fn()) :: t()
@@ -4168,8 +4168,8 @@ defmodule ExRoseTree.Zipper do
     do: map(zipper, &forward/1, map_fn)
 
   @doc """
-  Moves forward in the Zipper and accumulates an additional value using the provided
-  `acc_fn`. Returns a tuple including the new Zipper and the accumulated value.
+  Moves forward in the `Zipper` and accumulates an additional value using the provided
+  `acc_fn`. Returns a tuple including the new `Zipper` and the accumulated value.
   """
   @doc section: :breadth_first
   @spec forward_accumulate(t(), term(), acc_fn()) :: {t(), term()}
@@ -4181,7 +4181,7 @@ defmodule ExRoseTree.Zipper do
   ###
 
   @doc """
-  Traverses backward through the zipper in a breadth-first manner.
+  Traverses backward through the `Zipper` in a breadth-first manner.
   """
   @doc section: :breadth_first
   @spec backward(t()) :: t()
@@ -4209,8 +4209,8 @@ defmodule ExRoseTree.Zipper do
     do: move_for(zipper, &backward/1, reps)
 
   @doc """
-  Moves backward in the Zipper if the provided predicate function
-  returns true when applied to the next node. Otherwise, returns nil.
+  Moves backward in the `Zipper` if the provided predicate function
+  returns `true` when applied to the next node. Otherwise, returns `nil`.
   """
   @doc section: :breadth_first
   @spec backward_if(t(), predicate()) :: t() | nil
@@ -4218,8 +4218,8 @@ defmodule ExRoseTree.Zipper do
     do: move_if(zipper, &backward/1, predicate)
 
   @doc """
-  Moves backward in the Zipper continuously until the provided predicate
-  function returns true when applied to the next node. Otherwise, returns nil.
+  Moves backward in the `Zipper` continuously until the provided predicate
+  function returns `true` when applied to the next node. Otherwise, returns `nil`.
   """
   @doc section: :breadth_first
   @spec backward_until(t(), predicate()) :: t() | nil
@@ -4227,7 +4227,7 @@ defmodule ExRoseTree.Zipper do
     do: move_until(zipper, &backward/1, predicate)
 
   @doc """
-  Moves backward in the Zipper while the given predicate remains true.
+  Moves backward in the `Zipper` while the given predicate remains `true`.
   If no custom predicate is given, `backward/1` will repeat until it no
   longer can.
   """
@@ -4237,7 +4237,7 @@ defmodule ExRoseTree.Zipper do
     do: move_while(zipper, &backward/1, predicate)
 
   @doc """
-  Moves backward through the Zipper until the root has been reached. If the
+  Moves backward through the `Zipper` until the root has been reached. If the
   root has previous siblings, will move the the first sibling of the root.
   """
   @doc section: :breadth_first
@@ -4246,8 +4246,8 @@ defmodule ExRoseTree.Zipper do
     do: backward_while(zipper)
 
   @doc """
-  Searches for a predicate match by moving backward in the Zipper. If no match
-  is found, returns nil.
+  Searches for a predicate match by moving backward in the `Zipper`. If no match
+  is found, returns `nil`.
   """
   @doc section: :breadth_first
   @spec backward_find(t(), predicate()) :: t() | nil
@@ -4255,8 +4255,8 @@ defmodule ExRoseTree.Zipper do
     do: find(zipper, &backward/1, predicate)
 
   @doc """
-  Moves backward in the Zipper and maps the `term` at each node using the provided
-  `map_fn()`. Returns the new Zipper with mapped values.
+  Moves backward in the `Zipper` and maps the `term` at each node using the provided
+  `map_fn()`. Returns the new `Zipper` with mapped values.
   """
   @doc section: :breadth_first
   @spec backward_map(t(), map_fn()) :: t()
@@ -4264,8 +4264,8 @@ defmodule ExRoseTree.Zipper do
     do: map(zipper, &backward/1, map_fn)
 
   @doc """
-  Moves backward in the Zipper and accumulates an additional value using the provided
-  `acc_fn`. Returns a tuple including the new Zipper and the accumulated value.
+  Moves backward in the `Zipper` and accumulates an additional value using the provided
+  `acc_fn`. Returns a tuple including the new `Zipper` and the accumulated value.
   """
   @doc section: :breadth_first
   @spec backward_accumulate(t(), term(), acc_fn()) :: {t(), term()}
@@ -4277,7 +4277,7 @@ defmodule ExRoseTree.Zipper do
   ###
 
   @doc """
-  Traverses forward through the zipper in a depth-first manner.
+  Traverses forward through the `Zipper` in a depth-first manner.
   """
   @doc section: :depth_first
   @spec descend(t()) :: t() | nil
@@ -4301,8 +4301,8 @@ defmodule ExRoseTree.Zipper do
     do: move_for(zipper, &descend/1, reps)
 
   @doc """
-  Descends into the Zipper if the provided predicate function
-  returns true when applied to the next focus. Otherwise, returns nil.
+  Descends into the `Zipper` if the provided predicate function
+  returns `true` when applied to the next focus. Otherwise, returns `nil`.
   """
   @doc section: :depth_first
   @spec descend_if(t(), predicate()) :: t() | nil
@@ -4310,9 +4310,9 @@ defmodule ExRoseTree.Zipper do
     do: move_if(zipper, &descend/1, predicate)
 
   @doc """
-  Descends into the Zipper continuously until the provided predicate
-  function returns true when applied to the next focus. Otherwise,
-  returns nil.
+  Descends into the `Zipper` continuously until the provided predicate
+  function returns `true` when applied to the next focus. Otherwise,
+  returns `nil`.
   """
   @doc section: :depth_first
   @spec descend_until(t(), predicate()) :: t() | nil
@@ -4320,7 +4320,7 @@ defmodule ExRoseTree.Zipper do
     do: move_until(zipper, &descend/1, predicate)
 
   @doc """
-  Descends the Zipper while the given predicate remains true. If no custom
+  Descends the `Zipper` while the given predicate remains `true`. If no custom
   predicate is given, `descend/1` will repeat until it no longer can.
   """
   @doc section: :depth_first
@@ -4329,7 +4329,7 @@ defmodule ExRoseTree.Zipper do
     do: move_while(zipper, &descend/1, predicate)
 
   @doc """
-  Descends the Zipper until the last node of the tree has been reached.
+  Descends the `Zipper` until the last node of the tree has been reached.
   """
   @doc section: :depth_first
   @spec descend_to_last(t()) :: t()
@@ -4337,8 +4337,8 @@ defmodule ExRoseTree.Zipper do
     do: descend_while(zipper)
 
   @doc """
-  Searches for a predicate match by descending the Zipper. If no match
-  is found, returns nil.
+  Searches for a predicate match by descending the `Zipper`. If no match
+  is found, returns `nil`.
   """
   @doc section: :depth_first
   @spec descend_find(t(), predicate()) :: t() | nil
@@ -4346,8 +4346,8 @@ defmodule ExRoseTree.Zipper do
     do: find(zipper, &descend/1, predicate)
 
   @doc """
-  Descends the Zipper and maps the `term` at each node using the provided
-  `map_fn()`. Returns the new Zipper with mapped values.
+  Descends the `Zipper` and maps the `term` at each node using the provided
+  `map_fn()`. Returns the new `Zipper` with mapped values.
   """
   @doc section: :depth_first
   @spec descend_map(t(), map_fn()) :: t()
@@ -4355,8 +4355,8 @@ defmodule ExRoseTree.Zipper do
     do: map(zipper, &descend/1, map_fn)
 
   @doc """
-  Descends the Zipper and accumulates an additional value using the provided
-  `acc_fn`. Returns a tuple including the new Zipper and the accumulated value.
+  Descends the `Zipper` and accumulates an additional value using the provided
+  `acc_fn`. Returns a tuple including the new `Zipper` and the accumulated value.
   """
   @doc section: :depth_first
   @spec descend_accumulate(t(), term(), acc_fn()) :: {t(), term()}
@@ -4368,7 +4368,7 @@ defmodule ExRoseTree.Zipper do
   ###
 
   @doc """
-  Traverses back through the zipper in a depth-first manner.
+  Traverses back through the `Zipper` in a depth-first manner.
   """
   @doc section: :depth_first
   @spec ascend(t()) :: t()
@@ -4392,8 +4392,8 @@ defmodule ExRoseTree.Zipper do
     do: move_for(zipper, &ascend/1, reps)
 
   @doc """
-  Ascends the Zipper if the provided predicate function returns true
-  when applied to the next focus. Otherwise, returns nil.
+  Ascends the `Zipper` if the provided predicate function returns `true`
+  when applied to the next focus. Otherwise, returns `nil`.
   """
   @doc section: :depth_first
   @spec ascend_if(t(), predicate()) :: t() | nil
@@ -4401,8 +4401,8 @@ defmodule ExRoseTree.Zipper do
     do: move_if(zipper, &ascend/1, predicate)
 
   @doc """
-  Ascends the Zipper continuously until the provided predicate function
-  returns true when applied to the next focus. Otherwise, returns nil.
+  Ascends the `Zipper` continuously until the provided predicate function
+  returns `true` when applied to the next focus. Otherwise, returns `nil`.
   """
   @doc section: :depth_first
   @spec ascend_until(t(), predicate()) :: t() | nil
@@ -4410,7 +4410,7 @@ defmodule ExRoseTree.Zipper do
     do: move_until(zipper, &ascend/1, predicate)
 
   @doc """
-  Ascends the Zipper while the given predicate remains true. If no custom
+  Ascends the `Zipper` while the given predicate remains `true`. If no custom
   predicate is given, `ascend/1` will repeat until it no longer can.
   """
   @doc section: :depth_first
@@ -4419,7 +4419,7 @@ defmodule ExRoseTree.Zipper do
     do: move_while(zipper, &ascend/1, predicate)
 
   @doc """
-  Ascends the Zipper until the root has been reached. If the root has
+  Ascends the `Zipper` until the root has been reached. If the root has
   previous siblings, will move the the first sibling of the root.
   """
   @doc section: :depth_first
@@ -4428,8 +4428,8 @@ defmodule ExRoseTree.Zipper do
     do: ascend_while(zipper)
 
   @doc """
-  Searches for a predicate match by ascending the Zipper. If no match
-  is found, returns nil.
+  Searches for a predicate match by ascending the `Zipper`. If no match
+  is found, returns `nil`.
   """
   @doc section: :depth_first
   @spec ascend_find(t(), predicate()) :: t() | nil
@@ -4437,8 +4437,8 @@ defmodule ExRoseTree.Zipper do
     do: find(zipper, &ascend/1, predicate)
 
   @doc """
-  Ascends the Zipper and maps the `term` at each node using the provided
-  `map_fn()`. Returns the new Zipper with mapped values.
+  Ascends the `Zipper` and maps the `term` at each node using the provided
+  `map_fn()`. Returns the new `Zipper` with mapped values.
   """
   @doc section: :depth_first
   @spec ascend_map(t(), map_fn()) :: t()
@@ -4446,8 +4446,8 @@ defmodule ExRoseTree.Zipper do
     do: map(zipper, &ascend/1, map_fn)
 
   @doc """
-  Ascends the Zipper and accumulates an additional value using the provided
-  `acc_fn`. Returns a tuple including the new Zipper and the accumulated value.
+  Ascends the `Zipper` and accumulates an additional value using the provided
+  `acc_fn`. Returns a tuple including the new `Zipper` and the accumulated value.
   """
   @doc section: :depth_first
   @spec ascend_accumulate(t(), term(), acc_fn()) :: {t(), term()}
