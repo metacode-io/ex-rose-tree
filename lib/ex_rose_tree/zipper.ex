@@ -4411,7 +4411,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Ascends the Zipper while the given predicate remains true. If no custom
-  predicate is given, `descend/1` will repeat until it no longer can.
+  predicate is given, `ascend/1` will repeat until it no longer can.
   """
   @doc section: :depth_first
   @spec ascend_while(t(), predicate()) :: t()
