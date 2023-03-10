@@ -1624,26 +1624,26 @@ defmodule ExRoseTree.Zipper do
 
   ## Examples
 
-    iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
-    ...> next = for n <- [6,7,8,9], do: ExRoseTree.new(n)
-    ...> tree = ExRoseTree.new(5)
-    ...> z = ExRoseTree.Zipper.new(tree, prev: prev, next: next)
-    ...> ExRoseTree.Zipper.first_sibling(z)
-    %ExRoseTree.Zipper{
-      focus: %ExRoseTree{term: 1, children: []},
-      prev: [],
-      next: [
-        %ExRoseTree{term: 2, children: []},
-        %ExRoseTree{term: 3, children: []},
-        %ExRoseTree{term: 4, children: []},
-        %ExRoseTree{term: 5, children: []},
-        %ExRoseTree{term: 6, children: []},
-        %ExRoseTree{term: 7, children: []},
-        %ExRoseTree{term: 8, children: []},
-        %ExRoseTree{term: 9, children: []}
-      ],
-      path: []
-    }
+      iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
+      ...> next = for n <- [6,7,8,9], do: ExRoseTree.new(n)
+      ...> tree = ExRoseTree.new(5)
+      ...> z = ExRoseTree.Zipper.new(tree, prev: prev, next: next)
+      ...> ExRoseTree.Zipper.first_sibling(z)
+      %ExRoseTree.Zipper{
+        focus: %ExRoseTree{term: 1, children: []},
+        prev: [],
+        next: [
+          %ExRoseTree{term: 2, children: []},
+          %ExRoseTree{term: 3, children: []},
+          %ExRoseTree{term: 4, children: []},
+          %ExRoseTree{term: 5, children: []},
+          %ExRoseTree{term: 6, children: []},
+          %ExRoseTree{term: 7, children: []},
+          %ExRoseTree{term: 8, children: []},
+          %ExRoseTree{term: 9, children: []}
+        ],
+        path: []
+      }
 
   """
   @doc section: :siblings
@@ -1676,27 +1676,27 @@ defmodule ExRoseTree.Zipper do
 
   ## Examples
 
-    iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
-    ...> next = for n <- [6,7,8,9], do: ExRoseTree.new(n)
-    ...> tree = ExRoseTree.new(5)
-    ...> z = ExRoseTree.Zipper.new(tree, prev: prev, next: next)
-    ...> ExRoseTree.Zipper.previous_sibling(z)
-    %ExRoseTree.Zipper{
-      focus: %ExRoseTree{term: 4, children: []},
-      prev: [
-        %ExRoseTree{term: 3, children: []},
-        %ExRoseTree{term: 2, children: []},
-        %ExRoseTree{term: 1, children: []}
-      ],
-      next: [
-        %ExRoseTree{term: 5, children: []},
-        %ExRoseTree{term: 6, children: []},
-        %ExRoseTree{term: 7, children: []},
-        %ExRoseTree{term: 8, children: []},
-        %ExRoseTree{term: 9, children: []}
-      ],
-      path: []
-    }
+      iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
+      ...> next = for n <- [6,7,8,9], do: ExRoseTree.new(n)
+      ...> tree = ExRoseTree.new(5)
+      ...> z = ExRoseTree.Zipper.new(tree, prev: prev, next: next)
+      ...> ExRoseTree.Zipper.previous_sibling(z)
+      %ExRoseTree.Zipper{
+        focus: %ExRoseTree{term: 4, children: []},
+        prev: [
+          %ExRoseTree{term: 3, children: []},
+          %ExRoseTree{term: 2, children: []},
+          %ExRoseTree{term: 1, children: []}
+        ],
+        next: [
+          %ExRoseTree{term: 5, children: []},
+          %ExRoseTree{term: 6, children: []},
+          %ExRoseTree{term: 7, children: []},
+          %ExRoseTree{term: 8, children: []},
+          %ExRoseTree{term: 9, children: []}
+        ],
+        path: []
+      }
 
   """
   @doc section: :siblings
@@ -1727,26 +1727,26 @@ defmodule ExRoseTree.Zipper do
 
   ## Examples
 
-    iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
-    ...> next = for n <- [6,7,8,9], do: ExRoseTree.new(n)
-    ...> tree = ExRoseTree.new(5)
-    ...> z = ExRoseTree.Zipper.new(tree, prev: prev, next: next)
-    ...> ExRoseTree.Zipper.last_sibling(z)
-    %ExRoseTree.Zipper{
-      focus: %ExRoseTree{term: 9, children: []},
-      prev: [
-        %ExRoseTree{term: 8, children: []},
-        %ExRoseTree{term: 7, children: []},
-        %ExRoseTree{term: 6, children: []},
-        %ExRoseTree{term: 5, children: []},
-        %ExRoseTree{term: 4, children: []},
-        %ExRoseTree{term: 3, children: []},
-        %ExRoseTree{term: 2, children: []},
-        %ExRoseTree{term: 1, children: []}
-      ],
-      next: [],
-      path: []
-    }
+      iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
+      ...> next = for n <- [6,7,8,9], do: ExRoseTree.new(n)
+      ...> tree = ExRoseTree.new(5)
+      ...> z = ExRoseTree.Zipper.new(tree, prev: prev, next: next)
+      ...> ExRoseTree.Zipper.last_sibling(z)
+      %ExRoseTree.Zipper{
+        focus: %ExRoseTree{term: 9, children: []},
+        prev: [
+          %ExRoseTree{term: 8, children: []},
+          %ExRoseTree{term: 7, children: []},
+          %ExRoseTree{term: 6, children: []},
+          %ExRoseTree{term: 5, children: []},
+          %ExRoseTree{term: 4, children: []},
+          %ExRoseTree{term: 3, children: []},
+          %ExRoseTree{term: 2, children: []},
+          %ExRoseTree{term: 1, children: []}
+        ],
+        next: [],
+        path: []
+      }
 
   """
   @doc section: :siblings
@@ -1779,27 +1779,27 @@ defmodule ExRoseTree.Zipper do
 
   ## Examples
 
-    iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
-    ...> next = for n <- [6,7,8,9], do: ExRoseTree.new(n)
-    ...> tree = ExRoseTree.new(5)
-    ...> z = ExRoseTree.Zipper.new(tree, prev: prev, next: next)
-    ...> ExRoseTree.Zipper.next_sibling(z)
-    %ExRoseTree.Zipper{
-      focus: %ExRoseTree{term: 6, children: []},
-      prev: [
-        %ExRoseTree{term: 5, children: []},
-        %ExRoseTree{term: 4, children: []},
-        %ExRoseTree{term: 3, children: []},
-        %ExRoseTree{term: 2, children: []},
-        %ExRoseTree{term: 1, children: []}
-      ],
-      next: [
-        %ExRoseTree{term: 7, children: []},
-        %ExRoseTree{term: 8, children: []},
-        %ExRoseTree{term: 9, children: []}
-      ],
-      path: []
-    }
+      iex> prev = for n <- [1,2,3,4], do: ExRoseTree.new(n)
+      ...> next = for n <- [6,7,8,9], do: ExRoseTree.new(n)
+      ...> tree = ExRoseTree.new(5)
+      ...> z = ExRoseTree.Zipper.new(tree, prev: prev, next: next)
+      ...> ExRoseTree.Zipper.next_sibling(z)
+      %ExRoseTree.Zipper{
+        focus: %ExRoseTree{term: 6, children: []},
+        prev: [
+          %ExRoseTree{term: 5, children: []},
+          %ExRoseTree{term: 4, children: []},
+          %ExRoseTree{term: 3, children: []},
+          %ExRoseTree{term: 2, children: []},
+          %ExRoseTree{term: 1, children: []}
+        ],
+        next: [
+          %ExRoseTree{term: 7, children: []},
+          %ExRoseTree{term: 8, children: []},
+          %ExRoseTree{term: 9, children: []}
+        ],
+        path: []
+      }
 
   """
   @doc section: :siblings
