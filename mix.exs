@@ -88,7 +88,7 @@ defmodule ExRoseTree.MixProject do
       maintainers: ["Matthew Caldwell"],
       licenses: ["Apache-2.0"],
       files:
-        ~w(CHANGELOG.md CODE_OF_CONDUCT.md CONTRIBUTING.md Cheatsheet.cheatmd .formatter.exs lib dev LICENSE* mix.exs README.md),
+        ~w(CHANGELOG.md CODE_OF_CONDUCT.md CONTRIBUTING.md .formatter.exs lib dev LICENSE* mix.exs README.md),
       links: %{"GitHub" => @source_url}
     ]
   end
