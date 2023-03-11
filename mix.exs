@@ -86,7 +86,6 @@ defmodule ExRoseTree.MixProject do
   defp package() do
     [
       maintainers: ["Matthew Caldwell"],
-      organization: "metacode",
       licenses: ["Apache-2.0"],
       files:
         ~w(CHANGELOG.md CODE_OF_CONDUCT.md Cheatsheet.cheatmd formatters lib dev LICENSE* mix.exs README.md),
