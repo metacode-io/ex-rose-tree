@@ -188,6 +188,8 @@ $ mix deps.get
 $ MIX_ENV=test mix coveralls.html
 ```
 
+<!-- README END -->
+
 ## Contributions, Issues, and Further Development
 
 Additional functionality and work to explore adding include:
@@ -218,8 +220,6 @@ initial inspiration in building this library.
 Copyright (c) 2022-present, Paraclade, LLC.
 
 ExRoseTree source code is licensed under the [Apache License 2.0](/LICENSE).
-
-<!-- README END -->
 
 
 
