@@ -1,4 +1,4 @@
-## ExRoseTree :: A Rose Tree with Functional Zipper in Elixir
+## ExRoseTree :: A Rose Tree and Zipper in Elixir with a slew of navigation primitives.
 
 [![Build Status](https://github.com/StoatPower/ex-rose-tree/actions/workflows/elixir.yml/badge.svg)](https://github.com/StoatPower/ex-rose-tree/actions/workflows/elixir.yml)
 

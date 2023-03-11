@@ -1,7 +1,7 @@
 defmodule ExRoseTree.MixProject do
   use Mix.Project
 
-  @description "A Rose Tree (Multiway-tree) implementation with Zipper in Elixir."
+  @description "A Rose Tree and Zipper in Elixir with a slew of navigation primitives."
   @source_url "https://github.com/metacode-io/ex-rose-tree"
   @version "0.1.0"
 
