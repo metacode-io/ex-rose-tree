@@ -3,7 +3,7 @@ defmodule ExRoseTree.MixProject do
 
   @description "A Rose Tree and Zipper in Elixir with a slew of navigation primitives."
   @source_url "https://github.com/metacode-io/ex-rose-tree"
-  @version "0.1.1"
+  @version "0.1.2"
 
   def project do
     [
