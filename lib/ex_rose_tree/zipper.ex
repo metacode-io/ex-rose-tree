@@ -78,7 +78,7 @@ defmodule ExRoseTree.Zipper do
 
   @type move_fn() :: (t() -> t() | nil)
 
-  @type predicate() :: (term() -> boolean())
+  @type predicate() :: (t() -> boolean())
 
   ###
   ### GUARDS
