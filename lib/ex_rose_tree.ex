@@ -18,6 +18,8 @@ defmodule ExRoseTree do
           children: [t()]
         }
 
+  @type predicate() :: (t() -> boolean())
+
   ###
   ### GUARDS
   ###
