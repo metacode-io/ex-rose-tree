@@ -3834,7 +3834,7 @@ defmodule ExRoseTree.Zipper do
   ###
 
   @doc """
-  Repeats a call to the given move function, `move_fn`, by the
+  Repeats a call to the given `move_fn()`, by the
   given number of `reps`.
 
   ## Examples
@@ -3937,7 +3937,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Using the designated move function, `move_fn()`, searches for the first
+  Using the given `move_fn()`, searches for the first
   tree that satisfies the given `predicate` function.
   """
   @doc section: :traversal
@@ -3978,7 +3978,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Accumulates an additional value using the provided `acc_fn` while traversing the
+  Accumulates an additional value using the provided `acc_fn()` while traversing the
   `Zipper` using the provided `move_fn()`. Returns a tuple including the new `Zipper`
   context and the accumulated value.
   """
@@ -4074,7 +4074,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Rewinds the `Zipper` and accumulates an additional value using the provided
-  `acc_fn`. Returns a tuple including the root `Zipper` and the accumulated value.
+  `acc_fn()`. Returns a tuple including the root `Zipper` and the accumulated value.
   """
   @doc section: :path_traversal
   @spec rewind_accumulate(t(), term(), acc_fn()) ::
@@ -4169,7 +4169,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves forward in the `Zipper` and accumulates an additional value using the provided
-  `acc_fn`. Returns a tuple including the new `Zipper` and the accumulated value.
+  `acc_fn()`. Returns a tuple including the new `Zipper` and the accumulated value.
   """
   @doc section: :breadth_first
   @spec forward_accumulate(t(), term(), acc_fn()) :: {t(), term()}
@@ -4265,7 +4265,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Moves backward in the `Zipper` and accumulates an additional value using the provided
-  `acc_fn`. Returns a tuple including the new `Zipper` and the accumulated value.
+  `acc_fn()`. Returns a tuple including the new `Zipper` and the accumulated value.
   """
   @doc section: :breadth_first
   @spec backward_accumulate(t(), term(), acc_fn()) :: {t(), term()}
@@ -4356,7 +4356,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Descends the `Zipper` and accumulates an additional value using the provided
-  `acc_fn`. Returns a tuple including the new `Zipper` and the accumulated value.
+  `acc_fn()`. Returns a tuple including the new `Zipper` and the accumulated value.
   """
   @doc section: :depth_first
   @spec descend_accumulate(t(), term(), acc_fn()) :: {t(), term()}
@@ -4447,7 +4447,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Ascends the `Zipper` and accumulates an additional value using the provided
-  `acc_fn`. Returns a tuple including the new `Zipper` and the accumulated value.
+  `acc_fn()`. Returns a tuple including the new `Zipper` and the accumulated value.
   """
   @doc section: :depth_first
   @spec ascend_accumulate(t(), term(), acc_fn()) :: {t(), term()}
