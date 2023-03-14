@@ -72,13 +72,13 @@ defmodule ExRoseTree.Zipper do
           path: [Location.t()]
         }
 
-  @typep acc_fn() :: (t(), term() -> term())
+  @type acc_fn() :: (t(), term() -> term())
 
-  @typep map_fn() :: (t() -> t())
+  @type map_fn() :: (t() -> t())
 
-  @typep move_fn() :: (t() -> t() | nil)
+  @type move_fn() :: (t() -> t() | nil)
 
-  @typep predicate() :: (term() -> boolean())
+  @type predicate() :: (term() -> boolean())
 
   ###
   ### GUARDS
