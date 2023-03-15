@@ -113,8 +113,8 @@ defmodule ExRoseTree.Zipper.Location do
 
   """
   @spec map_term(t(), (term() -> term())) :: t()
-  def map_term(%__MODULE__{term: term} = loc, map_fn) when is_function(map_fn) do
-    %{loc | term: map_fn.(term)}
+  def map_term(%__MODULE__{term: term} = location, map_fn) when is_function(map_fn) do
+    %{location | term: map_fn.(term)}
   end
 
   @doc """
