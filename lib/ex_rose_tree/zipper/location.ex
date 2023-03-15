@@ -87,8 +87,8 @@ defmodule ExRoseTree.Zipper.Location do
   end
 
   @doc """
-  Returns whether a list of values are all Locations or not. Will return
-  true if passed an empty list.
+  Returns whether a list of values are all `Location`s or not. Will return
+  `true` if passed an empty list.
 
   ## Examples
 
@@ -103,7 +103,7 @@ defmodule ExRoseTree.Zipper.Location do
   end
 
   @doc """
-  Applies the given function to the Location's `term` field.
+  Applies the given function to the `Location`'s `term` field.
 
   ## Examples
 
@@ -118,7 +118,7 @@ defmodule ExRoseTree.Zipper.Location do
   end
 
   @doc """
-  Returns the index of the Location in relation to its siblings.
+  Returns the index of the `Location` in relation to its siblings.
 
   ## Examples
 
