@@ -51,11 +51,11 @@ defmodule ExRoseTree.Zipper do
   ]
 
   @typedoc """
-  The `Zipper` struct represents a contextual position within a `ExRoseTree`.
+  The `Zipper` struct represents a contextual position within an `ExRoseTree`.
 
   It includes the following important pieces:
   * `focus` - the current _focus_ or _context_ within the `ExRoseTree.Zipper`. Its
-    type is that of a `ExRoseTree`.
+    type is that of an `ExRoseTree`.
   * `prev` - all siblings occurring before the current `focus`. It's type is a list of
     `ExRoseTree`s and is maintained in reverse order, so that the immediately previous
     sibling to the `focus` is at the head of the list.
