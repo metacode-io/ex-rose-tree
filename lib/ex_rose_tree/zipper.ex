@@ -257,8 +257,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :basic
   @spec to_tree(t()) :: ExRoseTree.t()
-  def to_tree(%__MODULE__{} = z) do
-    %__MODULE__{focus: root} = rewind_to_root(z)
+  def to_tree(%__MODULE__{} = zipper) do
+    %__MODULE__{focus: root} = rewind_to_root(zipper)
 
     root
   end
@@ -290,8 +290,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :basic
   @spec to_forest(t()) :: {[ExRoseTree.t()], [ExRoseTree.t()]}
-  def to_forest(%__MODULE__{} = z) do
-    %__MODULE__{focus: root, prev: prev, next: next} = rewind_to_root(z)
+  def to_forest(%__MODULE__{} = zipper) do
+    %__MODULE__{focus: root, prev: prev, next: next} = rewind_to_root(zipper)
 
     {Enum.reverse(prev), [root | next]}
   end
@@ -310,7 +310,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :basic
   @spec root?(t()) :: boolean()
-  def root?(%__MODULE__{path: []}), do: true
+  def root?(%__MODULE__{path: []} = _zipper), do: true
   def root?(_), do: false
 
   @doc """
@@ -400,8 +400,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :basic
   @spec set_focus(t(), ExRoseTree.t()) :: t()
-  def set_focus(%__MODULE__{} = z, new_focus) when ExRoseTree.rose_tree?(new_focus),
-    do: %{z | focus: new_focus}
+  def set_focus(%__MODULE__{} = zipper, new_focus) when ExRoseTree.rose_tree?(new_focus),
+    do: %{zipper | focus: new_focus}
 
   @doc """
   Sets the term of the current focus of the Zipper.
@@ -423,9 +423,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :basic
   @spec set_focused_term(t(), term()) :: t()
-  def set_focused_term(%__MODULE__{} = z, new_term) do
-    with %ExRoseTree{} = new_focus <- ExRoseTree.set_term(z.focus, new_term),
-         %__MODULE__{} = new_zipper <- set_focus(z, new_focus) do
+  def set_focused_term(%__MODULE__{} = zipper, new_term) do
+    with %ExRoseTree{} = new_focus <- ExRoseTree.set_term(zipper.focus, new_term),
+         %__MODULE__{} = new_zipper <- set_focus(zipper, new_focus) do
       new_zipper
     end
   end
@@ -454,10 +454,10 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :basic
   @spec map_focus(t(), (ExRoseTree.t() -> ExRoseTree.t())) :: t()
-  def map_focus(%__MODULE__{focus: focus} = z, map_fn) when is_function(map_fn) do
+  def map_focus(%__MODULE__{focus: focus} = zipper, map_fn) when is_function(map_fn) do
     case map_fn.(focus) do
       new_focus when ExRoseTree.rose_tree?(new_focus) ->
-        set_focus(z, new_focus)
+        set_focus(zipper, new_focus)
 
       _ ->
         raise ArgumentError, "map_fn must return a valid ExRoseTree struct"
@@ -485,9 +485,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :basic
   @spec map_focused_term(t(), (term() -> term())) :: t()
-  def map_focused_term(%__MODULE__{} = z, map_fn) when is_function(map_fn) do
-    with %ExRoseTree{} = new_focus <- ExRoseTree.map_term(z.focus, map_fn),
-         %__MODULE__{} = new_zipper <- set_focus(z, new_focus) do
+  def map_focused_term(%__MODULE__{} = zipper, map_fn) when is_function(map_fn) do
+    with %ExRoseTree{} = new_focus <- ExRoseTree.map_term(zipper.focus, map_fn),
+         %__MODULE__{} = new_zipper <- set_focus(zipper, new_focus) do
       new_zipper
     end
   end
@@ -525,7 +525,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :basic
   @spec remove_focus(t()) :: {t(), ExRoseTree.t() | nil}
-  def remove_focus(%__MODULE__{} = z) when empty?(z), do: {z, nil}
+  def remove_focus(%__MODULE__{} = zipper) when empty?(zipper), do: {zipper, nil}
 
   def remove_focus(%__MODULE__{prev: [], next: [], path: []}), do: {empty(), nil}
 
@@ -605,9 +605,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :basic
   @spec set_focused_children(t(), [ExRoseTree.t()]) :: t()
-  def set_focused_children(%__MODULE__{} = z, new_children) when is_list(new_children) do
-    with %ExRoseTree{} = new_focus <- ExRoseTree.set_children(z.focus, new_children),
-         %__MODULE__{} = new_zipper <- set_focus(z, new_focus) do
+  def set_focused_children(%__MODULE__{} = zipper, new_children) when is_list(new_children) do
+    with %ExRoseTree{} = new_focus <- ExRoseTree.set_children(zipper.focus, new_children),
+         %__MODULE__{} = new_zipper <- set_focus(zipper, new_focus) do
       new_zipper
     end
   end
@@ -638,9 +638,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :basic
   @spec map_focused_children(t(), (ExRoseTree.t() -> ExRoseTree.t())) :: t()
-  def map_focused_children(%__MODULE__{} = z, map_fn) when is_function(map_fn) do
-    with %ExRoseTree{} = new_focus <- ExRoseTree.map_children(z.focus, map_fn),
-         %__MODULE__{} = new_zipper <- set_focus(z, new_focus) do
+  def map_focused_children(%__MODULE__{} = zipper, map_fn) when is_function(map_fn) do
+    with %ExRoseTree{} = new_focus <- ExRoseTree.map_children(zipper.focus, map_fn),
+         %__MODULE__{} = new_zipper <- set_focus(zipper, new_focus) do
       new_zipper
     end
   end
@@ -670,13 +670,13 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :basic
   @spec map_path(t(), (Location.t() -> Location.t())) :: t()
-  def map_path(%__MODULE__{path: path} = z, map_fn) when is_function(map_fn) do
+  def map_path(%__MODULE__{path: path} = zipper, map_fn) when is_function(map_fn) do
     new_locations =
       path
       |> Enum.map(fn location -> map_fn.(location) end)
 
     if Location.all_locations?(new_locations) do
-      %{z | path: new_locations}
+      %{zipper | path: new_locations}
     else
       raise ArgumentError, "map_fn must return a valid ExRoseTree.Zipper.Location struct"
     end
@@ -859,10 +859,10 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :ancestors
   @spec parent(t()) :: t() | nil
-  def parent(%__MODULE__{} = z) do
-    combined_siblings = Enum.reverse(z.prev) ++ [z.focus | z.next]
+  def parent(%__MODULE__{} = zipper) do
+    combined_siblings = Enum.reverse(zipper.prev) ++ [zipper.focus | zipper.next]
 
-    z
+    zipper
     |> do_parental_shift(combined_siblings)
   end
 
@@ -885,8 +885,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :ancestors
   @spec grandparent(t()) :: t() | nil
-  def grandparent(%__MODULE__{} = z) do
-    with %__MODULE__{} = parent <- parent(z),
+  def grandparent(%__MODULE__{} = zipper) do
+    with %__MODULE__{} = parent <- parent(zipper),
          %__MODULE__{} = grandparent <- parent(parent) do
       grandparent
     else
@@ -901,8 +901,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :ancestors
   @spec great_grandparent(t()) :: t() | nil
-  def great_grandparent(%__MODULE__{} = z) do
-    with %__MODULE__{} = grandparent <- grandparent(z),
+  def great_grandparent(%__MODULE__{} = zipper) do
+    with %__MODULE__{} = grandparent <- grandparent(zipper),
          %__MODULE__{} = great_grandparent <- parent(grandparent) do
       great_grandparent
     else
@@ -1048,7 +1048,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :descendants
   @spec child_at(t(), non_neg_integer()) :: t() | nil
-  def child_at(%__MODULE__{focus: focus}, _index)
+  def child_at(%__MODULE__{focus: focus} = _zipper, _index)
       when ExRoseTree.empty?(focus) or ExRoseTree.leaf?(focus),
       do: nil
 
@@ -1373,13 +1373,13 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec map_previous_siblings(t(), (ExRoseTree.t() -> ExRoseTree.t())) :: t()
-  def map_previous_siblings(%__MODULE__{prev: prev} = z, map_fn) when is_function(map_fn) do
+  def map_previous_siblings(%__MODULE__{prev: prev} = zipper, map_fn) when is_function(map_fn) do
     new_siblings =
       prev
       |> Enum.map(fn sibling -> map_fn.(sibling) end)
 
     if ExRoseTree.all_rose_trees?(new_siblings) do
-      %{z | prev: new_siblings}
+      %{zipper | prev: new_siblings}
     else
       raise ArgumentError, "map_fn must return a valid ExRoseTree struct"
     end
@@ -1411,13 +1411,13 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec map_next_siblings(t(), (ExRoseTree.t() -> ExRoseTree.t())) :: t()
-  def map_next_siblings(%__MODULE__{next: next} = z, map_fn) when is_function(map_fn) do
+  def map_next_siblings(%__MODULE__{next: next} = zipper, map_fn) when is_function(map_fn) do
     new_siblings =
       next
       |> Enum.map(fn sibling -> map_fn.(sibling) end)
 
     if ExRoseTree.all_rose_trees?(new_siblings) do
-      %{z | next: new_siblings}
+      %{zipper | next: new_siblings}
     else
       raise ArgumentError, "map_fn must return a valid ExRoseTree struct"
     end
@@ -1428,8 +1428,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec prepend_first_sibling(t(), term()) :: t()
-  def prepend_first_sibling(%__MODULE__{} = z, sibling) when ExRoseTree.rose_tree?(sibling),
-    do: %{z | prev: z.prev ++ [sibling]}
+  def prepend_first_sibling(%__MODULE__{} = zipper, sibling) when ExRoseTree.rose_tree?(sibling),
+    do: %{zipper | prev: zipper.prev ++ [sibling]}
 
   def prepend_first_sibling(%__MODULE__{} = z, sibling),
     do: %{z | prev: z.prev ++ [ExRoseTree.new(sibling)]}
@@ -1439,8 +1439,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec append_last_sibling(t(), term()) :: t()
-  def append_last_sibling(%__MODULE__{} = z, sibling) when ExRoseTree.rose_tree?(sibling),
-    do: %{z | next: z.next ++ [sibling]}
+  def append_last_sibling(%__MODULE__{} = zipper, sibling) when ExRoseTree.rose_tree?(sibling),
+    do: %{zipper | next: zipper.next ++ [sibling]}
 
   def append_last_sibling(%__MODULE__{} = z, sibling),
     do: %{z | next: z.next ++ [ExRoseTree.new(sibling)]}
@@ -1450,8 +1450,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec append_previous_sibling(t(), term()) :: t()
-  def append_previous_sibling(%__MODULE__{} = z, sibling) when ExRoseTree.rose_tree?(sibling),
-    do: %{z | prev: [sibling | z.prev]}
+  def append_previous_sibling(%__MODULE__{} = zipper, sibling) when ExRoseTree.rose_tree?(sibling),
+    do: %{zipper | prev: [sibling | zipper.prev]}
 
   def append_previous_sibling(%__MODULE__{} = z, sibling),
     do: %{z | prev: [ExRoseTree.new(sibling) | z.prev]}
@@ -1461,8 +1461,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec prepend_next_sibling(t(), term()) :: t()
-  def prepend_next_sibling(%__MODULE__{} = z, sibling) when ExRoseTree.rose_tree?(sibling),
-    do: %{z | next: [sibling | z.next]}
+  def prepend_next_sibling(%__MODULE__{} = zipper, sibling) when ExRoseTree.rose_tree?(sibling),
+    do: %{zipper | next: [sibling | zipper.next]}
 
   def prepend_next_sibling(%__MODULE__{} = z, sibling),
     do: %{z | next: [ExRoseTree.new(sibling) | z.next]}
@@ -1472,9 +1472,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec insert_previous_sibling_at(t(), term(), integer()) :: t()
-  def insert_previous_sibling_at(%__MODULE__{} = z, sibling, index)
+  def insert_previous_sibling_at(%__MODULE__{} = zipper, sibling, index)
       when ExRoseTree.rose_tree?(sibling),
-      do: do_insert_previous_sibling_at(z, sibling, index)
+      do: do_insert_previous_sibling_at(zipper, sibling, index)
 
   def insert_previous_sibling_at(%__MODULE__{} = z, sibling, index),
     do: do_insert_previous_sibling_at(z, ExRoseTree.new(sibling), index)
@@ -1496,9 +1496,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec insert_next_sibling_at(t(), term(), integer()) :: t()
-  def insert_next_sibling_at(%__MODULE__{} = z, sibling, index)
+  def insert_next_sibling_at(%__MODULE__{} = zipper, sibling, index)
       when ExRoseTree.rose_tree?(sibling),
-      do: do_insert_next_sibling_at(z, sibling, index)
+      do: do_insert_next_sibling_at(zipper, sibling, index)
 
   def insert_next_sibling_at(%__MODULE__{} = z, sibling, index),
     do: do_insert_next_sibling_at(z, ExRoseTree.new(sibling), index)
@@ -1515,7 +1515,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec pop_first_sibling(t()) :: {t(), ExRoseTree.t() | nil}
-  def pop_first_sibling(%__MODULE__{prev: []} = z), do: {z, nil}
+  def pop_first_sibling(%__MODULE__{prev: []} = zipper), do: {zipper, nil}
 
   def pop_first_sibling(%__MODULE__{} = z) do
     {new_siblings, [first_sibling | []]} = Enum.split(z.prev, -1)
@@ -1527,7 +1527,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec pop_previous_sibling(t()) :: {t(), ExRoseTree.t() | nil}
-  def pop_previous_sibling(%__MODULE__{prev: []} = z), do: {z, nil}
+  def pop_previous_sibling(%__MODULE__{prev: []} = zipper), do: {zipper, nil}
 
   def pop_previous_sibling(%__MODULE__{prev: [previous | new_siblings]} = z),
     do: {%{z | prev: new_siblings}, previous}
@@ -1537,7 +1537,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec pop_last_sibling(t()) :: {t(), ExRoseTree.t() | nil}
-  def pop_last_sibling(%__MODULE__{next: []} = z), do: {z, nil}
+  def pop_last_sibling(%__MODULE__{next: []} = zipper), do: {zipper, nil}
 
   def pop_last_sibling(%__MODULE__{} = z) do
     {new_siblings, [last_sibling | []]} = Enum.split(z.next, -1)
@@ -1549,7 +1549,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec pop_next_sibling(t()) :: {t(), ExRoseTree.t() | nil}
-  def pop_next_sibling(%__MODULE__{next: []} = z), do: {z, nil}
+  def pop_next_sibling(%__MODULE__{next: []} = zipper), do: {zipper, nil}
 
   def pop_next_sibling(%__MODULE__{next: [next | new_siblings]} = z),
     do: {%{z | next: new_siblings}, next}
@@ -1559,7 +1559,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec pop_previous_sibling_at(t(), integer()) :: {t(), ExRoseTree.t() | nil}
-  def pop_previous_sibling_at(%__MODULE__{prev: []} = z, _index), do: {z, nil}
+  def pop_previous_sibling_at(%__MODULE__{prev: []} = zipper, _index), do: {zipper, nil}
 
   def pop_previous_sibling_at(%__MODULE__{} = z, index) when is_integer(index) and index < 0 do
     if abs(index) > length(z.prev) do
@@ -1591,7 +1591,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec pop_next_sibling_at(t(), integer()) :: {t(), ExRoseTree.t() | nil}
-  def pop_next_sibling_at(%__MODULE__{next: []} = z, _index), do: {z, nil}
+  def pop_next_sibling_at(%__MODULE__{next: []} = zipper, _index), do: {zipper, nil}
 
   def pop_next_sibling_at(%__MODULE__{} = z, index) when is_integer(index) and index < 0 do
     if abs(index) > length(z.prev) do
@@ -1856,7 +1856,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :siblings
   @spec sibling_at(t(), non_neg_integer()) :: t() | nil
-  def sibling_at(%__MODULE__{prev: [], next: []}, _index), do: nil
+  def sibling_at(%__MODULE__{prev: [], next: []} = _zipper, _index), do: nil
 
   def sibling_at(%__MODULE__{} = z, index) when is_integer(index) do
     current_idx = index_of_focus(z)
@@ -1892,8 +1892,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec first_nibling(t(), predicate()) :: t() | nil
-  def first_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate) do
-    with %__MODULE__{} = first_sibling <- first_sibling(z, &ExRoseTree.parent?/1),
+  def first_nibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) when is_function(predicate) do
+    with %__MODULE__{} = first_sibling <- first_sibling(zipper, &ExRoseTree.parent?/1),
          %__MODULE__{} = first_child <- first_child(first_sibling, predicate) do
       first_child
     else
@@ -1909,8 +1909,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec last_nibling(t(), predicate()) :: t() | nil
-  def last_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate) do
-    with %__MODULE__{} = last_sibling <- last_sibling(z, &ExRoseTree.parent?/1),
+  def last_nibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) when is_function(predicate) do
+    with %__MODULE__{} = last_sibling <- last_sibling(zipper, &ExRoseTree.parent?/1),
          %__MODULE__{} = last_child <- last_child(last_sibling, predicate) do
       last_child
     else
@@ -1926,9 +1926,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec previous_nibling(t(), predicate()) :: t() | nil
-  def previous_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def previous_nibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with %__MODULE__{} = previous_sibling <- previous_sibling(z, &ExRoseTree.parent?/1),
+    with %__MODULE__{} = previous_sibling <- previous_sibling(zipper, &ExRoseTree.parent?/1),
          %__MODULE__{} = last_child <- last_child(previous_sibling, predicate) do
       last_child
     else
@@ -1944,8 +1944,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec next_nibling(t(), predicate()) :: t() | nil
-  def next_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate) do
-    with %__MODULE__{} = next_sibling <- next_sibling(z, &ExRoseTree.parent?/1),
+  def next_nibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) when is_function(predicate) do
+    with %__MODULE__{} = next_sibling <- next_sibling(zipper, &ExRoseTree.parent?/1),
          %__MODULE__{} = first_child <- first_child(next_sibling, predicate) do
       first_child
     else
@@ -1961,9 +1961,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec first_nibling_at_sibling(t(), non_neg_integer(), predicate()) :: t() | nil
-  def first_nibling_at_sibling(%__MODULE__{} = z, index, predicate \\ &Util.always/1)
+  def first_nibling_at_sibling(%__MODULE__{} = zipper, index, predicate \\ &Util.always/1)
       when is_integer(index) and is_function(predicate) do
-    with %__MODULE__{} = sibling_at <- sibling_at(z, index),
+    with %__MODULE__{} = sibling_at <- sibling_at(zipper, index),
          %__MODULE__{} = first_child <- first_child(sibling_at, predicate) do
       first_child
     else
@@ -1979,9 +1979,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec last_nibling_at_sibling(t(), non_neg_integer(), predicate()) :: t() | nil
-  def last_nibling_at_sibling(%__MODULE__{} = z, index, predicate \\ &Util.always/1)
+  def last_nibling_at_sibling(%__MODULE__{} = zipper, index, predicate \\ &Util.always/1)
       when is_integer(index) and is_function(predicate) do
-    with %__MODULE__{} = sibling_at <- sibling_at(z, index),
+    with %__MODULE__{} = sibling_at <- sibling_at(zipper, index),
          %__MODULE__{} = last_child <- last_child(sibling_at, predicate) do
       last_child
     else
@@ -1996,9 +1996,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec previous_grandnibling(t(), predicate()) :: t() | nil
-  def previous_grandnibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def previous_grandnibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    case previous_sibling(z, &ExRoseTree.parent?/1) do
+    case previous_sibling(zipper, &ExRoseTree.parent?/1) do
       nil ->
         nil
 
@@ -2023,9 +2023,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec next_grandnibling(t(), predicate()) :: t() | nil
-  def next_grandnibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def next_grandnibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    case next_sibling(z, &ExRoseTree.parent?/1) do
+    case next_sibling(zipper, &ExRoseTree.parent?/1) do
       nil ->
         nil
 
@@ -2053,9 +2053,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec first_descendant_nibling(t(), predicate()) :: t() | nil
-  def first_descendant_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def first_descendant_nibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    case first_sibling(z) do
+    case first_sibling(zipper) do
       nil ->
         nil
 
@@ -2090,9 +2090,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec last_descendant_nibling(t(), predicate()) :: t() | nil
-  def last_descendant_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def last_descendant_nibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    case last_sibling(z) do
+    case last_sibling(zipper) do
       nil ->
         nil
 
@@ -2127,9 +2127,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec previous_descendant_nibling(t(), predicate()) :: t() | nil
-  def previous_descendant_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def previous_descendant_nibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    case previous_sibling(z) do
+    case previous_sibling(zipper) do
       nil ->
         nil
 
@@ -2164,9 +2164,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec next_descendant_nibling(t(), predicate()) :: t() | nil
-  def next_descendant_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def next_descendant_nibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    case next_sibling(z) do
+    case next_sibling(zipper) do
       nil ->
         nil
 
@@ -2198,9 +2198,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec first_extended_nibling(t(), predicate()) :: t() | nil
-  def first_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
+  def first_extended_nibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) do
     with %__MODULE__{} = first_extended_cousin <-
-           first_extended_cousin(z, &ExRoseTree.has_child?(&1, predicate)),
+           first_extended_cousin(zipper, &ExRoseTree.has_child?(&1, predicate)),
          %__MODULE__{} = first_child <- first_child(first_extended_cousin, predicate) do
       first_child
     else
@@ -2214,9 +2214,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec last_extended_nibling(t(), predicate()) :: t() | nil
-  def last_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
+  def last_extended_nibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) do
     with %__MODULE__{} = last_extended_cousin <-
-           last_extended_cousin(z, &ExRoseTree.has_child?(&1, predicate)),
+           last_extended_cousin(zipper, &ExRoseTree.has_child?(&1, predicate)),
          %__MODULE__{} = last_child <- last_child(last_extended_cousin, predicate) do
       last_child
     else
@@ -2230,9 +2230,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec previous_extended_nibling(t(), predicate()) :: t() | nil
-  def previous_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
+  def previous_extended_nibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) do
     with %__MODULE__{} = prev_extended_cousin <-
-           previous_extended_cousin(z, &ExRoseTree.has_child?(&1, predicate)),
+           previous_extended_cousin(zipper, &ExRoseTree.has_child?(&1, predicate)),
          %__MODULE__{} = last_child <- last_child(prev_extended_cousin, predicate) do
       last_child
     else
@@ -2246,9 +2246,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :niblings
   @spec next_extended_nibling(t(), predicate()) :: t() | nil
-  def next_extended_nibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
+  def next_extended_nibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) do
     with %__MODULE__{} = next_extended_cousin <-
-           next_extended_cousin(z, &ExRoseTree.has_child?(&1, predicate)),
+           next_extended_cousin(zipper, &ExRoseTree.has_child?(&1, predicate)),
          %__MODULE__{} = first_child <- first_child(next_extended_cousin, predicate) do
       first_child
     else
@@ -2266,8 +2266,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec first_pibling(t(), predicate()) :: t() | nil
-  def first_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate) do
-    with %__MODULE__{} = parent <- parent(z),
+  def first_pibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) when is_function(predicate) do
+    with %__MODULE__{} = parent <- parent(zipper),
          %__MODULE__{} = first_sibling <- first_sibling(parent, predicate) do
       first_sibling
     else
@@ -2282,8 +2282,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec last_pibling(t(), predicate()) :: t() | nil
-  def last_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate) do
-    with %__MODULE__{} = parent <- parent(z),
+  def last_pibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) when is_function(predicate) do
+    with %__MODULE__{} = parent <- parent(zipper),
          %__MODULE__{} = last_sibling <- last_sibling(parent, predicate) do
       last_sibling
     else
@@ -2298,9 +2298,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec previous_pibling(t(), predicate()) :: t() | nil
-  def previous_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def previous_pibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with %__MODULE__{} = parent <- parent(z),
+    with %__MODULE__{} = parent <- parent(zipper),
          %__MODULE__{} = previous_sibling <- previous_sibling(parent, predicate) do
       previous_sibling
     else
@@ -2315,8 +2315,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec next_pibling(t(), predicate()) :: t() | nil
-  def next_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate) do
-    with %__MODULE__{} = parent <- parent(z),
+  def next_pibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) when is_function(predicate) do
+    with %__MODULE__{} = parent <- parent(zipper),
          %__MODULE__{} = next_sibling <- next_sibling(parent, predicate) do
       next_sibling
     else
@@ -2331,8 +2331,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec pibling_at(t(), non_neg_integer()) :: t() | nil
-  def pibling_at(%__MODULE__{} = z, index) when is_integer(index) do
-    with %__MODULE__{} = parent <- parent(z),
+  def pibling_at(%__MODULE__{} = zipper, index) when is_integer(index) do
+    with %__MODULE__{} = parent <- parent(zipper),
          %__MODULE__{} = sibling_at <- sibling_at(parent, index) do
       sibling_at
     else
@@ -2347,9 +2347,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec first_grandpibling(t(), predicate()) :: t() | nil
-  def first_grandpibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def first_grandpibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with %__MODULE__{} = grandparent <- grandparent(z),
+    with %__MODULE__{} = grandparent <- grandparent(zipper),
          %__MODULE__{} = first_sibling <- first_sibling(grandparent, predicate) do
       first_sibling
     else
@@ -2364,9 +2364,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec last_grandpibling(t(), predicate()) :: t() | nil
-  def last_grandpibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def last_grandpibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with %__MODULE__{} = grandparent <- grandparent(z),
+    with %__MODULE__{} = grandparent <- grandparent(zipper),
          %__MODULE__{} = last_sibling <- last_sibling(grandparent, predicate) do
       last_sibling
     else
@@ -2381,9 +2381,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec previous_grandpibling(t(), predicate()) :: t() | nil
-  def previous_grandpibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def previous_grandpibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with %__MODULE__{} = grandparent <- grandparent(z),
+    with %__MODULE__{} = grandparent <- grandparent(zipper),
          %__MODULE__{} = previous_sibling <- previous_sibling(grandparent, predicate) do
       previous_sibling
     else
@@ -2398,9 +2398,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec next_grandpibling(t(), predicate()) :: t() | nil
-  def next_grandpibling(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def next_grandpibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with %__MODULE__{} = grandparent <- grandparent(z),
+    with %__MODULE__{} = grandparent <- grandparent(zipper),
          %__MODULE__{} = next_sibling <- next_sibling(grandparent, predicate) do
       next_sibling
     else
@@ -2418,8 +2418,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec first_extended_pibling(t(), predicate()) :: t() | nil
-  def first_extended_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
-    with %__MODULE__{} = parent <- parent(z),
+  def first_extended_pibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) do
+    with %__MODULE__{} = parent <- parent(zipper),
          %__MODULE__{} = first_extended_cousin <- first_extended_cousin(parent, predicate) do
       first_extended_cousin
     else
@@ -2436,8 +2436,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec last_extended_pibling(t(), predicate()) :: t() | nil
-  def last_extended_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
-    with %__MODULE__{} = parent <- parent(z),
+  def last_extended_pibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) do
+    with %__MODULE__{} = parent <- parent(zipper),
          %__MODULE__{} = last_extended_cousin <- last_extended_cousin(parent, predicate) do
       last_extended_cousin
     else
@@ -2454,8 +2454,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec previous_extended_pibling(t(), predicate()) :: t() | nil
-  def previous_extended_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
-    with %__MODULE__{} = parent <- parent(z),
+  def previous_extended_pibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) do
+    with %__MODULE__{} = parent <- parent(zipper),
          %__MODULE__{} = previous_extended_cousin <- previous_extended_cousin(parent, predicate) do
       previous_extended_cousin
     else
@@ -2472,8 +2472,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec next_extended_pibling(t(), predicate()) :: t() | nil
-  def next_extended_pibling(%__MODULE__{} = z, predicate \\ &Util.always/1) do
-    with %__MODULE__{} = parent <- parent(z),
+  def next_extended_pibling(%__MODULE__{} = zipper, predicate \\ &Util.always/1) do
+    with %__MODULE__{} = parent <- parent(zipper),
          %__MODULE__{} = next_extended_cousin <- next_extended_cousin(parent, predicate) do
       next_extended_cousin
     else
@@ -2490,7 +2490,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec first_ancestral_pibling(t(), predicate()) :: t() | nil
-  def first_ancestral_pibling(z, predicate \\ &Util.always/1)
+  def first_ancestral_pibling(zipper, predicate \\ &Util.always/1)
 
   def first_ancestral_pibling(%__MODULE__{} = z, predicate)
       when is_function(predicate) do
@@ -2516,7 +2516,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec previous_ancestral_pibling(t(), predicate()) :: t() | nil
-  def previous_ancestral_pibling(z, predicate \\ &Util.always/1)
+  def previous_ancestral_pibling(zipper, predicate \\ &Util.always/1)
 
   def previous_ancestral_pibling(%__MODULE__{} = z, predicate)
       when is_function(predicate) do
@@ -2542,7 +2542,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec next_ancestral_pibling(t(), predicate()) :: t() | nil
-  def next_ancestral_pibling(z, predicate \\ &Util.always/1)
+  def next_ancestral_pibling(zipper, predicate \\ &Util.always/1)
 
   def next_ancestral_pibling(%__MODULE__{} = z, predicate)
       when is_function(predicate) do
@@ -2568,7 +2568,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :piblings
   @spec last_ancestral_pibling(t(), predicate()) :: t() | nil
-  def last_ancestral_pibling(z, predicate \\ &Util.always/1)
+  def last_ancestral_pibling(zipper, predicate \\ &Util.always/1)
 
   def last_ancestral_pibling(%__MODULE__{} = z, predicate)
       when is_function(predicate) do
@@ -2595,10 +2595,10 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :first_cousins
   @spec first_first_cousin(t(), predicate()) :: t() | nil
-  def first_first_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def first_first_cousin(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with starting_idx <- index_of_parent(z),
-         %__MODULE__{} = first_pibling <- first_pibling(z, &ExRoseTree.parent?/1),
+    with starting_idx <- index_of_parent(zipper),
+         %__MODULE__{} = first_pibling <- first_pibling(zipper, &ExRoseTree.parent?/1),
          %__MODULE__{} = first_first_cousin <-
            do_first_first_cousin(first_pibling, predicate, starting_idx) do
       first_first_cousin
@@ -2632,10 +2632,10 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :first_cousins
   @spec last_first_cousin(t(), predicate()) :: t() | nil
-  def last_first_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def last_first_cousin(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with starting_idx <- index_of_parent(z),
-         %__MODULE__{} = last_pibling <- last_pibling(z, &ExRoseTree.parent?/1),
+    with starting_idx <- index_of_parent(zipper),
+         %__MODULE__{} = last_pibling <- last_pibling(zipper, &ExRoseTree.parent?/1),
          %__MODULE__{} = last_first_cousin <-
            do_last_first_cousin(last_pibling, predicate, starting_idx) do
       last_first_cousin
@@ -2669,9 +2669,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :first_cousins
   @spec previous_first_cousin(t(), predicate()) :: t() | nil
-  def previous_first_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def previous_first_cousin(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with %__MODULE__{} = previous_pibling <- previous_pibling(z, &ExRoseTree.parent?/1),
+    with %__MODULE__{} = previous_pibling <- previous_pibling(zipper, &ExRoseTree.parent?/1),
          %__MODULE__{} = previous_first_cousin <-
            do_previous_first_cousin(previous_pibling, predicate) do
       previous_first_cousin
@@ -2701,9 +2701,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :first_cousins
   @spec next_first_cousin(t(), predicate()) :: t() | nil
-  def next_first_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def next_first_cousin(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with %__MODULE__{} = next_pibling <- next_pibling(z, &ExRoseTree.parent?/1),
+    with %__MODULE__{} = next_pibling <- next_pibling(zipper, &ExRoseTree.parent?/1),
          %__MODULE__{} = next_first_cousin <-
            do_next_first_cousin(next_pibling, predicate) do
       next_first_cousin
@@ -2738,10 +2738,10 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :second_cousins
   @spec first_second_cousin(t(), predicate()) :: t() | nil
-  def first_second_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def first_second_cousin(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with starting_idx <- index_of_grandparent(z),
-         %__MODULE__{} = first_grandpibling <- first_grandpibling(z, &ExRoseTree.parent?/1),
+    with starting_idx <- index_of_grandparent(zipper),
+         %__MODULE__{} = first_grandpibling <- first_grandpibling(zipper, &ExRoseTree.parent?/1),
          %__MODULE__{} = first_second_cousin <-
            do_first_second_cousin(first_grandpibling, predicate, starting_idx) do
       first_second_cousin
@@ -2776,10 +2776,10 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :second_cousins
   @spec last_second_cousin(t(), predicate()) :: t() | nil
-  def last_second_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def last_second_cousin(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with starting_idx <- index_of_grandparent(z),
-         %__MODULE__{} = last_grandpibling <- last_grandpibling(z, &ExRoseTree.parent?/1),
+    with starting_idx <- index_of_grandparent(zipper),
+         %__MODULE__{} = last_grandpibling <- last_grandpibling(zipper, &ExRoseTree.parent?/1),
          %__MODULE__{} = last_second_cousin <-
            do_last_second_cousin(last_grandpibling, predicate, starting_idx) do
       last_second_cousin
@@ -2813,9 +2813,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :second_cousins
   @spec previous_second_cousin(t(), predicate()) :: t() | nil
-  def previous_second_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def previous_second_cousin(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with %__MODULE__{} = previous_grandpibling <- previous_grandpibling(z, &ExRoseTree.parent?/1),
+    with %__MODULE__{} = previous_grandpibling <- previous_grandpibling(zipper, &ExRoseTree.parent?/1),
          %__MODULE__{} = previous_second_cousin <-
            do_previous_second_cousin(previous_grandpibling, predicate) do
       previous_second_cousin
@@ -2845,9 +2845,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :second_cousins
   @spec next_second_cousin(t(), predicate()) :: t() | nil
-  def next_second_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def next_second_cousin(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    with %__MODULE__{} = next_grandpibling <- next_grandpibling(z, &ExRoseTree.parent?/1),
+    with %__MODULE__{} = next_grandpibling <- next_grandpibling(zipper, &ExRoseTree.parent?/1),
          %__MODULE__{} = next_second_cousin <-
            do_next_second_cousin(next_grandpibling, predicate) do
       next_second_cousin
@@ -2908,9 +2908,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :extended_cousins
   @spec first_extended_cousin(t(), predicate()) :: t() | nil
-  def first_extended_cousin(z, predicate \\ &Util.always/1)
+  def first_extended_cousin(zipper, predicate \\ &Util.always/1)
 
-  def first_extended_cousin(%__MODULE__{path: []}, _predicate), do: nil
+  def first_extended_cousin(%__MODULE__{path: []} = _zipper, _predicate), do: nil
 
   def first_extended_cousin(%__MODULE__{} = z, predicate) when is_function(predicate) do
     target_depth = depth_of_focus(z)
@@ -3243,9 +3243,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :extended_cousins
   @spec last_extended_cousin(t(), predicate()) :: t() | nil
-  def last_extended_cousin(z, predicate \\ &Util.always/1)
+  def last_extended_cousin(zipper, predicate \\ &Util.always/1)
 
-  def last_extended_cousin(%__MODULE__{path: []}, _predicate), do: nil
+  def last_extended_cousin(%__MODULE__{path: []} = _zipper, _predicate), do: nil
 
   def last_extended_cousin(%__MODULE__{} = z, predicate)
       when is_function(predicate) do
@@ -3582,11 +3582,11 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :extended_cousins
   @spec previous_extended_cousin(t(), predicate()) :: t() | nil
-  def previous_extended_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def previous_extended_cousin(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    target_depth = depth_of_focus(z)
+    target_depth = depth_of_focus(zipper)
 
-    z
+    zipper
     |> find_previous_extended_cousin(target_depth, predicate)
   end
 
@@ -3708,11 +3708,11 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :extended_cousins
   @spec next_extended_cousin(t(), predicate()) :: t() | nil
-  def next_extended_cousin(%__MODULE__{} = z, predicate \\ &Util.always/1)
+  def next_extended_cousin(%__MODULE__{} = zipper, predicate \\ &Util.always/1)
       when is_function(predicate) do
-    target_depth = depth_of_focus(z)
+    target_depth = depth_of_focus(zipper)
 
-    z
+    zipper
     |> find_next_extended_cousin(target_depth, predicate)
   end
 
@@ -3855,10 +3855,10 @@ defmodule ExRoseTree.Zipper do
           move_fn(),
           pos_integer()
         ) :: t() | nil
-  def move_for(%__MODULE__{} = z, move_fn, reps) when reps > 0 and is_function(move_fn) do
+  def move_for(%__MODULE__{} = zipper, move_fn, reps) when reps > 0 and is_function(move_fn) do
     1..reps
-    |> Enum.reduce_while(z, fn _rep, zipper ->
-      case move_fn.(zipper) do
+    |> Enum.reduce_while(zipper, fn _rep, z ->
+      case move_fn.(z) do
         nil ->
           {:halt, nil}
 
@@ -3877,9 +3877,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :traversal
   @spec move_if(t(), move_fn(), predicate()) :: t() | nil
-  def move_if(%__MODULE__{} = z, move_fn, predicate)
+  def move_if(%__MODULE__{} = zipper, move_fn, predicate)
       when is_function(move_fn) and is_function(predicate) do
-    case move_fn.(z) do
+    case move_fn.(zipper) do
       nil ->
         nil
 
@@ -3899,9 +3899,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :traversal
   @spec move_until(t(), move_fn(), predicate()) :: t() | nil
-  def move_until(%__MODULE__{} = z, move_fn, predicate)
+  def move_until(%__MODULE__{} = zipper, move_fn, predicate)
       when is_function(move_fn) and is_function(predicate) do
-    case move_fn.(z) do
+    case move_fn.(zipper) do
       nil ->
         nil
 
@@ -3921,18 +3921,18 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :traversal
   @spec move_while(t(), move_fn(), predicate()) :: t()
-  def move_while(%__MODULE__{} = z, move_fn, predicate \\ &Util.always/1)
+  def move_while(%__MODULE__{} = zipper, move_fn, predicate \\ &Util.always/1)
       when is_function(move_fn) and is_function(predicate) do
-    if predicate.(z) == true do
-      case move_fn.(z) do
+    if predicate.(zipper) == true do
+      case move_fn.(zipper) do
         nil ->
-          z
+          zipper
 
         %__MODULE__{} = next_z ->
           move_while(next_z, move_fn, predicate)
       end
     else
-      z
+      zipper
     end
   end
 
@@ -3942,12 +3942,12 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :traversal
   @spec find(t(), move_fn(), predicate()) :: t() | nil
-  def find(%__MODULE__{} = z, move_fn, predicate)
+  def find(%__MODULE__{} = zipper, move_fn, predicate)
       when is_function(move_fn) and is_function(predicate) do
-    if predicate.(z) == true do
-      z
+    if predicate.(zipper) == true do
+      zipper
     else
-      case move_fn.(z) do
+      case move_fn.(zipper) do
         nil ->
           nil
 
@@ -3964,9 +3964,9 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :traversal
   @spec map(t(), move_fn(), map_fn()) :: t()
-  def map(%__MODULE__{} = z, move_fn, map_fn)
+  def map(%__MODULE__{} = zipper, move_fn, map_fn)
       when is_function(move_fn) and is_function(map_fn) do
-    new_z = map_focus(z, map_fn)
+    new_z = map_focus(zipper, map_fn)
 
     case move_fn.(new_z) do
       nil ->
@@ -3985,14 +3985,14 @@ defmodule ExRoseTree.Zipper do
   @doc section: :traversal
   @spec accumulate(t(), move_fn(), term(), acc_fn()) ::
           {t(), term()}
-  def accumulate(%__MODULE__{} = z, move_fn, acc, acc_fn)
+  def accumulate(%__MODULE__{} = zipper, move_fn, acc, acc_fn)
       when is_function(move_fn) and is_function(acc_fn) do
-    case move_fn.(z) do
+    case move_fn.(zipper) do
       nil ->
-        {z, acc_fn.(z, acc)}
+        {zipper, acc_fn.(zipper, acc)}
 
       %__MODULE__{} = next_z ->
-        accumulate(next_z, move_fn, acc_fn.(z, acc), acc_fn)
+        accumulate(next_z, move_fn, acc_fn.(zipper, acc), acc_fn)
     end
   end
 
@@ -4005,8 +4005,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :path_traversal
   @spec rewind_for(t(), pos_integer()) :: t() | nil
-  def rewind_for(%__MODULE__{} = z, reps),
-    do: move_for(z, &parent/1, reps)
+  def rewind_for(%__MODULE__{} = zipper, reps),
+    do: move_for(zipper, &parent/1, reps)
 
   @doc """
   Rewinds a Zipper along the `path` if the provided predicate function
@@ -4014,8 +4014,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :path_traversal
   @spec rewind_if(t(), predicate()) :: t() | nil
-  def rewind_if(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_if(z, &parent/1, predicate)
+  def rewind_if(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: move_if(zipper, &parent/1, predicate)
 
   @doc """
   Rewinds a Zipper continuously until the provided predicate function
@@ -4023,8 +4023,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :path_traversal
   @spec rewind_until(t(), predicate()) :: t() | nil
-  def rewind_until(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_until(z, &parent/1, predicate)
+  def rewind_until(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: move_until(zipper, &parent/1, predicate)
 
   @doc """
   Rewinds a Zipper while the given predicate remains true. If no custom
@@ -4032,8 +4032,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :path_traversal
   @spec rewind_while(t(), predicate()) :: t()
-  def rewind_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
-    do: move_while(z, &parent/1, predicate)
+  def rewind_while(%__MODULE__{} = zipper, predicate \\ &Util.always/1) when is_function(predicate),
+    do: move_while(zipper, &parent/1, predicate)
 
   @doc """
   Rewinds a zipper back to the root.
@@ -4051,8 +4051,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :path_traversal
   @spec rewind_to_root(t()) :: t()
-  def rewind_to_root(%__MODULE__{} = z),
-    do: rewind_while(z)
+  def rewind_to_root(%__MODULE__{} = zipper),
+    do: rewind_while(zipper)
 
   @doc """
   Searches for a predicate match by rewinding the path in the Zipper. If no match
@@ -4060,8 +4060,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :path_traversal
   @spec rewind_find(t(), predicate()) :: t() | nil
-  def rewind_find(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: find(z, &parent/1, predicate)
+  def rewind_find(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: find(zipper, &parent/1, predicate)
 
   @doc """
   Rewinds the Zipper and maps the `term` at each node using the provided `map_fn()`.
@@ -4069,8 +4069,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :path_traversal
   @spec rewind_map(t(), map_fn()) :: t()
-  def rewind_map(%__MODULE__{} = z, map_fn) when is_function(map_fn),
-    do: map(z, &parent/1, map_fn)
+  def rewind_map(%__MODULE__{} = zipper, map_fn) when is_function(map_fn),
+    do: map(zipper, &parent/1, map_fn)
 
   @doc """
   Rewinds the Zipper and accumulates an additional value using the provided
@@ -4079,8 +4079,8 @@ defmodule ExRoseTree.Zipper do
   @doc section: :path_traversal
   @spec rewind_accumulate(t(), term(), acc_fn()) ::
           {t(), term()}
-  def rewind_accumulate(%__MODULE__{} = z, acc, acc_fn) when is_function(acc_fn),
-    do: accumulate(z, &parent/1, acc, acc_fn)
+  def rewind_accumulate(%__MODULE__{} = zipper, acc, acc_fn) when is_function(acc_fn),
+    do: accumulate(zipper, &parent/1, acc, acc_fn)
 
   ###
   ### FORWARD, BREADTH-FIRST TRAVERSAL
@@ -4091,7 +4091,7 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec forward(t()) :: t() | nil
-  def forward(%__MODULE__{} = z) do
+  def forward(%__MODULE__{} = zipper) do
     funs = [
       &next_sibling/2,
       &next_extended_cousin/2,
@@ -4100,7 +4100,7 @@ defmodule ExRoseTree.Zipper do
       &first_child/2
     ]
 
-    z
+    zipper
     |> Util.first_of_with_args(funs, [&Util.always/1])
   end
 
@@ -4109,8 +4109,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec forward_for(t(), pos_integer()) :: t() | nil
-  def forward_for(%__MODULE__{} = z, reps),
-    do: move_for(z, &forward/1, reps)
+  def forward_for(%__MODULE__{} = zipper, reps),
+    do: move_for(zipper, &forward/1, reps)
 
   @doc """
   Moves forward in the Zipper if the provided predicate function
@@ -4118,8 +4118,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec forward_if(t(), predicate()) :: t() | nil
-  def forward_if(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_if(z, &forward/1, predicate)
+  def forward_if(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: move_if(zipper, &forward/1, predicate)
 
   @doc """
   Moves forward in the Zipper continuously until the provided predicate
@@ -4127,8 +4127,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec forward_until(t(), predicate()) :: t() | nil
-  def forward_until(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_until(z, &forward/1, predicate)
+  def forward_until(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: move_until(zipper, &forward/1, predicate)
 
   @doc """
   Moves forward in the Zipper while the given predicate remains true.
@@ -4137,8 +4137,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec forward_while(t(), predicate()) :: t()
-  def forward_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
-    do: move_while(z, &forward/1, predicate)
+  def forward_while(%__MODULE__{} = zipper, predicate \\ &Util.always/1) when is_function(predicate),
+    do: move_while(zipper, &forward/1, predicate)
 
   @doc """
   Moves forward through the Zipper until the last node of the tree
@@ -4146,8 +4146,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec forward_to_last(t()) :: t()
-  def forward_to_last(%__MODULE__{} = z),
-    do: forward_while(z)
+  def forward_to_last(%__MODULE__{} = zipper),
+    do: forward_while(zipper)
 
   @doc """
   Searches for a predicate match by moving forward in the Zipper. If no match
@@ -4155,8 +4155,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec forward_find(t(), predicate()) :: t() | nil
-  def forward_find(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: find(z, &forward/1, predicate)
+  def forward_find(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: find(zipper, &forward/1, predicate)
 
   @doc """
   Moves forward in the Zipper and maps the `term` at each node using the provided
@@ -4164,8 +4164,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec forward_map(t(), map_fn()) :: t()
-  def forward_map(%__MODULE__{} = z, map_fn) when is_function(map_fn),
-    do: map(z, &forward/1, map_fn)
+  def forward_map(%__MODULE__{} = zipper, map_fn) when is_function(map_fn),
+    do: map(zipper, &forward/1, map_fn)
 
   @doc """
   Moves forward in the Zipper and accumulates an additional value using the provided
@@ -4173,8 +4173,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec forward_accumulate(t(), term(), acc_fn()) :: {t(), term()}
-  def forward_accumulate(%__MODULE__{} = z, acc, acc_fn) when is_function(acc_fn),
-    do: accumulate(z, &forward/1, acc, acc_fn)
+  def forward_accumulate(%__MODULE__{} = zipper, acc, acc_fn) when is_function(acc_fn),
+    do: accumulate(zipper, &forward/1, acc, acc_fn)
 
   ###
   ### BACKWARD, BREADTH-FIRST TRAVERSAL
@@ -4205,8 +4205,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec backward_for(t(), pos_integer()) :: t() | nil
-  def backward_for(%__MODULE__{} = z, reps),
-    do: move_for(z, &backward/1, reps)
+  def backward_for(%__MODULE__{} = zipper, reps),
+    do: move_for(zipper, &backward/1, reps)
 
   @doc """
   Moves backward in the Zipper if the provided predicate function
@@ -4214,8 +4214,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec backward_if(t(), predicate()) :: t() | nil
-  def backward_if(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_if(z, &backward/1, predicate)
+  def backward_if(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: move_if(zipper, &backward/1, predicate)
 
   @doc """
   Moves backward in the Zipper continuously until the provided predicate
@@ -4223,8 +4223,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec backward_until(t(), predicate()) :: t() | nil
-  def backward_until(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_until(z, &backward/1, predicate)
+  def backward_until(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: move_until(zipper, &backward/1, predicate)
 
   @doc """
   Moves backward in the Zipper while the given predicate remains true.
@@ -4233,8 +4233,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec backward_while(t(), predicate()) :: t()
-  def backward_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
-    do: move_while(z, &backward/1, predicate)
+  def backward_while(%__MODULE__{} = zipper, predicate \\ &Util.always/1) when is_function(predicate),
+    do: move_while(zipper, &backward/1, predicate)
 
   @doc """
   Moves backward through the Zipper until the root has been reached. If the
@@ -4242,8 +4242,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec backward_to_root(t()) :: t()
-  def backward_to_root(%__MODULE__{} = z),
-    do: backward_while(z)
+  def backward_to_root(%__MODULE__{} = zipper),
+    do: backward_while(zipper)
 
   @doc """
   Searches for a predicate match by moving backward in the Zipper. If no match
@@ -4251,8 +4251,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec backward_find(t(), predicate()) :: t() | nil
-  def backward_find(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: find(z, &backward/1, predicate)
+  def backward_find(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: find(zipper, &backward/1, predicate)
 
   @doc """
   Moves backward in the Zipper and maps the `term` at each node using the provided
@@ -4260,8 +4260,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec backward_map(t(), map_fn()) :: t()
-  def backward_map(%__MODULE__{} = z, map_fn) when is_function(map_fn),
-    do: map(z, &backward/1, map_fn)
+  def backward_map(%__MODULE__{} = zipper, map_fn) when is_function(map_fn),
+    do: map(zipper, &backward/1, map_fn)
 
   @doc """
   Moves backward in the Zipper and accumulates an additional value using the provided
@@ -4269,8 +4269,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :breadth_first
   @spec backward_accumulate(t(), term(), acc_fn()) :: {t(), term()}
-  def backward_accumulate(%__MODULE__{} = z, acc, acc_fn) when is_function(acc_fn),
-    do: accumulate(z, &backward/1, acc, acc_fn)
+  def backward_accumulate(%__MODULE__{} = zipper, acc, acc_fn) when is_function(acc_fn),
+    do: accumulate(zipper, &backward/1, acc, acc_fn)
 
   ###
   ### DESCEND, DEPTH-FIRST TRAVERSAL
@@ -4281,14 +4281,14 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec descend(t()) :: t() | nil
-  def descend(%__MODULE__{} = z) do
+  def descend(%__MODULE__{} = zipper) do
     funs = [
       &first_child/2,
       &next_sibling/2,
       &next_ancestral_pibling/2
     ]
 
-    z
+    zipper
     |> Util.first_of_with_args(funs, [&Util.always/1])
   end
 
@@ -4297,8 +4297,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec descend_for(t(), pos_integer()) :: t() | nil
-  def descend_for(%__MODULE__{} = z, reps),
-    do: move_for(z, &descend/1, reps)
+  def descend_for(%__MODULE__{} = zipper, reps),
+    do: move_for(zipper, &descend/1, reps)
 
   @doc """
   Descends into the Zipper if the provided predicate function
@@ -4306,8 +4306,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec descend_if(t(), predicate()) :: t() | nil
-  def descend_if(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_if(z, &descend/1, predicate)
+  def descend_if(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: move_if(zipper, &descend/1, predicate)
 
   @doc """
   Descends into the Zipper continuously until the provided predicate
@@ -4316,8 +4316,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec descend_until(t(), predicate()) :: t() | nil
-  def descend_until(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_until(z, &descend/1, predicate)
+  def descend_until(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: move_until(zipper, &descend/1, predicate)
 
   @doc """
   Descends the Zipper while the given predicate remains true. If no custom
@@ -4325,16 +4325,16 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec descend_while(t(), predicate()) :: t()
-  def descend_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
-    do: move_while(z, &descend/1, predicate)
+  def descend_while(%__MODULE__{} = zipper, predicate \\ &Util.always/1) when is_function(predicate),
+    do: move_while(zipper, &descend/1, predicate)
 
   @doc """
   Descends the Zipper until the last node of the tree has been reached.
   """
   @doc section: :depth_first
   @spec descend_to_last(t()) :: t()
-  def descend_to_last(%__MODULE__{} = z),
-    do: descend_while(z)
+  def descend_to_last(%__MODULE__{} = zipper),
+    do: descend_while(zipper)
 
   @doc """
   Searches for a predicate match by descending the Zipper. If no match
@@ -4342,8 +4342,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec descend_find(t(), predicate()) :: t() | nil
-  def descend_find(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: find(z, &descend/1, predicate)
+  def descend_find(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: find(zipper, &descend/1, predicate)
 
   @doc """
   Descends the Zipper and maps the `term` at each node using the provided
@@ -4351,8 +4351,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec descend_map(t(), map_fn()) :: t()
-  def descend_map(%__MODULE__{} = z, map_fn) when is_function(map_fn),
-    do: map(z, &descend/1, map_fn)
+  def descend_map(%__MODULE__{} = zipper, map_fn) when is_function(map_fn),
+    do: map(zipper, &descend/1, map_fn)
 
   @doc """
   Descends the Zipper and accumulates an additional value using the provided
@@ -4360,8 +4360,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec descend_accumulate(t(), term(), acc_fn()) :: {t(), term()}
-  def descend_accumulate(%__MODULE__{} = z, acc, acc_fn) when is_function(acc_fn),
-    do: accumulate(z, &descend/1, acc, acc_fn)
+  def descend_accumulate(%__MODULE__{} = zipper, acc, acc_fn) when is_function(acc_fn),
+    do: accumulate(zipper, &descend/1, acc, acc_fn)
 
   ###
   ### ASCEND, DEPTH-FIRST TRAVERSAL
@@ -4372,14 +4372,14 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec ascend(t()) :: t()
-  def ascend(%__MODULE__{} = z) do
+  def ascend(%__MODULE__{} = zipper) do
     funs = [
       fn x -> previous_descendant_nibling(x) end,
       fn x -> previous_sibling(x) end,
       &parent/1
     ]
 
-    z
+    zipper
     |> Util.first_of(funs)
   end
 
@@ -4388,8 +4388,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec ascend_for(t(), pos_integer()) :: t() | nil
-  def ascend_for(%__MODULE__{} = z, reps),
-    do: move_for(z, &ascend/1, reps)
+  def ascend_for(%__MODULE__{} = zipper, reps),
+    do: move_for(zipper, &ascend/1, reps)
 
   @doc """
   Ascends the Zipper if the provided predicate function returns true
@@ -4397,8 +4397,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec ascend_if(t(), predicate()) :: t() | nil
-  def ascend_if(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_if(z, &ascend/1, predicate)
+  def ascend_if(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: move_if(zipper, &ascend/1, predicate)
 
   @doc """
   Ascends the Zipper continuously until the provided predicate function
@@ -4406,8 +4406,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec ascend_until(t(), predicate()) :: t() | nil
-  def ascend_until(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: move_until(z, &ascend/1, predicate)
+  def ascend_until(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: move_until(zipper, &ascend/1, predicate)
 
   @doc """
   Ascends the Zipper while the given predicate remains true. If no custom
@@ -4415,8 +4415,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec ascend_while(t(), predicate()) :: t()
-  def ascend_while(%__MODULE__{} = z, predicate \\ &Util.always/1) when is_function(predicate),
-    do: move_while(z, &ascend/1, predicate)
+  def ascend_while(%__MODULE__{} = zipper, predicate \\ &Util.always/1) when is_function(predicate),
+    do: move_while(zipper, &ascend/1, predicate)
 
   @doc """
   Ascends the Zipper until the root has been reached. If the root has
@@ -4424,8 +4424,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec ascend_to_root(t()) :: t()
-  def ascend_to_root(%__MODULE__{} = z),
-    do: ascend_while(z)
+  def ascend_to_root(%__MODULE__{} = zipper),
+    do: ascend_while(zipper)
 
   @doc """
   Searches for a predicate match by ascending the Zipper. If no match
@@ -4433,8 +4433,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec ascend_find(t(), predicate()) :: t() | nil
-  def ascend_find(%__MODULE__{} = z, predicate) when is_function(predicate),
-    do: find(z, &ascend/1, predicate)
+  def ascend_find(%__MODULE__{} = zipper, predicate) when is_function(predicate),
+    do: find(zipper, &ascend/1, predicate)
 
   @doc """
   Ascends the Zipper and maps the `term` at each node using the provided
@@ -4442,8 +4442,8 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec ascend_map(t(), map_fn()) :: t()
-  def ascend_map(%__MODULE__{} = z, map_fn) when is_function(map_fn),
-    do: map(z, &ascend/1, map_fn)
+  def ascend_map(%__MODULE__{} = zipper, map_fn) when is_function(map_fn),
+    do: map(zipper, &ascend/1, map_fn)
 
   @doc """
   Ascends the Zipper and accumulates an additional value using the provided
@@ -4451,6 +4451,6 @@ defmodule ExRoseTree.Zipper do
   """
   @doc section: :depth_first
   @spec ascend_accumulate(t(), term(), acc_fn()) :: {t(), term()}
-  def ascend_accumulate(%__MODULE__{} = z, acc, acc_fn) when is_function(acc_fn),
-    do: accumulate(z, &ascend/1, acc, acc_fn)
+  def ascend_accumulate(%__MODULE__{} = zipper, acc, acc_fn) when is_function(acc_fn),
+    do: accumulate(zipper, &ascend/1, acc, acc_fn)
 end
