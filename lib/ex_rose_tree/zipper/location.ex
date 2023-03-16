@@ -11,7 +11,7 @@ defmodule ExRoseTree.Zipper.Location do
   @typedoc """
   A `Location` is made up of the `term` of an `ExRoseTree` with lists of `prev` and `next` siblings.
 
-  * `term` is a `ExRoseTree` `term`.
+  * `term` is an `ExRoseTree` `term`.
   * `prev` is a list of `ExRoseTree`s. They are the siblings that
       occur prior the `term`. It is reversed such that the
       head of the list is the nearest previous sibling.
@@ -32,10 +32,10 @@ defmodule ExRoseTree.Zipper.Location do
                   is_list(value.next)
 
   @doc """
-  Builds a new `Location` given a `term()` or a `ExRoseTree` as the first
+  Builds a new `Location` given a `term()` or an `ExRoseTree` as the first
   argument, and optional `:prev` and `:next` keywords of lists of `ExRoseTree`s.
 
-  If the first argument is a `ExRoseTree`, it will unwrap its `term` element.
+  If the first argument is an `ExRoseTree`, it will unwrap its `term` element.
 
   ## Examples
 
