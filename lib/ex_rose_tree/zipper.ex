@@ -298,7 +298,7 @@ defmodule ExRoseTree.Zipper do
 
   @doc """
   Returns whether or not the current `Zipper` is at the root of the tree.
-  A `Zipper` is considered at the root when it has no `Location`s in its path.
+  A `Zipper` is considered at the root when it has no `ExRoseTree.Zipper.Location`s in its path.
 
   ## Examples
 
@@ -646,7 +646,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Applies the given function to path of `Location`s from the current focus back to the root
+  Applies the given function to path of `ExRoseTree.Zipper.Location`s from the current focus back to the root
   without moving the `Zipper`.
 
   ## Examples
@@ -683,7 +683,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Builds a new `Location` out of the current `Zipper`.
+  Builds a new `ExRoseTree.Zipper.Location` out of the current `Zipper`.
 
   ## Examples
 
@@ -710,7 +710,7 @@ defmodule ExRoseTree.Zipper do
   end
 
   @doc """
-  Builds a new `Zipper` from a list of `Location`s.
+  Builds a new `Zipper` from a list of `ExRoseTree.Zipper.Location`s.
 
   ## Examples
 
@@ -795,7 +795,7 @@ defmodule ExRoseTree.Zipper do
     do: Location.index_of_term(grandparent)
 
   @doc """
-  Returns the current `Zipper`'s parent `Location`.
+  Returns the current `Zipper`'s parent `ExRoseTree.Zipper.Location`.
 
   ## Examples
       iex> loc_trees = for n <- [4,3,2,1], do: ExRoseTree.new(n)
@@ -813,7 +813,7 @@ defmodule ExRoseTree.Zipper do
   def parent_location(%__MODULE__{path: [parent | _]}), do: parent
 
   @doc """
-  Returns the `term` in the current `Zipper`'s parent `Location`.
+  Returns the `term` in the current `Zipper`'s parent `ExRoseTree.Zipper.Location`.
 
   ## Examples
       iex> loc_trees = for n <- [4,3,2,1], do: ExRoseTree.new(n)
@@ -831,7 +831,7 @@ defmodule ExRoseTree.Zipper do
   def parent_term(%__MODULE__{path: [parent | _]}), do: parent.term
 
   @doc """
-  Moves the focus to the parent `Location`. If at the root, thus no
+  Moves the focus to the parent `ExRoseTree.Zipper.Location`. If at the root, thus no
   parent, returns `nil`.
 
   ## Examples
@@ -2897,13 +2897,13 @@ defmodule ExRoseTree.Zipper do
 
   High level steps:
 
-  1. Ascend `path` to find highest `Location` with `prev` siblings.
+  1. Ascend `path` to find highest `ExRoseTree.Zipper.Location` with `prev` siblings.
   2. Starting with the first sibling, check each subtree from left to right,
       and if you reach the target depth and find a tree that satisifies any
       given predicate, stop there. Otherwise, continue left to right.
-  3. If you return back to the starting `Location`, descend the `path` to next
-      deepest `Location` and set as starting `Location`. Goto step 2.
-  4. If you return back to starting `Location`, and it is also the ending `Location`,
+  3. If you return back to the starting `ExRoseTree.Zipper.Location`, descend the `path` to next
+      deepest `ExRoseTree.Zipper.Location` and set as starting `ExRoseTree.Zipper.Location`. Goto step 2.
+  4. If you return back to starting `ExRoseTree.Zipper.Location`, and it is also the ending `ExRoseTree.Zipper.Location`,
       and you have not found a suitable note at the right depth, you will not find one.
   """
   @doc section: :extended_cousins
