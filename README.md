@@ -79,84 +79,85 @@ end
 ## Example Usage
 
 ```elixir
-iex> alias ExRoseTree, as: Tree
-iex> alias ExRoseTree.Zipper
-iex> Tree.new(1)
-%ExRoseTree{term: 1, children: []}
-iex>
-iex> tree = Tree.new(1, [2,3,4,5])
-%ExRoseTree{term: 1, children: [
-  %ExRoseTree{term: 2, children: []},
-  %ExRoseTree{term: 3, children: []},
-  %ExRoseTree{term: 4, children: []},
-  %ExRoseTree{term: 5, children: []},
-]}
-iex>
-iex> zipper = Zipper.new(tree)
-%ExRoseTree.Zipper{
-  focus: %ExRoseTree{
-    term: 1,
-    children: [
-      %ExRoseTree{term: 2, children: []},
-      %ExRoseTree{term: 3, children: []},
-      %ExRoseTree{term: 4, children: []},
-      %ExRoseTree{term: 5, children: []}
-    ]
-  },
-  prev: [],
-  next: [],
-  path: []
-}
-iex>
-iex> zipper = Zipper.last_child(zipper)
-%ExRoseTree.Zipper{
-  focus: %ExRoseTree{term: 5, children: []},
-  prev: [
-    %ExRoseTree{term: 4, children: []},
-    %ExRoseTree{term: 3, children: []},
-    %ExRoseTree{term: 2, children: []}
-  ],
-  next: [],
-  path: [%ExRoseTree.Zipper.Location{prev: [], term: 1, next: []}]
-}
-iex>
-iex> zipper = Zipper.backward(zipper)
-%ExRoseTree.Zipper{
-  focus: %ExRoseTree{term: 4, children: []},
-  prev: [
-    %ExRoseTree{term: 3, children: []},
-    %ExRoseTree{term: 2, children: []}
-  ],
-  next: [%ExRoseTree{term: 5, children: []}],
-  path: [%ExRoseTree.Zipper.Location{prev: [], term: 1, next: []}]
-}
-iex>
-iex> zipper = Zipper.rewind_map(zipper, &Tree.map_term(&1, fn t -> t * 10 end))
-%ExRoseTree.Zipper{
-  focus: %ExRoseTree{
-    term: 10,
-    children: [
-      %ExRoseTree{term: 2, children: []},
-      %ExRoseTree{term: 3, children: []},
-      %ExRoseTree{term: 40, children: []},
-      %ExRoseTree{term: 5, children: []},
-    ]
-  },
-  prev: [],
-  next: [],
-  path: []
-}
-iex>
-iex> Zipper.to_tree(zipper)
-%ExRoseTree{
-  term: 10,
-  children: [
-    %ExRoseTree{term: 2, children: []},
-    %ExRoseTree{term: 3, children: []},
-    %ExRoseTree{term: 40, children: []},
-    %ExRoseTree{term: 5, children: []}
-  ]
-}
+alias ExRoseTree, as: Tree
+alias ExRoseTree.Zipper
+
+Tree.new(1)
+# %ExRoseTree{term: 1, children: []}
+
+tree = Tree.new(1, [2,3,4,5])
+# %ExRoseTree{term: 1, children: [
+#   %ExRoseTree{term: 2, children: []},
+#   %ExRoseTree{term: 3, children: []},
+#   %ExRoseTree{term: 4, children: []},
+#   %ExRoseTree{term: 5, children: []},
+# ]}
+
+zipper = Zipper.new(tree)
+# %ExRoseTree.Zipper{
+#   focus: %ExRoseTree{
+#     term: 1,
+#     children: [
+#       %ExRoseTree{term: 2, children: []},
+#       %ExRoseTree{term: 3, children: []},
+#       %ExRoseTree{term: 4, children: []},
+#       %ExRoseTree{term: 5, children: []}
+#     ]
+#   },
+#   prev: [],
+#   next: [],
+#   path: []
+# }
+
+zipper = Zipper.last_child(zipper)
+# %ExRoseTree.Zipper{
+#   focus: %ExRoseTree{term: 5, children: []},
+#   prev: [
+#     %ExRoseTree{term: 4, children: []},
+#     %ExRoseTree{term: 3, children: []},
+#     %ExRoseTree{term: 2, children: []}
+#   ],
+#   next: [],
+#   path: [%ExRoseTree.Zipper.Location{prev: [], term: 1, next: []}]
+# }
+
+zipper = Zipper.backward(zipper)
+# %ExRoseTree.Zipper{
+#   focus: %ExRoseTree{term: 4, children: []},
+#   prev: [
+#     %ExRoseTree{term: 3, children: []},
+#     %ExRoseTree{term: 2, children: []}
+#   ],
+#   next: [%ExRoseTree{term: 5, children: []}],
+#   path: [%ExRoseTree.Zipper.Location{prev: [], term: 1, next: []}]
+# }
+
+zipper = Zipper.rewind_map(zipper, &Tree.map_term(&1, fn t -> t * 10 end))
+# %ExRoseTree.Zipper{
+#   focus: %ExRoseTree{
+#     term: 10,
+#     children: [
+#       %ExRoseTree{term: 2, children: []},
+#       %ExRoseTree{term: 3, children: []},
+#       %ExRoseTree{term: 40, children: []},
+#       %ExRoseTree{term: 5, children: []},
+#     ]
+#   },
+#   prev: [],
+#   next: [],
+#   path: []
+# }
+
+Zipper.to_tree(zipper)
+# %ExRoseTree{
+#   term: 10,
+#   children: [
+#     %ExRoseTree{term: 2, children: []},
+#     %ExRoseTree{term: 3, children: []},
+#     %ExRoseTree{term: 40, children: []},
+#     %ExRoseTree{term: 5, children: []}
+#   ]
+# }
 ```
 
 ## Testing and Disclaimer
