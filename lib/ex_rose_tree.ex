@@ -8,7 +8,7 @@ defmodule ExRoseTree do
   defstruct ~w(term children)a
 
   @typedoc """
-  The foundational, recursive data type of a `ExRoseTree`.
+  The foundational, recursive data type of an `ExRoseTree`.
 
   * `term` can by any valid Erlang `term()`
   * `children` is a list of `t()`
@@ -137,7 +137,7 @@ defmodule ExRoseTree do
   ###
 
   @doc """
-  Returns the inner `term` of a `ExRoseTree`.
+  Returns the inner `term` of an `ExRoseTree`.
 
   ## Examples
 
@@ -206,7 +206,7 @@ defmodule ExRoseTree do
   end
 
   @doc """
-  Returns the children of a `ExRoseTree`.
+  Returns the children of an `ExRoseTree`.
 
   ## Examples
 
@@ -509,7 +509,7 @@ defmodule ExRoseTree do
   @type unfold_fn() :: (seed :: term() -> {term(), [seed :: term()]})
 
   @doc """
-  Given a `seed` value and an `unfold_fn`, generates a new rose tree.
+  Given a `seed` value and an `unfold_fn()`, generates a new rose tree.
 
   ## Examples
 
