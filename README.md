@@ -214,6 +214,8 @@ A big thanks to [@zwilias](https://github.com/zwilias) and his Elm package
 [elm-rosetree](https://github.com/zwilias/elm-rosetree/tree/1.5.0) for the 
 initial inspiration in building this library. 
 
+Continued thanks to [@odoood](https://github.com/odoood) for ongoing help reviewing code and improving documentation.
+
 ## Copyright and License
 
 Copyright (c) 2022-present, Paraclade, LLC.
