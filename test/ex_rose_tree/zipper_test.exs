@@ -157,7 +157,7 @@ defmodule ExRoseTree.ZipperTest do
 
   describe "root?/1" do
     test "should return false if given a Zipper with populated path", %{
-      simple_z: z
+      simple_z: %Zipper{} = z
     } do
       path = [Location.new(z.focus)]
 

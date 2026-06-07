@@ -34,7 +34,6 @@ defmodule ExRoseTree.Zipper do
 
   """
 
-  require Logger
   require ExRoseTree
   require ExRoseTree.Zipper.Location
 

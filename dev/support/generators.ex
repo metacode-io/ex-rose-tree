@@ -1,6 +1,4 @@
 defmodule ExRoseTree.Support.Generators do
-  require Logger
-
   alias ExRoseTree.{Util, Zipper}
   alias ExRoseTree.Zipper.Location
 

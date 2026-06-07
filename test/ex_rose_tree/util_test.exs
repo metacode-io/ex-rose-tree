@@ -289,7 +289,7 @@ defmodule ExRoseTree.UtilTest do
     end
 
     test "should return two empty lists if given a negative index" do
-      random_idx = Enum.random(-1..-100)
+      random_idx = Enum.random(-1..-100//-1)
       assert {[], []} = Util.split_at([1, 2, 3, 4, 5], random_idx)
     end
 

@@ -3,7 +3,7 @@ defmodule ExRoseTree.MixProject do
 
   @description "A Rose Tree and Zipper in Elixir with a slew of navigation primitives."
   @source_url "https://github.com/metacode-io/ex-rose-tree"
-  @version "0.1.3"
+  @version "0.1.4"
 
   def project do
     [
@@ -19,8 +19,10 @@ defmodule ExRoseTree.MixProject do
       docs: docs(),
       source_url: @source_url,
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [
-        coveralls: :test
+      preferred_envs: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.html": :test
       ]
     ]
   end
@@ -96,11 +98,11 @@ defmodule ExRoseTree.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:credo, "~> 1.6.4", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:excoveralls, "~> 0.14.5", only: :test},
-      {:ex_doc, "~> 0.29", only: :dev, runtime: false},
-      {:benchee, "~> 1.1", only: :dev}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
+      {:excoveralls, "~> 0.18", only: :test},
+      {:ex_doc, "~> 0.40", only: :dev, runtime: false},
+      {:benchee, "~> 1.5", only: :dev}
     ]
   end
 end

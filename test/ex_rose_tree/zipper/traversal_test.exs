@@ -641,7 +641,7 @@ defmodule ExRoseTree.Zipper.ZipperTest do
 
   describe "forward_for/2" do
     test "should return nil if given a number of reps <= 0", %{simple_z: z} do
-      for reps <- 0..-5 do
+      for reps <- 0..-5//-1 do
         assert Zipper.forward_for(z, reps) == nil
       end
     end
@@ -1024,7 +1024,7 @@ defmodule ExRoseTree.Zipper.ZipperTest do
 
   describe "backward_for/2" do
     test "should return nil if given a number of reps <= 0", %{simple_z: z} do
-      for reps <- 0..-5 do
+      for reps <- 0..-5//-1 do
         assert Zipper.backward_for(z, reps) == nil
       end
     end
@@ -1482,7 +1482,7 @@ defmodule ExRoseTree.Zipper.ZipperTest do
 
   describe "descend_for/2" do
     test "should return nil if given a number of reps <= 0", %{simple_z: z} do
-      for reps <- 0..-5 do
+      for reps <- 0..-5//-1 do
         assert Zipper.descend_for(z, reps) == nil
       end
     end
@@ -1839,7 +1839,7 @@ defmodule ExRoseTree.Zipper.ZipperTest do
 
   describe "ascend_for/2" do
     test "should return nil if given a number of reps <= 0", %{simple_z: z} do
-      for reps <- 0..-5 do
+      for reps <- 0..-5//-1 do
         assert Zipper.ascend_for(z, reps) == nil
       end
     end
