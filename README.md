@@ -2,6 +2,11 @@
 
 [![Build Status](https://github.com/StoatPower/ex-rose-tree/actions/workflows/elixir.yml/badge.svg)](https://github.com/StoatPower/ex-rose-tree/actions/workflows/elixir.yml)
 
+### Compatibility
+
+- Verified on Elixir 1.20 / OTP 28|29
+- Continued support for Elixir `~> 1.14`.
+
 ### Documentation
 
 API documentation is available at https://hexdocs.pm/ex_rose_tree.
