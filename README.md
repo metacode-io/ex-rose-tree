@@ -1,6 +1,8 @@
 ## ExRoseTree :: A Rose Tree and Zipper in Elixir with a slew of navigation primitives.
 
-[![Build Status](https://github.com/StoatPower/ex-rose-tree/actions/workflows/elixir.yml/badge.svg)](https://github.com/StoatPower/ex-rose-tree/actions/workflows/elixir.yml)
+[![Hex.pm](https://img.shields.io/hexpm/v/ex_rose_tree.svg)](https://hex.pm/packages/ex_rose_tree)
+[![Hex Docs](https://img.shields.io/badge/docs-hexdocs-blue.svg)](https://hexdocs.pm/ex_rose_tree)
+[![License](https://img.shields.io/hexpm/l/ex_rose_tree.svg)](LICENSE)
 
 ### Compatibility
 
